@@ -186,6 +186,14 @@ export default function AutocompletePlugin(): JSX.Element | null {
 
   useEffect(() => {
     const unregisterTextListener = editor.registerTextContentListener((textContent) => {
+      // Hide autocomplete if editor is completely empty
+      if (textContent === '') {
+        if (autocompleteState?.isActive) {
+          hideAutocomplete();
+        }
+        return;
+      }
+
       editor.getEditorState().read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) return;
