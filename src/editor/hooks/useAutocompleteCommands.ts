@@ -48,7 +48,7 @@ export function useAutocompleteCommands(
       
       if (triggerIndex !== -1) {
         // Replace the entire <> + matchString with AutocompleteNode
-        insertAutocompleteNode(anchorNode, suggestion, triggerIndex, cursorOffset);
+        insertAutocompleteNode(anchorNode, suggestion, triggerIndex, cursorOffset, state.matchString);
       }
     });
     
