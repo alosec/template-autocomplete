@@ -5,7 +5,7 @@ import { EditorState, $getRoot } from 'lexical';
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
 import EditorToolbar from './EditorToolbar';
 import EditorWithSync from './EditorWithSync';
-import GlobalBrainSidebar from './GlobalBrainSidebar';
+import ResizableSidebar from './ResizableSidebar';
 import { Document } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
 
@@ -24,6 +24,7 @@ export default function MinimalEditor() {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
   const [isModified, setIsModified] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(300);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleNewDocument = useCallback(() => {
@@ -127,9 +128,38 @@ export default function MinimalEditor() {
     setSidebarVisible(prev => !prev);
   }, []);
 
+  const handleSidebarWidthChange = useCallback((width: number) => {
+    setSidebarWidth(width);
+  }, []);
+
+  const handleLoadGlobalBrainItem = useCallback(async (item: any) => {
+    // Create a new document from the global brain item
+    const newDoc = documentManager.createDocumentFromGlobalBrainItem(item);
+    
+    // Save it to IndexedDB
+    await documentManager.saveDocument(newDoc);
+    
+    // Load it into the editor
+    setCurrentDocument(newDoc);
+    setIsModified(false);
+  }, []);
+
 
   return (
-    <div className={`minimal-editor ${sidebarVisible ? 'sidebar-open' : ''}`}>
+    <div 
+      className="minimal-editor"
+      style={{
+        marginLeft: sidebarVisible ? `${sidebarWidth}px` : '0'
+      }}
+    >
+      <ResizableSidebar 
+        isVisible={sidebarVisible}
+        onToggle={toggleSidebar}
+        width={sidebarWidth}
+        onWidthChange={handleSidebarWidthChange}
+        onLoadItem={handleLoadGlobalBrainItem}
+      />
+      
       <EditorToolbar
         currentDocument={currentDocument}
         isModified={isModified}
@@ -175,11 +205,6 @@ export default function MinimalEditor() {
           )}
         </div>
       </div>
-      
-      <GlobalBrainSidebar 
-        isVisible={sidebarVisible}
-        onToggle={toggleSidebar}
-      />
       
       <div className="editor-status">
         <div className="status-left">

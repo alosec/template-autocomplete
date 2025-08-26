@@ -97,6 +97,26 @@ class DocumentManager {
       return null;
     }
   }
+
+  createDocumentFromGlobalBrainItem(item: any): Document {
+    const content = `${item.text}
+
+${item.description}
+
+${item.tags ? item.tags.map((tag: string) => `#${tag}`).join(' ') : ''}`;
+
+    const document: Document = {
+      id: this.generateId(),
+      title: item.text,
+      content: content.trim(),
+      editorState: undefined,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      wordCount: 0,
+      concepts: item.tags || []
+    };
+    return this.updateWordCount(document);
+  }
   
   // Private methods
   private deserializeDocument(doc: any): Document {

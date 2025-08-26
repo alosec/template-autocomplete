@@ -97,6 +97,14 @@ export default function EditorToolbar({
   return (
     <div className="editor-toolbar">
       <div className="toolbar-left">
+        <button 
+          className="toolbar-btn sidebar-toggle-btn"
+          onClick={onToggleSidebar}
+          title={sidebarVisible ? 'Hide sidebar' : 'Show sidebar'}
+        >
+          {sidebarVisible ? '←' : '→'}
+        </button>
+        
         <div className="toolbar-dropdown">
           <button className="toolbar-btn dropdown-toggle">
             File ▾
@@ -121,19 +129,6 @@ export default function EditorToolbar({
           </div>
         </div>
 
-        <div className="toolbar-dropdown">
-          <button className="toolbar-btn dropdown-toggle">
-            View ▾
-          </button>
-          <div className="dropdown-content">
-            <button 
-              className={sidebarVisible ? 'active' : ''}
-              onClick={onToggleSidebar}
-            >
-              🧠 Global Brain Sidebar
-            </button>
-          </div>
-        </div>
 
         <div className="toolbar-dropdown">
           <button className="toolbar-btn dropdown-toggle">
