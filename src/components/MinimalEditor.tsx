@@ -5,7 +5,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
-import { EditorState } from 'lexical';
+import { EditorState, $getRoot } from 'lexical';
 
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
 import AutocompletePlugin from '../editor/plugins/AutocompletePlugin';
@@ -82,7 +82,8 @@ export default function MinimalEditor() {
 
   const handleContentChange = useCallback((editorState: EditorState) => {
     const textContent = editorState.read(() => {
-      return editorState.getRoot().getTextContent();
+      const root = $getRoot();
+      return root.getTextContent();
     });
     
     if (!currentDocument) return;
