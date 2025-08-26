@@ -25,6 +25,8 @@ interface AutocompleteState {
   selectedIndex: number;
   suggestions: string[];
   triggerPosition: { top: number; left: number; };
+  triggerNode: TextNode;
+  triggerOffset: number;
 }
 
 // Hardcoded suggestions as per requirements
@@ -56,14 +58,14 @@ export default function AutocompletePlugin(): JSX.Element | null {
 
   const selectSuggestion = useCallback((suggestion: string) => {
     editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection) || !autocompleteState) return;
+      if (!autocompleteState) return;
 
-      // Find and remove the <> + matchString
-      const anchorNode = selection.anchor.getNode();
+      // Use stored trigger context instead of current cursor position
+      const anchorNode = autocompleteState.triggerNode;
+      const cursorOffset = autocompleteState.triggerOffset;
+      
       if (anchorNode instanceof TextNode) {
         const textContent = anchorNode.getTextContent();
-        const cursorOffset = selection.anchor.offset;
         
         // Find the <> trigger position
         const beforeCursor = textContent.substring(0, cursorOffset);
@@ -226,7 +228,9 @@ export default function AutocompletePlugin(): JSX.Element | null {
               matchString,
               selectedIndex: 0,
               suggestions: filtered,
-              triggerPosition
+              triggerPosition,
+              triggerNode: anchorNode,
+              triggerOffset: cursorOffset
             });
             return;
           }
