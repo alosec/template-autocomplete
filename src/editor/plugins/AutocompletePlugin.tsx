@@ -11,6 +11,7 @@ import {
   KEY_TAB_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
+  KEY_ESCAPE_COMMAND,
   PASTE_COMMAND,
   TextNode,
   $getNodeByKey,
@@ -215,26 +216,53 @@ export default function AutocompletePlugin(): JSX.Element | null {
       
       editor.registerCommand(
         KEY_ENTER_COMMAND,
-        () => {
+        (event) => {
           if (!autocompleteState?.isActive || autocompleteState.suggestions.length === 0) return false;
+          
+          // Prevent default behavior to stop newline insertion
+          if (event) {
+            event.preventDefault();
+          }
           
           const selectedSuggestion = autocompleteState.suggestions[autocompleteState.selectedIndex] || autocompleteState.matchString;
           selectSuggestion(selectedSuggestion);
           return true;
         },
-        COMMAND_PRIORITY_LOW
+        COMMAND_PRIORITY_HIGH
       ),
       
       editor.registerCommand(
         KEY_TAB_COMMAND,
-        () => {
+        (event) => {
           if (!autocompleteState?.isActive || autocompleteState.suggestions.length === 0) return false;
+          
+          // Prevent default behavior to stop tab navigation
+          if (event) {
+            event.preventDefault();
+          }
           
           const selectedSuggestion = autocompleteState.suggestions[autocompleteState.selectedIndex] || autocompleteState.matchString;
           selectSuggestion(selectedSuggestion);
           return true;
         },
-        COMMAND_PRIORITY_LOW
+        COMMAND_PRIORITY_HIGH
+      ),
+
+      editor.registerCommand(
+        KEY_ESCAPE_COMMAND,
+        (event) => {
+          if (!autocompleteState?.isActive) return false;
+          
+          // Prevent default escape behavior
+          if (event) {
+            event.preventDefault();
+          }
+          
+          // Just hide autocomplete without selecting
+          hideAutocomplete();
+          return true;
+        },
+        COMMAND_PRIORITY_HIGH
       ),
 
       editor.registerCommand(
