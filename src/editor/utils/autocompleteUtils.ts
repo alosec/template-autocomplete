@@ -99,7 +99,7 @@ export function calculateDropdownPosition(): DropdownPosition {
 }
 
 /**
- * Detect trigger pattern in text
+ * Detect trigger pattern in text with proper consecutive trigger handling
  */
 export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
   const beforeCursor = text.substring(0, cursorOffset);
@@ -108,8 +108,9 @@ export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
   if (triggerIndex !== -1) {
     const matchString = beforeCursor.substring(triggerIndex + 2);
     
-    // Don't trigger if match string contains newline
-    if (!matchString.includes('\n')) {
+    // Don't trigger if match string contains newline OR partial trigger pattern
+    // This prevents false positives when cursor is between consecutive triggers
+    if (!matchString.includes('\n') && !matchString.includes('<')) {
       return {
         found: true,
         matchString,

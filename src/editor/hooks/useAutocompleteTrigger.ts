@@ -86,15 +86,28 @@ export function useAutocompleteTrigger(
 
   // Listen to selection changes (cursor movement)
   useEffect(() => {
+    let lastCursorPosition = -1;
+    let lastNodeKey = '';
+    
     const unregisterSelectionListener = editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
 
-        // Only check when cursor moves (not during text changes)
-        setTimeout(() => {
+        const anchorNode = selection.anchor.getNode();
+        if (!(anchorNode instanceof TextNode)) return;
+
+        const currentCursorPosition = selection.anchor.offset;
+        const currentNodeKey = anchorNode.getKey();
+        
+        // Only check if cursor actually moved
+        if (currentCursorPosition !== lastCursorPosition || currentNodeKey !== lastNodeKey) {
+          lastCursorPosition = currentCursorPosition;
+          lastNodeKey = currentNodeKey;
+          
+          // Use immediate check for cursor movement (no setTimeout)
           checkAutocompleteAtCursor();
-        }, 0);
+        }
       });
     });
 
