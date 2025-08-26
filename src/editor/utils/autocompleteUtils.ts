@@ -1,5 +1,6 @@
 import { TextNode, $getSelection, $isRangeSelection, $createTextNode } from 'lexical';
 import { $createAutocompleteNode } from '../nodes/AutocompleteNode';
+import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
 export interface DropdownPosition {
   top: number;
@@ -146,14 +147,16 @@ export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
 /**
  * Filter suggestions based on match string
  */
-export function filterSuggestions(suggestions: string[], matchString: string): string[] {
+export function filterSuggestions(suggestions: AutocompleteItem[], matchString: string): AutocompleteItem[] {
   if (!matchString.trim()) {
     return suggestions;
   }
   
   const matchLower = matchString.toLowerCase();
-  return suggestions.filter(suggestion => 
-    suggestion.toLowerCase().startsWith(matchLower)
+  return suggestions.filter(item => 
+    item.text.toLowerCase().includes(matchLower) ||
+    item.description.toLowerCase().includes(matchLower) ||
+    item.tags.some(tag => tag.toLowerCase().includes(matchLower))
   );
 }
 

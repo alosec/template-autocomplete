@@ -18,8 +18,10 @@ import { $isAutocompleteNode } from '../nodes/AutocompleteNode';
 import { insertAutocompleteNode } from '../utils/autocompleteUtils';
 import { AutocompleteState, AutocompleteActions } from './useAutocompleteState';
 
+import { AutocompleteItem } from '../../types/GlobalBrainTypes';
+
 export interface AutocompleteCommandHandlers {
-  selectSuggestion: (suggestion: string) => void;
+  selectSuggestion: (suggestion: AutocompleteItem) => void;
 }
 
 /**
@@ -31,7 +33,7 @@ export function useAutocompleteCommands(
   state: AutocompleteState,
   actions: AutocompleteActions
 ): AutocompleteCommandHandlers {
-  const selectSuggestion = useCallback((suggestion: string) => {
+  const selectSuggestion = useCallback((suggestion: AutocompleteItem) => {
     editor.update(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
@@ -48,7 +50,7 @@ export function useAutocompleteCommands(
       
       if (triggerIndex !== -1) {
         // Replace the entire <> + matchString with AutocompleteNode
-        insertAutocompleteNode(anchorNode, suggestion, triggerIndex, cursorOffset, state.matchString);
+        insertAutocompleteNode(anchorNode, suggestion.text, triggerIndex, cursorOffset, state.matchString);
       }
     });
     

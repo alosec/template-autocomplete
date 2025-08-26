@@ -1,13 +1,13 @@
 import { useState, useCallback } from 'react';
 import { TextNode } from 'lexical';
 import { DropdownPosition } from '../utils/autocompleteUtils';
-import { AutocompleteSuggestion } from '../config/autocompleteConfig';
+import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
 export interface AutocompleteState {
   isActive: boolean;
   matchString: string;
   selectedIndex: number;
-  suggestions: string[];
+  suggestions: AutocompleteItem[];
   triggerPosition: DropdownPosition;
   triggerBoxPosition: DropdownPosition;
   triggerNode: TextNode | null;
@@ -18,7 +18,7 @@ export interface AutocompleteState {
 export interface AutocompleteActions {
   showAutocomplete: (params: {
     matchString: string;
-    suggestions: string[];
+    suggestions: AutocompleteItem[];
     triggerPosition: DropdownPosition;
     triggerBoxPosition: DropdownPosition;
     triggerNode: TextNode;
@@ -29,7 +29,7 @@ export interface AutocompleteActions {
   selectNext: () => void;
   selectPrevious: () => void;
   setSelectedIndex: (index: number) => void;
-  getSelectedSuggestion: () => string | null;
+  getSelectedSuggestion: () => AutocompleteItem | null;
 }
 
 const INITIAL_STATE: AutocompleteState = {
@@ -49,7 +49,7 @@ export function useAutocompleteState(): [AutocompleteState, AutocompleteActions]
 
   const showAutocomplete = useCallback((params: {
     matchString: string;
-    suggestions: string[];
+    suggestions: AutocompleteItem[];
     triggerPosition: DropdownPosition;
     triggerBoxPosition: DropdownPosition;
     triggerNode: TextNode;
@@ -100,8 +100,8 @@ export function useAutocompleteState(): [AutocompleteState, AutocompleteActions]
 
   const getSelectedSuggestion = useCallback(() => {
     if (!state.isActive || state.suggestions.length === 0) return null;
-    return state.suggestions[state.selectedIndex] || state.matchString;
-  }, [state.isActive, state.suggestions, state.selectedIndex, state.matchString]);
+    return state.suggestions[state.selectedIndex] || null;
+  }, [state.isActive, state.suggestions, state.selectedIndex]);
 
   const actions: AutocompleteActions = {
     showAutocomplete,

@@ -1,11 +1,12 @@
 import React from 'react';
 import { DropdownPosition } from '../utils/autocompleteUtils';
+import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
 interface AutocompleteDropdownProps {
-  suggestions: string[];
+  suggestions: AutocompleteItem[];
   selectedIndex: number;
   position: DropdownPosition;
-  onSelect: (suggestion: string) => void;
+  onSelect: (suggestion: AutocompleteItem) => void;
   onHover: (index: number) => void;
 }
 
@@ -36,12 +37,20 @@ export function AutocompleteDropdown({
     >
       {suggestions.map((suggestion, index) => (
         <div
-          key={suggestion}
+          key={`${suggestion.text}-${index}`}
           className={`autocomplete-suggestion ${index === selectedIndex ? 'selected' : ''}`}
           onClick={() => onSelect(suggestion)}
           onMouseEnter={() => onHover(index)}
         >
-          {suggestion}
+          <div className="suggestion-text">{suggestion.text}</div>
+          <div className="suggestion-description">{suggestion.description}</div>
+          {suggestion.tags.length > 0 && (
+            <div className="suggestion-tags">
+              {suggestion.tags.slice(0, 3).map(tag => (
+                <span key={tag} className="suggestion-tag">{tag}</span>
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </div>

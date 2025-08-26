@@ -5,8 +5,8 @@ import {
   filterSuggestions, 
   calculateDropdownPosition
 } from '../utils/autocompleteUtils';
-import { GLOBAL_BRAIN_SUGGESTIONS } from '../config/autocompleteConfig';
 import { AutocompleteActions, AutocompleteState } from './useAutocompleteState';
+import { useGlobalBrain } from '../../hooks/useGlobalBrain';
 
 /**
  * Hook to handle autocomplete triggering based on text content and cursor position changes
@@ -17,6 +17,7 @@ export function useAutocompleteTrigger(
   actions: AutocompleteActions,
   state: AutocompleteState
 ): void {
+  const { suggestions } = useGlobalBrain();
   // Helper function to check autocomplete state at current cursor position
   const checkAutocompleteAtCursor = () => {
     editor.getEditorState().read(() => {
@@ -44,7 +45,7 @@ export function useAutocompleteTrigger(
           const triggerPosition = calculateDropdownPosition();
           
           // Filter suggestions based on match string
-          const filtered = filterSuggestions([...GLOBAL_BRAIN_SUGGESTIONS], triggerInfo.matchString);
+          const filtered = filterSuggestions(suggestions, triggerInfo.matchString);
           
           // Show autocomplete for this trigger
           actions.showAutocomplete({
@@ -82,7 +83,7 @@ export function useAutocompleteTrigger(
     return () => {
       unregisterTextListener();
     };
-  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex]);
+  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex, suggestions]);
 
   // Listen to selection changes (cursor movement)
   useEffect(() => {
@@ -114,5 +115,5 @@ export function useAutocompleteTrigger(
     return () => {
       unregisterSelectionListener();
     };
-  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex]);
+  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex, suggestions]);
 }
