@@ -118,20 +118,71 @@ export default function AutocompletePlugin(): JSX.Element | null {
     hideAutocomplete();
   }, [editor, autocompleteState, hideAutocomplete]);
 
-  const updateSuggestions = useCallback((matchString: string) => {
+  const calculateCursorPosition = useCallback(() => {
+    try {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return { top: 100, left: 100 };
+      
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      // Get editor container position for relative positioning
+      const editorContainer = document.querySelector('.editor-container');
+      const containerRect = editorContainer?.getBoundingClientRect();
+      
+      if (!containerRect) return { top: 100, left: 100 };
+      
+      // Calculate position relative to editor container
+      let top = rect.bottom - containerRect.top + 5; // 5px below cursor
+      let left = Math.max(0, rect.left - containerRect.left);
+      
+      // Enhanced viewport boundary detection
+      const dropdownWidth = 250; // Max dropdown width from CSS
+      const dropdownHeight = 200; // Max dropdown height from CSS
+      
+      // Adjust horizontal position if dropdown would overflow
+      const maxLeft = containerRect.width - dropdownWidth;
+      if (left > maxLeft) {
+        left = maxLeft;
+      }
+      
+      // Adjust vertical position if dropdown would overflow below
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        // Show dropdown above cursor instead of below
+        top = rect.top - containerRect.top - dropdownHeight - 5;
+      }
+      
+      // Ensure dropdown stays within editor bounds
+      top = Math.max(0, top);
+      left = Math.max(0, left);
+      
+      return { top, left };
+    } catch (error) {
+      console.warn('Could not calculate cursor position:', error);
+      return { top: 100, left: 100 };
+    }
+  }, []);
+
+  const updateSuggestions = useCallback((matchString: string, updatePosition = false) => {
     const filtered = SUGGESTIONS.filter(suggestion => 
       suggestion.toLowerCase().startsWith(matchString.toLowerCase())
     );
     
     if (!autocompleteState) return;
     
+    const triggerPosition = updatePosition ? calculateCursorPosition() : autocompleteState.triggerPosition;
+    
     setAutocompleteState({
       ...autocompleteState,
       matchString,
       suggestions: filtered,
-      selectedIndex: Math.min(autocompleteState.selectedIndex, Math.max(0, filtered.length - 1))
+      selectedIndex: Math.min(autocompleteState.selectedIndex, Math.max(0, filtered.length - 1)),
+      triggerPosition
     });
-  }, [autocompleteState]);
+  }, [autocompleteState, calculateCursorPosition]);
 
   useEffect(() => {
     const unregisterTextListener = editor.registerTextContentListener((textContent) => {
@@ -155,8 +206,8 @@ export default function AutocompletePlugin(): JSX.Element | null {
           
           // Ensure match string doesn't contain newlines
           if (!matchString.includes('\n')) {
-            // Calculate position for dropdown (simplified positioning)
-            const triggerPosition = { top: 100, left: 100 }; // TODO: Calculate actual position
+            // Calculate actual cursor position for dropdown
+            const triggerPosition = calculateCursorPosition();
             
             const filtered = SUGGESTIONS.filter(suggestion => 
               suggestion.toLowerCase().startsWith(matchString.toLowerCase())
@@ -181,7 +232,32 @@ export default function AutocompletePlugin(): JSX.Element | null {
     });
 
     return unregisterTextListener;
-  }, [editor, autocompleteState, hideAutocomplete]);
+  }, [editor, autocompleteState, hideAutocomplete, calculateCursorPosition]);
+
+  // Update dropdown position when autocomplete is active and cursor moves
+  useEffect(() => {
+    if (!autocompleteState?.isActive) return;
+
+    const updatePosition = () => {
+      const newPosition = calculateCursorPosition();
+      setAutocompleteState(prev => prev ? {
+        ...prev,
+        triggerPosition: newPosition
+      } : null);
+    };
+
+    // Update position on selection changes (cursor movement)
+    const handleSelectionChange = () => {
+      // Small delay to ensure DOM is updated
+      setTimeout(updatePosition, 10);
+    };
+
+    document.addEventListener('selectionchange', handleSelectionChange);
+    
+    return () => {
+      document.removeEventListener('selectionchange', handleSelectionChange);
+    };
+  }, [autocompleteState?.isActive, calculateCursorPosition]);
 
   useEffect(() => {
     const unregisterKeyHandlers = [
