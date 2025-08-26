@@ -308,9 +308,16 @@ body {
     font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
-.editor-input::placeholder {
+.editor-placeholder {
     color: #bdc3c7;
     font-style: italic;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    pointer-events: none;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 /* Status Bar */

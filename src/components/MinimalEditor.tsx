@@ -168,9 +168,9 @@ export default function MinimalEditor() {
                     contentEditable={
                       <ContentEditable
                         className="editor-input"
-                        placeholder="Start writing..."
                       />
                     }
+                    placeholder={<div className="editor-placeholder">Start writing... Hint: type &lt;&gt; for autocomplete</div>}
                     ErrorBoundary={LexicalErrorBoundary}
                   />
                   <OnChangePlugin onChange={handleContentChange} />
