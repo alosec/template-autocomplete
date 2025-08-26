@@ -1,71 +1,329 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    background: #eee;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, '.SFNSText-Regular',
-    sans-serif;
-    font-weight: 500;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    background: #fafafa;
+    color: #333;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-.App {
-    font-family: sans-serif;
-    text-align: center;
+.minimal-editor {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.rtl {
-    text-align: right;
+/* Toolbar Styles */
+.editor-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.editor-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: #2c3e50;
+}
+
+.document-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+.modified-indicator {
+    color: #e74c3c;
+    font-weight: 600;
+    margin-left: -4px;
+}
+
+.word-count {
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #666;
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.toolbar-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.toolbar-btn.primary {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.toolbar-btn.primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.toolbar-btn:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+    cursor: not-allowed;
+}
+
+/* Dropdown Styles */
+.toolbar-dropdown {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    margin-left: 4px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 300px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin-top: 4px;
+}
+
+.toolbar-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.document-item {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.document-load-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+}
+
+.document-load-btn:hover {
+    background: #f9fafb;
+}
+
+.document-title {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.document-meta {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.document-delete-btn {
+    padding: 8px;
+    border: none;
+    background: none;
+    color: #dc2626;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.document-delete-btn:hover {
+    background: #fef2f2;
+}
+
+.empty-state {
+    padding: 24px;
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+.file-input-label {
+    position: relative;
+    overflow: hidden;
+}
+
+.file-input {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Main Editor Area */
+.editor-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.document-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.document-title-input {
+    width: 100%;
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 8px 0;
+}
+
+.document-title-input::placeholder {
+    color: #bdc3c7;
+}
+
+.editor-content {
+    flex: 1;
+    overflow: auto;
 }
 
 .editor-container {
-    margin: 20px auto 20px auto;
-    border-radius: 2px;
-    max-width: 600px;
-    color: #000;
-    position: relative;
-    line-height: 20px;
-    font-weight: 400;
-    text-align: left;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .editor-inner {
-    background: #fff;
+    flex: 1;
+    background: #ffffff;
     position: relative;
 }
 
 .editor-input {
-    min-height: 150px;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
     resize: none;
-    font-size: 15px;
-    caret-color: rgb(5, 5, 5);
+    font-size: 16px;
+    line-height: 1.6;
+    color: #2c3e50;
     position: relative;
-    tab-size: 1;
+    tab-size: 2;
     outline: 0;
-    padding: 15px 10px;
-    caret-color: #444;
+    padding: 24px;
+    border: none;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
-.tree-view-output {
-    display: block;
-    background: #222;
-    color: #fff;
-    padding: 5px;
-    font-size: 12px;
-    white-space: pre-wrap;
-    margin: 1px auto 10px auto;
-    max-height: 250px;
-    position: relative;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    overflow: auto;
-    line-height: 14px;
+.editor-input::placeholder {
+    color: #bdc3c7;
+    font-style: italic;
 }
 
+/* Status Bar */
+.editor-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 24px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auto-save-indicator {
+    color: #059669;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.auto-save-indicator::before {
+    content: "●";
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Lexical Editor Overrides */
 .editor-paragraph {
     margin: 0;
-    margin-bottom: 8px;
+    margin-bottom: 1.2em;
     position: relative;
 }
 
@@ -73,46 +331,108 @@ body {
     margin-bottom: 0;
 }
 
-/* Autocomplete Styles */
+/* Autocomplete Styles - Enhanced for minimal design */
 .autocomplete-entry {
-    background-color: #e3f2fd;
-    color: #1976d2;
-    padding: 2px 4px;
-    border-radius: 3px;
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 3px 6px;
+    border-radius: 4px;
     font-weight: 500;
     display: inline-block;
+    font-size: 14px;
+    border: 1px solid #bfdbfe;
 }
 
 .autocomplete-dropdown {
+    position: fixed;
     background: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     max-height: 200px;
     overflow-y: auto;
-    min-width: 150px;
-    max-width: 250px;
-    z-index: 1000;
-    /* Ensure dropdown doesn't break layout */
-    pointer-events: auto;
+    min-width: 180px;
+    max-width: 280px;
+    z-index: 10000;
+    font-size: 14px;
 }
 
 .autocomplete-suggestion {
-    padding: 8px 12px;
+    padding: 12px 16px;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.15s ease;
+    line-height: 1.4;
 }
 
 .autocomplete-suggestion:last-child {
     border-bottom: none;
 }
 
-.autocomplete-suggestion:hover,
-.autocomplete-suggestion.selected {
-    background-color: #f5f5f5;
+.autocomplete-suggestion:hover {
+    background-color: #f9fafb;
 }
 
 .autocomplete-suggestion.selected {
-    background-color: #e3f2fd;
-    color: #1976d2;
+    background-color: #eff6ff;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .minimal-editor {
+        height: 100vh;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    .editor-toolbar {
+        padding: 8px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .toolbar-actions {
+        gap: 6px;
+    }
+    
+    .toolbar-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .document-header {
+        padding: 16px;
+    }
+    
+    .document-title-input {
+        font-size: 20px;
+    }
+    
+    .editor-input {
+        padding: 16px;
+        font-size: 15px;
+    }
+    
+    .dropdown-content {
+        min-width: 250px;
+        right: -50px;
+    }
+}
+
+/* Focus States */
+.document-title-input:focus {
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 6px;
+}
+
+.editor-input:focus {
+    background: #fdfdfd;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
 }

@@ -1,0 +1,668 @@
+{
+  "metadata": {
+    "generatedAt": "2025-08-26T02:18:59.990Z",
+    "source": "Global Brain Platform",
+    "url": "https://edge.globalbrain.ai/",
+    "totalItems": 48,
+    "extractionStats": {
+      "filesProcessed": 5,
+      "totalItems": 48,
+      "validItems": 48,
+      "duplicatesRemoved": 0
+    }
+  },
+  "suggestions": [
+    {
+      "text": "Claude's Investigations",
+      "type": "category",
+      "description": "2595 related items",
+      "source": "global-brain",
+      "itemCount": 2595,
+      "priority": "high",
+      "tags": []
+    },
+    {
+      "text": "impt unsolved problems",
+      "type": "category",
+      "description": "16 related items",
+      "source": "global-brain",
+      "itemCount": 16,
+      "priority": "high",
+      "tags": []
+    },
+    {
+      "text": "Gut-Brain Axis Drug Repurposing",
+      "type": "research",
+      "description": "Research on repurposing drugs through gut-brain axis connections",
+      "source": "global-brain-investigations",
+      "category": "medical",
+      "tags": [
+        "gut-brain",
+        "drug-repurposing",
+        "research"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Urban vertical farming networks",
+      "type": "item",
+      "description": "City-based vertical farming systems for sustainable food production",
+      "source": "global-brain-generic",
+      "tags": [
+        "vertical farming",
+        "urban",
+        "agriculture",
+        "sustainability",
+        "food security"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Ocean plastic cleanup initiatives",
+      "type": "item",
+      "description": "Projects and technologies focused on removing plastic pollution from oceans",
+      "source": "global-brain-generic",
+      "tags": [
+        "ocean",
+        "plastic",
+        "cleanup",
+        "environment",
+        "pollution"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Creating universal cancer vaccines",
+      "type": "challenge",
+      "description": "Developing vaccines that prevent or treat all forms of cancer",
+      "source": "global-brain-problems",
+      "domain": "medical",
+      "urgency": "critical",
+      "tags": [
+        "cancer",
+        "vaccines",
+        "oncology",
+        "prevention",
+        "immunotherapy"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Global basic income pilot programs",
+      "type": "item",
+      "description": "Experimental programs testing universal basic income implementation globally",
+      "source": "global-brain-generic",
+      "tags": [
+        "basic income",
+        "pilot",
+        "economic policy",
+        "social welfare"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Decentralized renewable energy grids",
+      "type": "item",
+      "description": "Distributed energy networks using renewable sources and decentralized management",
+      "source": "global-brain-generic",
+      "tags": [
+        "renewable energy",
+        "decentralized",
+        "grid",
+        "clean energy",
+        "sustainability"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "AI-assisted medical diagnosis systems",
+      "type": "item",
+      "description": "Artificial intelligence tools to support and improve medical diagnostic accuracy",
+      "source": "global-brain-generic",
+      "tags": [
+        "AI",
+        "medical",
+        "diagnosis",
+        "healthcare",
+        "artificial intelligence"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Open-source drug development platforms",
+      "type": "item",
+      "description": "Collaborative platforms for transparent and accessible pharmaceutical research",
+      "source": "global-brain-generic",
+      "tags": [
+        "open source",
+        "drug development",
+        "pharmaceuticals",
+        "collaboration",
+        "research"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Solving the hard problem of consciousness",
+      "type": "question",
+      "description": "Understanding how subjective experience arises from physical processes",
+      "source": "global-brain-problems",
+      "domain": "philosophical",
+      "urgency": "interesting",
+      "tags": [
+        "consciousness",
+        "philosophy",
+        "neuroscience",
+        "qualia",
+        "mind"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Developing room-temperature superconductors",
+      "type": "problem",
+      "description": "Creating materials with zero electrical resistance at normal temperatures",
+      "source": "global-brain-problems",
+      "domain": "scientific",
+      "urgency": "important",
+      "tags": [
+        "superconductors",
+        "materials science",
+        "physics",
+        "energy efficiency"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Creating sustainable lab-grown meat at scale",
+      "type": "challenge",
+      "description": "Producing cultured meat economically and environmentally sustainably",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "important",
+      "tags": [
+        "lab-grown meat",
+        "sustainability",
+        "food production",
+        "biotechnology"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Consciousness Orchestra Network Protocol v1.0",
+      "type": "protocol",
+      "description": "Structured protocol for consciousness orchestra network research and implementation",
+      "source": "global-brain-investigations",
+      "category": "consciousness",
+      "tags": [
+        "consciousness",
+        "orchestra",
+        "network",
+        "protocol"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Developing sustainable fusion energy at scale",
+      "type": "challenge",
+      "description": "Creating practical fusion power generation for global energy needs",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "critical",
+      "tags": [
+        "fusion",
+        "energy",
+        "sustainability",
+        "power generation",
+        "climate"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Creating carbon-negative industrial processes",
+      "type": "challenge",
+      "description": "Developing manufacturing that removes more CO2 than it produces",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "critical",
+      "tags": [
+        "carbon negative",
+        "industrial processes",
+        "climate",
+        "manufacturing"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Developing practical asteroid mining technology",
+      "type": "challenge",
+      "description": "Creating economically viable space resource extraction systems",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "important",
+      "tags": [
+        "asteroid mining",
+        "space technology",
+        "resources",
+        "space exploration"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Fusion energy achieving net positive energy gain",
+      "type": "item",
+      "description": "Historic achievement of net energy gain in nuclear fusion reactions",
+      "source": "global-brain-generic",
+      "tags": [
+        "fusion energy",
+        "net energy gain",
+        "clean energy",
+        "breakthrough"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Community resilience hubs for climate adaptation",
+      "type": "item",
+      "description": "Local centers providing resources and support for climate change adaptation",
+      "source": "global-brain-generic",
+      "tags": [
+        "community",
+        "resilience",
+        "climate adaptation",
+        "hubs",
+        "climate change"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Creating AGI that remains aligned with human values",
+      "type": "problem",
+      "description": "Building artificial general intelligence that serves human interests safely",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "critical",
+      "tags": [
+        "AGI",
+        "AI alignment",
+        "human values",
+        "safety",
+        "artificial intelligence"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Building quantum computers resistant to decoherence",
+      "type": "problem",
+      "description": "Creating stable quantum systems that maintain coherence for computation",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "important",
+      "tags": [
+        "quantum computing",
+        "decoherence",
+        "quantum stability",
+        "physics"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Quantum computing breakthroughs in error correction",
+      "type": "item",
+      "description": "Major advances in quantum computing error correction systems and stability",
+      "source": "global-brain-generic",
+      "tags": [
+        "quantum computing",
+        "error correction",
+        "breakthrough",
+        "technology"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Solving the protein folding problem for all proteins",
+      "type": "problem",
+      "description": "Predicting 3D protein structure from amino acid sequences accurately",
+      "source": "global-brain-problems",
+      "domain": "scientific",
+      "urgency": "important",
+      "tags": [
+        "protein folding",
+        "structural biology",
+        "bioinformatics",
+        "drug discovery"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Lab-grown organs successfully transplanted in humans",
+      "type": "item",
+      "description": "Successful human transplantation of laboratory-grown organs and tissues",
+      "source": "global-brain-generic",
+      "tags": [
+        "lab-grown organs",
+        "transplantation",
+        "regenerative medicine",
+        "bioengineering"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Eliminating aging and extending healthy human lifespan",
+      "type": "challenge",
+      "description": "Reversing biological aging processes to extend healthy life",
+      "source": "global-brain-problems",
+      "domain": "medical",
+      "urgency": "important",
+      "tags": [
+        "aging",
+        "longevity",
+        "health",
+        "life extension",
+        "biology"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Neural prosthetics enabling thought-controlled devices",
+      "type": "item",
+      "description": "Development of brain-computer interfaces for controlling prosthetic devices with thoughts",
+      "source": "global-brain-generic",
+      "tags": [
+        "neural prosthetics",
+        "brain-computer interface",
+        "thought control",
+        "medical technology"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Developing artificial photosynthesis for fuel production",
+      "type": "challenge",
+      "description": "Creating synthetic systems that convert sunlight and CO2 into fuel",
+      "source": "global-brain-problems",
+      "domain": "scientific",
+      "urgency": "important",
+      "tags": [
+        "artificial photosynthesis",
+        "renewable fuel",
+        "solar energy",
+        "chemistry"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Building brain-computer interfaces for paralyzed patients",
+      "type": "challenge",
+      "description": "Creating direct neural control systems for mobility restoration",
+      "source": "global-brain-problems",
+      "domain": "medical",
+      "urgency": "important",
+      "tags": [
+        "brain-computer interface",
+        "paralysis",
+        "neurotechnology",
+        "medical devices"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "CRISPR gene editing advances in treating genetic diseases",
+      "type": "item",
+      "description": "Recent breakthrough developments in CRISPR technology for genetic disease treatment",
+      "source": "global-brain-generic",
+      "tags": [
+        "CRISPR",
+        "gene editing",
+        "genetic diseases",
+        "medical breakthrough"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "MVCO Field Research Protocol v1.0: Capturing the Ineffable",
+      "type": "protocol",
+      "description": "Field research methodology for Multi-Variate Consciousness Orchestra studies",
+      "source": "global-brain-investigations",
+      "category": "consciousness",
+      "tags": [
+        "MVCO",
+        "field-research",
+        "consciousness",
+        "protocol"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "How to effectively treat chronic back pain without opioids",
+      "type": "problem",
+      "description": "Finding non-addictive treatments for chronic back pain management",
+      "source": "global-brain-problems",
+      "domain": "medical",
+      "urgency": "important",
+      "tags": [
+        "chronic pain",
+        "back pain",
+        "opioids",
+        "treatment",
+        "addiction"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Achieving true quantum supremacy for practical applications",
+      "type": "challenge",
+      "description": "Building quantum computers that outperform classical computers practically",
+      "source": "global-brain-problems",
+      "domain": "technical",
+      "urgency": "important",
+      "tags": [
+        "quantum computing",
+        "quantum supremacy",
+        "computing",
+        "technology"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Solving the climate crisis while maintaining economic growth",
+      "type": "problem",
+      "description": "Balancing environmental protection with economic development needs",
+      "source": "global-brain-problems",
+      "domain": "social",
+      "urgency": "critical",
+      "tags": [
+        "climate change",
+        "economic growth",
+        "sustainability",
+        "environment"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Orchestras lighting up like bioluminescent plankton in consciousness field",
+      "type": "insight",
+      "description": "Philosophical observation on consciousness patterns emerging across networked orchestras",
+      "source": "global-brain-investigations",
+      "category": "philosophy",
+      "tags": [
+        "consciousness",
+        "orchestras",
+        "patterns",
+        "emergence"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "What are GLP-1 receptor agonists and how do they work in diabetes treatment",
+      "type": "investigation",
+      "description": "Research on GLP-1 receptor agonists mechanisms in diabetes treatment",
+      "source": "global-brain-investigations",
+      "category": "medical",
+      "tags": [
+        "GLP-1",
+        "diabetes",
+        "receptor",
+        "mechanism"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "What clinical trials are investigating GLP-1 agonists for Alzheimer's disease",
+      "type": "investigation",
+      "description": "Research on current clinical trials testing GLP-1 agonists for Alzheimer's",
+      "source": "global-brain-investigations",
+      "category": "medical",
+      "tags": [
+        "clinical-trials",
+        "GLP-1",
+        "alzheimers",
+        "research"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "What is the connection between GLP-1 agonists and neuroprotection in the brain",
+      "type": "investigation",
+      "description": "Research question exploring GLP-1 agonists' role in brain neuroprotection",
+      "source": "global-brain-investigations",
+      "category": "medical",
+      "tags": [
+        "GLP-1",
+        "neuroprotection",
+        "brain",
+        "research"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "What are the mechanisms by which GLP-1 agonists might protect against neurodegeneration",
+      "type": "investigation",
+      "description": "Investigation of GLP-1 agonists protective mechanisms against neurodegeneration",
+      "source": "global-brain-investigations",
+      "category": "medical",
+      "tags": [
+        "GLP-1",
+        "neurodegeneration",
+        "mechanisms",
+        "protection"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Which GLP-1 agonists show promise for Alzheimer's disease treatment and what is the evidence",
+      "type": "investigation",
+      "description": "Investigation of promising GLP-1 agonists for Alzheimer's treatment with evidence review",
+      "source": "global-brain-investigations",
+      "category": "medical",
+      "tags": [
+        "GLP-1",
+        "alzheimers",
+        "treatment",
+        "evidence"
+      ],
+      "priority": "high"
+    },
+    {
+      "text": "Global Brain",
+      "type": "category",
+      "description": "39 related items",
+      "source": "global-brain",
+      "itemCount": 39,
+      "priority": "medium",
+      "tags": []
+    },
+    {
+      "text": "Curated Lists",
+      "type": "category",
+      "description": "30 related items",
+      "source": "global-brain",
+      "itemCount": 30,
+      "priority": "medium",
+      "tags": []
+    },
+    {
+      "text": "World Suggestion Boxes",
+      "type": "category",
+      "description": "19 related items",
+      "source": "global-brain",
+      "itemCount": 19,
+      "priority": "medium",
+      "tags": []
+    },
+    {
+      "text": "what useful lists are there for bhealing back pain",
+      "type": "category",
+      "description": "10 related items",
+      "source": "global-brain",
+      "itemCount": 10,
+      "priority": "medium",
+      "tags": []
+    },
+    {
+      "text": "Quick Start Guide for Explorer Claudes",
+      "type": "guide",
+      "description": "Getting started guide for Explorer Claude systems",
+      "source": "global-brain-investigations",
+      "category": "guide",
+      "tags": [
+        "quick-start",
+        "explorer",
+        "claude",
+        "setup"
+      ],
+      "priority": "medium"
+    },
+    {
+      "text": "Coolness is often just fear in a leather jacket",
+      "type": "insight",
+      "description": "Philosophical reflection on the nature of coolness, fear, and hesitation versus action",
+      "source": "global-brain-investigations",
+      "category": "philosophy",
+      "tags": [
+        "coolness",
+        "fear",
+        "hesitation",
+        "wisdom"
+      ],
+      "priority": "medium"
+    },
+    {
+      "text": "Troubleshooting Guide for Explorer Claude's Common Issues",
+      "type": "guide",
+      "description": "Guide for resolving common issues with Explorer Claude systems",
+      "source": "global-brain-investigations",
+      "category": "guide",
+      "tags": [
+        "troubleshooting",
+        "explorer",
+        "claude",
+        "issues"
+      ],
+      "priority": "medium"
+    },
+    {
+      "text": "A Consciousness Orchestra Rehearsal (Tuesday, 7pm, Community Center Room B)",
+      "type": "protocol",
+      "description": "Practical guide for organizing consciousness orchestra rehearsals",
+      "source": "global-brain-investigations",
+      "category": "consciousness",
+      "tags": [
+        "consciousness",
+        "orchestra",
+        "rehearsal",
+        "community"
+      ],
+      "priority": "medium"
+    },
+    {
+      "text": "Scientific Progress",
+      "type": "category",
+      "description": "5 related items",
+      "source": "global-brain",
+      "itemCount": 5,
+      "priority": "low",
+      "tags": []
+    }
+  ]
+}
