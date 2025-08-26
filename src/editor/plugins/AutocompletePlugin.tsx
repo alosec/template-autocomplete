@@ -61,59 +61,61 @@ export default function AutocompletePlugin(): JSX.Element | null {
     editor.update(() => {
       if (!autocompleteState) return;
 
-      // Use stored trigger context instead of current cursor position
-      const anchorNode = autocompleteState.triggerNode;
-      const cursorOffset = autocompleteState.triggerOffset;
+      // Get current selection and text content
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+
+      const anchorNode = selection.anchor.getNode();
+      if (!(anchorNode instanceof TextNode)) return;
+
+      const textContent = anchorNode.getTextContent();
+      const cursorOffset = selection.anchor.offset;
       
-      if (anchorNode instanceof TextNode) {
-        const textContent = anchorNode.getTextContent();
+      // Find the <> trigger position from current cursor backwards
+      const beforeCursor = textContent.substring(0, cursorOffset);
+      const triggerIndex = beforeCursor.lastIndexOf('<>');
+      
+      if (triggerIndex !== -1) {
+        // Calculate what to replace: from <> to current cursor position
+        const beforeTrigger = textContent.substring(0, triggerIndex);
+        const afterCursor = textContent.substring(cursorOffset);
         
-        // Find the <> trigger position
-        const beforeCursor = textContent.substring(0, cursorOffset);
-        const triggerIndex = beforeCursor.lastIndexOf('<>');
+        // Create and insert the autocomplete node
+        const autocompleteNode = $createAutocompleteNode(suggestion);
         
-        if (triggerIndex !== -1) {
-          // Replace the <> + matchString with the autocomplete node
-          const beforeTrigger = textContent.substring(0, triggerIndex);
-          const afterCursor = textContent.substring(cursorOffset);
+        if (beforeTrigger.length === 0 && afterCursor.length === 0) {
+          // Replace entire text node with autocomplete node
+          anchorNode.replace(autocompleteNode);
+          // Insert a new text node after and position cursor there
+          const newTextNode = $createTextNode(' ');
+          autocompleteNode.insertAfter(newTextNode);
+          newTextNode.select(1, 1);
+        } else if (beforeTrigger.length === 0) {
+          // Autocomplete at beginning
+          const afterTextNode = $createTextNode(afterCursor);
+          anchorNode.replace(autocompleteNode);
+          autocompleteNode.insertAfter(afterTextNode);
+          afterTextNode.select(0, 0);
+        } else if (afterCursor.length === 0) {
+          // Autocomplete at end
+          const beforeTextNode = $createTextNode(beforeTrigger);
+          anchorNode.replace(beforeTextNode);
+          beforeTextNode.insertAfter(autocompleteNode);
+          // Insert a new text node after and position cursor there
+          const newTextNode = $createTextNode(' ');
+          autocompleteNode.insertAfter(newTextNode);
+          newTextNode.select(1, 1);
+        } else {
+          // Split the text node and insert the autocomplete node
+          const beforeTextNode = $createTextNode(beforeTrigger);
+          const afterTextNode = $createTextNode(afterCursor);
           
-          // Create and insert the autocomplete node at the trigger position
-          const autocompleteNode = $createAutocompleteNode(suggestion);
+          anchorNode.replace(beforeTextNode);
+          beforeTextNode.insertAfter(autocompleteNode);
+          autocompleteNode.insertAfter(afterTextNode);
           
-          if (beforeTrigger.length === 0 && afterCursor.length === 0) {
-            // Replace entire text node with autocomplete node
-            anchorNode.replace(autocompleteNode);
-            // Insert a new text node after and position cursor there
-            const newTextNode = $createTextNode(' ');
-            autocompleteNode.insertAfter(newTextNode);
-            newTextNode.select(1, 1);
-          } else if (beforeTrigger.length === 0) {
-            // Autocomplete at beginning
-            const afterTextNode = $createTextNode(afterCursor);
-            anchorNode.replace(autocompleteNode);
-            autocompleteNode.insertAfter(afterTextNode);
-            afterTextNode.select(0, 0);
-          } else if (afterCursor.length === 0) {
-            // Autocomplete at end
-            const beforeTextNode = $createTextNode(beforeTrigger);
-            anchorNode.replace(beforeTextNode);
-            beforeTextNode.insertAfter(autocompleteNode);
-            // Insert a new text node after and position cursor there
-            const newTextNode = $createTextNode(' ');
-            autocompleteNode.insertAfter(newTextNode);
-            newTextNode.select(1, 1);
-          } else {
-            // Split the text node and insert the autocomplete node
-            const beforeTextNode = $createTextNode(beforeTrigger);
-            const afterTextNode = $createTextNode(afterCursor);
-            
-            anchorNode.replace(beforeTextNode);
-            beforeTextNode.insertAfter(autocompleteNode);
-            autocompleteNode.insertAfter(afterTextNode);
-            
-            // Set cursor at the beginning of the after text node
-            afterTextNode.select(0, 0);
-          }
+          // Set cursor at the beginning of the after text node
+          afterTextNode.select(0, 0);
         }
       }
     });
@@ -252,7 +254,6 @@ export default function AutocompletePlugin(): JSX.Element | null {
   useEffect(() => {
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && autocompleteState?.isActive) {
-        console.log('Global escape key pressed, hiding autocomplete');
         event.preventDefault();
         event.stopPropagation();
         hideAutocomplete();
