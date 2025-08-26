@@ -254,6 +254,12 @@ export default function AutocompletePlugin(): JSX.Element | null {
             ...autocompleteState,
             selectedIndex: (autocompleteState.selectedIndex + 1) % autocompleteState.suggestions.length
           });
+          
+          // Scroll selected item into view
+          setTimeout(() => {
+            document.querySelector('.autocomplete-suggestion.selected')?.scrollIntoView({block: 'nearest'});
+          }, 0);
+          
           return true;
         },
         COMMAND_PRIORITY_LOW
@@ -269,6 +275,12 @@ export default function AutocompletePlugin(): JSX.Element | null {
             ...autocompleteState,
             selectedIndex: newIndex < 0 ? autocompleteState.suggestions.length - 1 : newIndex
           });
+          
+          // Scroll selected item into view
+          setTimeout(() => {
+            document.querySelector('.autocomplete-suggestion.selected')?.scrollIntoView({block: 'nearest'});
+          }, 0);
+          
           return true;
         },
         COMMAND_PRIORITY_LOW
