@@ -6,67 +6,100 @@ import {
   calculateDropdownPosition
 } from '../utils/autocompleteUtils';
 import { GLOBAL_BRAIN_SUGGESTIONS } from '../config/autocompleteConfig';
-import { AutocompleteActions } from './useAutocompleteState';
+import { AutocompleteActions, AutocompleteState } from './useAutocompleteState';
 
 /**
- * Hook to handle autocomplete triggering based on text content changes
- * Replaces the massive useEffect from the original implementation
+ * Hook to handle autocomplete triggering based on text content and cursor position changes
+ * Handles flexible entry/exit based on cursor navigation
  */
 export function useAutocompleteTrigger(
   editor: LexicalEditor,
   actions: AutocompleteActions,
-  isActive: boolean
+  state: AutocompleteState
 ): void {
+  // Helper function to check autocomplete state at current cursor position
+  const checkAutocompleteAtCursor = () => {
+    editor.getEditorState().read(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+
+      const anchorNode = selection.anchor.getNode();
+      if (!(anchorNode instanceof TextNode)) return;
+
+      const nodeTextContent = anchorNode.getTextContent();
+      const cursorOffset = selection.anchor.offset;
+      
+      // Detect trigger pattern at current cursor position
+      const triggerInfo = detectTrigger(nodeTextContent, cursorOffset);
+      
+      if (triggerInfo.found) {
+        // Check if this is the same trigger that's already active
+        const isSameTrigger = state.isActive && 
+          state.triggerNode === anchorNode &&
+          state.triggerIndex === triggerInfo.triggerIndex;
+
+        // Only update if different trigger or not active
+        if (!isSameTrigger) {
+          // Calculate dropdown position
+          const triggerPosition = calculateDropdownPosition();
+          
+          // Filter suggestions based on match string
+          const filtered = filterSuggestions([...GLOBAL_BRAIN_SUGGESTIONS], triggerInfo.matchString);
+          
+          // Show autocomplete for this trigger
+          actions.showAutocomplete({
+            matchString: triggerInfo.matchString,
+            suggestions: filtered,
+            triggerPosition,
+            triggerBoxPosition: triggerPosition,
+            triggerNode: anchorNode,
+            triggerOffset: cursorOffset,
+            triggerIndex: triggerInfo.triggerIndex
+          });
+        }
+      } else if (state.isActive) {
+        // Hide autocomplete if no trigger found at cursor
+        actions.hideAutocomplete();
+      }
+    });
+  };
+
+  // Listen to text content changes
   useEffect(() => {
     const unregisterTextListener = editor.registerTextContentListener((textContent) => {
       // Hide autocomplete if editor is empty
       if (textContent === '') {
-        if (isActive) {
+        if (state.isActive) {
           actions.hideAutocomplete();
         }
         return;
       }
 
-      // Read current editor state
-      editor.getEditorState().read(() => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return;
-
-        const anchorNode = selection.anchor.getNode();
-        if (!(anchorNode instanceof TextNode)) return;
-
-        const nodeTextContent = anchorNode.getTextContent();
-        const cursorOffset = selection.anchor.offset;
-        
-        // Detect trigger pattern
-        const triggerInfo = detectTrigger(nodeTextContent, cursorOffset);
-        
-        if (triggerInfo.found) {
-          // Calculate dropdown position
-          const triggerPosition = calculateDropdownPosition();
-          
-          // Filter suggestions based on match string
-          const filtered = filterSuggestions(GLOBAL_BRAIN_SUGGESTIONS, triggerInfo.matchString);
-          
-          // Show autocomplete
-          actions.showAutocomplete({
-            matchString: triggerInfo.matchString,
-            suggestions: filtered,
-            triggerPosition,
-            triggerBoxPosition: triggerPosition, // Use same position for now
-            triggerNode: anchorNode,
-            triggerOffset: cursorOffset,
-            triggerIndex: triggerInfo.triggerIndex
-          });
-        } else if (isActive) {
-          // Hide autocomplete if trigger not found
-          actions.hideAutocomplete();
-        }
-      });
+      // Check autocomplete state at current cursor position
+      checkAutocompleteAtCursor();
     });
 
     return () => {
       unregisterTextListener();
     };
-  }, [editor, actions, isActive]);
+  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex]);
+
+  // Listen to selection changes (cursor movement)
+  useEffect(() => {
+    const unregisterSelectionListener = editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+
+        // Only check when cursor moves (not during text changes)
+        setTimeout(() => {
+          checkAutocompleteAtCursor();
+        }, 0);
+      });
+    });
+
+    return () => {
+      unregisterSelectionListener();
+    };
+  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex]);
 }

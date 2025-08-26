@@ -14,7 +14,7 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
   const [state, actions] = useAutocompleteState();
 
   // Handle autocomplete triggering (replaces the massive text listener useEffect)
-  useAutocompleteTrigger(editor, actions, state.isActive);
+  useAutocompleteTrigger(editor, actions, state);
 
   // Handle all keyboard commands (replaces the massive command registration useEffect)
   const handlers = useAutocompleteCommands(editor, state, actions);

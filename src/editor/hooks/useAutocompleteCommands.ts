@@ -54,12 +54,12 @@ export function useAutocompleteCommands(
     
     actions.hideAutocomplete();
   }, [editor, state.triggerNode, actions]);
-  // Critical priority keyboard handler to prevent cursor movement
+  // Critical priority keyboard handler for UP/DOWN arrows when autocomplete is active
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Only intercept UP/DOWN arrows when autocomplete is active
       if (!state.isActive || (event.key !== 'ArrowUp' && event.key !== 'ArrowDown')) {
-        return false; // Let editor handle all other cases
+        return false; // Let editor handle all other cases including LEFT/RIGHT
       }
       
       // Handle UP/DOWN before any other handlers
@@ -92,7 +92,6 @@ export function useAutocompleteCommands(
         
         return true;
       }
-      
       
       return false;
     };
