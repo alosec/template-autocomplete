@@ -5,6 +5,8 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
+import { $getRoot, $createTextNode, $getSelection, $isRangeSelection, $createParagraphNode } from 'lexical';
+import { act } from '@testing-library/react';
 import AutocompletePlugin from '../AutocompletePlugin';
 import { AutocompleteNode } from '../../nodes/AutocompleteNode';
 
@@ -27,6 +29,41 @@ const TestEditor: React.FC = () => (
     <AutocompletePlugin />
   </LexicalComposer>
 );
+
+// Helper function to insert text using Lexical's API
+const insertTextIntoTestEditor = async (text: string) => {
+  const editor = screen.getByTestId('editor');
+  const lexicalEditorInstance = (editor as any).__lexicalEditor;
+  
+  if (lexicalEditorInstance) {
+    await act(async () => {
+      lexicalEditorInstance.update(() => {
+        const root = $getRoot();
+        const paragraph = $createParagraphNode();
+        const textNode = $createTextNode(text);
+        paragraph.append(textNode);
+        root.clear();
+        root.append(paragraph);
+        
+        // Position cursor right after the <> trigger if it exists
+        const triggerIndex = text.indexOf('<>');
+        if (triggerIndex !== -1) {
+          const cursorPos = triggerIndex + 2; // Position after <>
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            textNode.select(cursorPos, cursorPos);
+          }
+        } else {
+          // Position cursor at end
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            textNode.select(text.length, text.length);
+          }
+        }
+      });
+    });
+  }
+};
 
 describe('AutocompletePlugin', () => {
   let user: ReturnType<typeof userEvent.setup>;
@@ -103,15 +140,17 @@ describe('AutocompletePlugin', () => {
       const malformedTriggers = ['<<>>', '<><', '><>', '<<<>>>'];
       
       for (const trigger of malformedTriggers) {
-        render(<TestEditor />);
+        const { unmount } = render(<TestEditor />);
         const editor = screen.getByTestId('editor');
         
         await user.click(editor);
-        fireEvent.input(editor, { data: trigger });
+        await insertTextIntoTestEditor(trigger);
         
         // Should not crash - malformed triggers should be treated as normal text
         expect(editor).toBeInTheDocument();
         expect(editor.textContent).toContain(trigger);
+        
+        unmount(); // Clean up between iterations
       }
     });
 
@@ -120,13 +159,10 @@ describe('AutocompletePlugin', () => {
       const editor = screen.getByTestId('editor');
       
       await user.click(editor);
-      await user.tab();
-      
-      // Use fireEvent.input for reliable Lexical text insertion
-      fireEvent.input(editor, { data: '<>' });
       
       const longString = 'a'.repeat(1000);
-      fireEvent.input(editor, { data: longString });
+      const textWithTrigger = '<>' + longString;
+      await insertTextIntoTestEditor(textWithTrigger);
       
       // Should handle long input without crashing
       expect(editor.textContent).toContain('<>');
@@ -138,7 +174,7 @@ describe('AutocompletePlugin', () => {
       const editor = screen.getByTestId('editor');
       
       await user.click(editor);
-      fireEvent.input(editor, { data: 'Hello <>world and <>universe' });
+      await insertTextIntoTestEditor('Hello <>world and <>universe');
       
       // Should handle multiple triggers gracefully
       expect(editor.textContent).toContain('<>world');
@@ -155,7 +191,7 @@ describe('AutocompletePlugin', () => {
       const editor = screen.getByTestId('editor');
       
       await user.click(editor);
-      fireEvent.input(editor, { data: '<>émoji🚀中文' });
+      await insertTextIntoTestEditor('<>émoji🚀中文');
       
       // Should handle unicode characters without issues
       expect(editor.textContent).toContain('émoji🚀中文');
@@ -266,7 +302,7 @@ describe('AutocompletePlugin', () => {
       
       // Test at very beginning
       await user.click(editor);
-      fireEvent.input(editor, { data: '<>start' });
+      await insertTextIntoTestEditor('<>start');
       
       await waitFor(() => {
         expect(document.querySelector('.autocomplete-dropdown')).toBeInTheDocument();
@@ -274,7 +310,7 @@ describe('AutocompletePlugin', () => {
       
       // Clear and test at end
       await user.clear(editor);
-      fireEvent.input(editor, { data: 'Some content here <>end' });
+      await insertTextIntoTestEditor('Some content here <>end');
       
       await waitFor(() => {
         expect(document.querySelector('.autocomplete-dropdown')).toBeInTheDocument();
@@ -304,7 +340,7 @@ describe('AutocompletePlugin', () => {
       for (const input of problematicInputs) {
         await user.clear(editor);
         if (input) {
-          fireEvent.input(editor, { data: input });
+          await insertTextIntoTestEditor(input);
         }
         
         // Should handle all inputs without crashing
@@ -324,7 +360,7 @@ describe('AutocompletePlugin', () => {
       
       // Type rapidly by building up the string
       const rapidText = 'a'.repeat(100);
-      fireEvent.input(editor, { data: rapidText });
+      await insertTextIntoTestEditor(rapidText);
       
       const duration = Date.now() - startTime;
       
