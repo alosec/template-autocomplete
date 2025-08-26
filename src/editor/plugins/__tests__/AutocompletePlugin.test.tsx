@@ -249,7 +249,8 @@ describe('AutocompletePlugin', () => {
         expect(document.querySelector('.autocomplete-dropdown')).toBeInTheDocument();
       });
       
-      await user.keyboard('{Enter}');
+      // Use fireEvent.keyDown to trigger Lexical command handlers directly
+      fireEvent.keyDown(editor, { key: 'Enter', code: 'Enter', keyCode: 13 });
       
       // Should select suggestion and close autocomplete
       await waitFor(() => {
