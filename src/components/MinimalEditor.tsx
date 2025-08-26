@@ -170,7 +170,7 @@ export default function MinimalEditor() {
                         className="editor-input"
                       />
                     }
-                    placeholder={<div className="editor-placeholder">Start writing... Hint: type &lt;&gt; for autocomplete</div>}
+                    placeholder={<div className="editor-placeholder">Start writing... Hint: type &lt;&gt; for autocomplete, ESC ESC to close</div>}
                     ErrorBoundary={LexicalErrorBoundary}
                   />
                   <OnChangePlugin onChange={handleContentChange} />

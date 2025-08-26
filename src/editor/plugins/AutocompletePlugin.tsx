@@ -11,7 +11,6 @@ import {
   KEY_TAB_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
-  KEY_ESCAPE_COMMAND,
   PASTE_COMMAND,
   TextNode,
   $getNodeByKey,
@@ -249,6 +248,21 @@ export default function AutocompletePlugin(): JSX.Element | null {
   }, [editor, autocompleteState, hideAutocomplete, calculateCursorPosition]);
 
 
+  // Add global escape key listener
+  useEffect(() => {
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && autocompleteState?.isActive) {
+        console.log('Global escape key pressed, hiding autocomplete');
+        event.preventDefault();
+        event.stopPropagation();
+        hideAutocomplete();
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalKeyDown);
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [autocompleteState, hideAutocomplete]);
+
   useEffect(() => {
     const unregisterKeyHandlers = [
       editor.registerCommand(
@@ -326,22 +340,6 @@ export default function AutocompletePlugin(): JSX.Element | null {
         COMMAND_PRIORITY_HIGH
       ),
 
-      editor.registerCommand(
-        KEY_ESCAPE_COMMAND,
-        (event) => {
-          if (!autocompleteState?.isActive) return false;
-          
-          // Prevent default escape behavior
-          if (event) {
-            event.preventDefault();
-          }
-          
-          // Just hide autocomplete without selecting
-          hideAutocomplete();
-          return true;
-        },
-        COMMAND_PRIORITY_HIGH
-      ),
 
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
