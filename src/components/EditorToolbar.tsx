@@ -66,43 +66,45 @@ export default function EditorToolbar({
 
   return (
     <div className="editor-toolbar">
-      <div className="toolbar-section">
-        <h1 className="editor-title">Minimal Editor</h1>
-        {currentDocument && (
-          <span className="document-status">
-            {currentDocument.title}
-            {isModified && <span className="modified-indicator">•</span>}
-            <span className="word-count">{currentDocument.wordCount} words</span>
-          </span>
-        )}
-      </div>
-      
-      <div className="toolbar-actions">
-        <button 
-          className={`toolbar-btn ${sidebarVisible ? 'active' : ''}`}
-          onClick={onToggleSidebar}
-          title="Toggle Global Brain Sidebar"
-        >
-          🧠 {sidebarVisible ? 'Hide' : 'Show'} Brain
-        </button>
-        
-        <button 
-          className="toolbar-btn primary"
-          onClick={onNewDocument}
-          title="New Document"
-        >
-          New
-        </button>
-        
-        <button 
-          className="toolbar-btn"
-          onClick={onSaveDocument}
-          disabled={!currentDocument || !isModified}
-          title="Save Document"
-        >
-          Save
-        </button>
-        
+      <div className="toolbar-left">
+        <div className="toolbar-dropdown">
+          <button className="toolbar-btn dropdown-toggle">
+            File ▾
+          </button>
+          <div className="dropdown-content file-menu">
+            <button onClick={onNewDocument}>New</button>
+            <button onClick={onSaveDocument} disabled={!currentDocument || !isModified}>
+              Save
+            </button>
+            <button onClick={handleExport} disabled={!currentDocument}>
+              Export
+            </button>
+            <label className="file-input-label">
+              Import
+              <input 
+                type="file" 
+                accept=".json"
+                onChange={handleImport}
+                className="file-input"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div className="toolbar-dropdown">
+          <button className="toolbar-btn dropdown-toggle">
+            View ▾
+          </button>
+          <div className="dropdown-content">
+            <button 
+              className={sidebarVisible ? 'active' : ''}
+              onClick={onToggleSidebar}
+            >
+              🧠 Global Brain Sidebar
+            </button>
+          </div>
+        </div>
+
         <div className="toolbar-dropdown">
           <button className="toolbar-btn dropdown-toggle">
             Recent ▾
@@ -135,25 +137,10 @@ export default function EditorToolbar({
             )}
           </div>
         </div>
-        
-        <button 
-          className="toolbar-btn"
-          onClick={handleExport}
-          disabled={!currentDocument}
-          title="Export Document"
-        >
-          Export
-        </button>
-        
-        <label className="toolbar-btn file-input-label">
-          Import
-          <input 
-            type="file" 
-            accept=".json"
-            onChange={handleImport}
-            className="file-input"
-          />
-        </label>
+      </div>
+
+      <div className="toolbar-right">
+        <h1 className="editor-title">Autocompleter</h1>
       </div>
     </div>
   );

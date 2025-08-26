@@ -74,14 +74,6 @@ export default function GlobalBrainSidebar({ isVisible, onToggle }: GlobalBrainS
     item.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleInsertText = (text: string) => {
-    // Simple insertion using document.execCommand
-    const editorElement = document.querySelector('.editor-input') as HTMLElement;
-    if (editorElement) {
-      editorElement.focus();
-      document.execCommand('insertText', false, text);
-    }
-  };
 
   return (
     <div className={`global-brain-sidebar ${isVisible ? 'visible' : 'hidden'}`}>
@@ -125,13 +117,6 @@ export default function GlobalBrainSidebar({ isVisible, onToggle }: GlobalBrainS
                     ))}
                   </div>
                 )}
-                <button
-                  className="insert-btn"
-                  onClick={() => handleInsertText(item.text)}
-                  title="Insert into editor"
-                >
-                  Insert
-                </button>
               </div>
             ))}
           </div>

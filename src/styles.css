@@ -28,22 +28,33 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px;
+    padding: 0;
     background: #ffffff;
     border-bottom: 1px solid #e0e0e0;
     flex-shrink: 0;
 }
 
-.toolbar-section {
+.toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 0;
+}
+
+.toolbar-right {
     display: flex;
     align-items: center;
     gap: 16px;
 }
 
+.editor-info {
+    display: flex;
+    align-items: center;
+}
+
 .editor-title {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
-    margin: 0;
+    margin: 0 0.5rem 0 0;
     color: #2c3e50;
 }
 
@@ -51,8 +62,9 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 13px;
     color: #666;
+    margin-right: 16px;
 }
 
 .modified-indicator {
@@ -69,28 +81,22 @@ body {
     color: #666;
 }
 
-.toolbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
 
 .toolbar-btn {
-    padding: 8px 16px;
-    border: 1px solid #d1d5db;
-    background: #ffffff;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
     color: #374151;
-    border-radius: 6px;
+    border-radius: 0;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 400;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.1s ease;
     white-space: nowrap;
 }
 
 .toolbar-btn:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: #f3f4f6;
 }
 
 .toolbar-btn.primary {
@@ -124,19 +130,49 @@ body {
     display: none;
     position: absolute;
     top: 100%;
-    right: 0;
+    left: 0;
     background: white;
     border: 1px solid #d1d5db;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    min-width: 300px;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    min-width: 200px;
     max-height: 400px;
     overflow-y: auto;
     z-index: 1000;
-    margin-top: 4px;
+    margin-top: 0px;
 }
 
-.toolbar-dropdown:hover .dropdown-content {
+.dropdown-content.file-menu {
+    min-width: 160px;
+}
+
+.dropdown-content button,
+.dropdown-content label {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+    border-radius: 0;
+    line-height: 1.4;
+}
+
+.dropdown-content button:hover,
+.dropdown-content label:hover {
+    background: #f3f4f6;
+}
+
+.dropdown-content button:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.toolbar-dropdown:hover .dropdown-content,
+.toolbar-dropdown .dropdown-content:hover {
     display: block;
 }
 
@@ -439,16 +475,17 @@ body {
 
 /* Global Brain Sidebar */
 .global-brain-sidebar {
+    --sidebar-width: 30vw;
     position: fixed;
     top: 0;
     right: 0;
-    width: 400px;
+    width: var(--sidebar-width);
     height: 100vh;
     background: #ffffff;
     border-left: 1px solid #e0e0e0;
-    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: -1px 0 3px rgba(0, 0, 0, 0.08);
     z-index: 1000;
-    transition: transform 0.3s ease;
+    transition: transform 0.15s ease;
     display: flex;
     flex-direction: column;
 }
@@ -465,7 +502,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
+    padding: 12px 16px;
     background: #f8f9fa;
     border-bottom: 1px solid #e0e0e0;
     flex-shrink: 0;
@@ -481,12 +518,12 @@ body {
 .sidebar-toggle {
     background: none;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
-    padding: 6px 10px;
+    border-radius: 1px;
+    padding: 4px 8px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     color: #374151;
-    transition: all 0.15s ease;
+    transition: all 0.1s ease;
 }
 
 .sidebar-toggle:hover {
@@ -496,7 +533,7 @@ body {
 .sidebar-content {
     flex: 1;
     overflow: auto;
-    padding: 16px 20px;
+    padding: 12px 16px;
 }
 
 .loading-state, .error-state {
@@ -516,17 +553,17 @@ body {
 
 .sidebar-search {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 1px;
+    font-size: 13px;
     outline: none;
-    transition: border-color 0.15s ease;
+    transition: border-color 0.1s ease;
 }
 
 .sidebar-search:focus {
     border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
 }
 
 .stats {
@@ -610,11 +647,11 @@ body {
 }
 
 .brain-item {
-    margin-bottom: 12px;
-    padding: 12px;
+    margin-bottom: 8px;
+    padding: 8px;
     background: #f9fafb;
     border: 1px solid #e5e7eb;
-    border-radius: 6px;
+    border-radius: 1px;
 }
 
 .item-header {
@@ -704,7 +741,7 @@ body {
 
 /* Sidebar open state adjustments */
 .minimal-editor.sidebar-open .editor-main {
-    margin-right: 400px;
+    margin-right: var(--sidebar-width);
 }
 
 .toolbar-btn.active {
