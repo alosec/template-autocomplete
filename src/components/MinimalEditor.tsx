@@ -33,10 +33,10 @@ export default function MinimalEditor() {
   }, []);
 
   // Load initial document or create new one
-  const initializeEditor = useCallback(() => {
+  const initializeEditor = useCallback(async () => {
     const currentDocId = documentManager.getCurrentDocumentId();
     if (currentDocId) {
-      const doc = documentManager.loadDocument(currentDocId);
+      const doc = await documentManager.loadDocument(currentDocId);
       if (doc) {
         setCurrentDocument(doc);
         return;
@@ -53,11 +53,11 @@ export default function MinimalEditor() {
     return undefined;
   });
 
-  const handleSaveDocument = useCallback(() => {
+  const handleSaveDocument = useCallback(async () => {
     if (!currentDocument) return;
     
     const updatedDoc = documentManager.updateWordCount(currentDocument);
-    documentManager.saveDocument(updatedDoc);
+    await documentManager.saveDocument(updatedDoc);
     setCurrentDocument(updatedDoc);
     setIsModified(false);
   }, [currentDocument]);
@@ -67,8 +67,8 @@ export default function MinimalEditor() {
     setIsModified(false);
   }, []);
 
-  const handleDeleteDocument = useCallback((id: string) => {
-    documentManager.deleteDocument(id);
+  const handleDeleteDocument = useCallback(async (id: string) => {
+    await documentManager.deleteDocument(id);
     
     // If deleted document was current, create new one
     if (currentDocument?.id === id) {
@@ -84,9 +84,13 @@ export default function MinimalEditor() {
     
     if (!currentDocument) return;
     
+    // Save both plain text content and rich editor state
+    const editorStateJSON = JSON.stringify(editorState.toJSON());
+    
     const updatedDoc = {
       ...currentDocument,
       content: textContent,
+      editorState: editorStateJSON,
       updatedAt: new Date()
     };
     
@@ -98,9 +102,9 @@ export default function MinimalEditor() {
       clearTimeout(autoSaveTimeoutRef.current);
     }
     
-    autoSaveTimeoutRef.current = setTimeout(() => {
+    autoSaveTimeoutRef.current = setTimeout(async () => {
       const finalDoc = documentManager.updateWordCount(updatedDoc);
-      documentManager.saveDocument(finalDoc);
+      await documentManager.saveDocument(finalDoc);
       setCurrentDocument(finalDoc);
       setIsModified(false);
     }, 2000); // Auto-save after 2 seconds of inactivity

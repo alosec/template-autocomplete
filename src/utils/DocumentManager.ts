@@ -1,54 +1,22 @@
 import { Document, DocumentSummary, EditorSettings } from '../types/EditorTypes';
-
-const STORAGE_KEYS = {
-  DOCUMENTS: 'minimal-editor-documents',
-  SETTINGS: 'minimal-editor-settings',
-  CURRENT_DOC: 'minimal-editor-current-doc'
-} as const;
+import { storageManager } from './StorageManager';
 
 class DocumentManager {
   // Document operations
-  saveDocument(document: Document): void {
-    const documents = this.getAllDocuments();
-    const existingIndex = documents.findIndex(d => d.id === document.id);
-    
-    if (existingIndex >= 0) {
-      documents[existingIndex] = document;
-    } else {
-      documents.push(document);
-    }
-    
-    localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(documents));
-    localStorage.setItem(STORAGE_KEYS.CURRENT_DOC, document.id);
+  async saveDocument(document: Document): Promise<void> {
+    return await storageManager.saveDocument(document);
   }
   
-  loadDocument(id: string): Document | null {
-    const documents = this.getAllDocuments();
-    const document = documents.find(d => d.id === id);
-    
-    if (document) {
-      localStorage.setItem(STORAGE_KEYS.CURRENT_DOC, id);
-      return this.deserializeDocument(document);
-    }
-    
-    return null;
+  async loadDocument(id: string): Promise<Document | null> {
+    return await storageManager.loadDocument(id);
   }
   
-  getAllDocuments(): Document[] {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.DOCUMENTS);
-      if (!stored) return [];
-      
-      const documents = JSON.parse(stored) as Document[];
-      return documents.map(this.deserializeDocument);
-    } catch (error) {
-      console.warn('Failed to load documents:', error);
-      return [];
-    }
+  async getAllDocuments(): Promise<Document[]> {
+    return await storageManager.getAllDocuments();
   }
   
-  getDocumentSummaries(): DocumentSummary[] {
-    const documents = this.getAllDocuments();
+  async getDocumentSummaries(): Promise<DocumentSummary[]> {
+    const documents = await this.getAllDocuments();
     return documents
       .map(doc => ({
         id: doc.id,
@@ -60,36 +28,21 @@ class DocumentManager {
       .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   }
   
-  deleteDocument(id: string): void {
-    const documents = this.getAllDocuments().filter(d => d.id !== id);
-    localStorage.setItem(STORAGE_KEYS.DOCUMENTS, JSON.stringify(documents));
-    
-    // Clear current doc if it was deleted
-    const currentDocId = localStorage.getItem(STORAGE_KEYS.CURRENT_DOC);
-    if (currentDocId === id) {
-      localStorage.removeItem(STORAGE_KEYS.CURRENT_DOC);
-    }
+  async deleteDocument(id: string): Promise<void> {
+    return await storageManager.deleteDocument(id);
   }
   
   getCurrentDocumentId(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.CURRENT_DOC);
+    return storageManager.getCurrentDocumentId();
   }
   
   // Settings operations
   saveSettings(settings: EditorSettings): void {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    storageManager.saveSettings(settings);
   }
   
   loadSettings(): EditorSettings {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      if (!stored) return this.getDefaultSettings();
-      
-      return { ...this.getDefaultSettings(), ...JSON.parse(stored) };
-    } catch (error) {
-      console.warn('Failed to load settings:', error);
-      return this.getDefaultSettings();
-    }
+    return storageManager.loadSettings();
   }
   
   // Utility methods
@@ -99,6 +52,7 @@ class DocumentManager {
       id: this.generateId(),
       title,
       content: '',
+      editorState: undefined,
       createdAt: now,
       updatedAt: now,
       wordCount: 0,
@@ -131,6 +85,7 @@ class DocumentManager {
         id: this.generateId(), // New ID for imported doc
         title: data.title || 'Imported Document',
         content: data.content || '',
+        editorState: data.editorState || undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
         wordCount: 0,

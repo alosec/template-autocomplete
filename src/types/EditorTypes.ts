@@ -13,6 +13,7 @@ export interface Document {
   id: string;
   title: string;
   content: string;
+  editorState?: string; // JSON string of the lexical editor state
   createdAt: Date;
   updatedAt: Date;
   concepts?: Concept[];
@@ -21,6 +22,11 @@ export interface Document {
     author?: string;
     tags?: string[];
     category?: string;
+  };
+  storageInfo?: {
+    storageType: 'localStorage' | 'indexedDB';
+    size: number;
+    compressed?: boolean;
   };
 }
 

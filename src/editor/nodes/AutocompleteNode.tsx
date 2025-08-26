@@ -44,13 +44,19 @@ export class AutocompleteNode extends TextNode {
 
   static importJSON(serializedNode: SerializedAutocompleteNode): AutocompleteNode {
     const { text } = serializedNode;
-    return new AutocompleteNode(text);
+    const node = new AutocompleteNode(text);
+    node.setFormat(serializedNode.format);
+    node.setDetail(serializedNode.detail);
+    node.setMode(serializedNode.mode);
+    node.setStyle(serializedNode.style);
+    return node;
   }
 
   exportJSON(): SerializedAutocompleteNode {
     return {
       ...super.exportJSON(),
       type: 'autocomplete',
+      text: this.__text,
     };
   }
 

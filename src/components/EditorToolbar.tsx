@@ -1,6 +1,6 @@
 import { Document, DocumentSummary } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -23,11 +23,20 @@ export default function EditorToolbar({
   onToggleSidebar,
   sidebarVisible
 }: EditorToolbarProps) {
-  const documentSummaries = documentManager.getDocumentSummaries();
+  const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   
-  const handleLoadDocument = (summary: DocumentSummary) => {
-    const document = documentManager.loadDocument(summary.id);
+  // Load document summaries
+  useEffect(() => {
+    const loadSummaries = async () => {
+      const summaries = await documentManager.getDocumentSummaries();
+      setDocumentSummaries(summaries);
+    };
+    loadSummaries();
+  }, [currentDocument]);
+  
+  const handleLoadDocument = async (summary: DocumentSummary) => {
+    const document = await documentManager.loadDocument(summary.id);
     if (document) {
       onLoadDocument(document);
     }
@@ -56,12 +65,18 @@ export default function EditorToolbar({
     setImportFeedback(null);
     
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const content = e.target?.result as string;
         const document = documentManager.importDocument(content);
         if (document) {
+          // Save the imported document so it appears in the recent menu
+          await documentManager.saveDocument(document);
           onLoadDocument(document);
+          
+          // Refresh document summaries
+          const summaries = await documentManager.getDocumentSummaries();
+          setDocumentSummaries(summaries);
           setImportFeedback({ type: 'success', message: `Imported "${document.title}" successfully` });
           
           // Clear success feedback after 3 seconds
