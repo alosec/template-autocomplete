@@ -165,7 +165,6 @@ export default function EditorToolbar({
       </div>
 
       <div className="toolbar-right">
-        <h1 className="editor-title">Autocompleter</h1>
       </div>
       
       {importFeedback && (
