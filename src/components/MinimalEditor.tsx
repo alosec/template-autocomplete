@@ -1,15 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import { PlainTextPlugin } from '@lexical/react/LexicalPlainTextPlugin';
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { EditorState, $getRoot } from 'lexical';
 
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
-import AutocompletePlugin from '../editor/plugins/AutocompletePlugin';
 import EditorToolbar from './EditorToolbar';
+import EditorWithSync from './EditorWithSync';
 import GlobalBrainSidebar from './GlobalBrainSidebar';
 import { Document } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
@@ -29,7 +24,7 @@ export default function MinimalEditor() {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
   const [isModified, setIsModified] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const autoSaveTimeoutRef = useRef<NodeJS.Timeout>();
+  const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleNewDocument = useCallback(() => {
     const newDoc = documentManager.createNewDocument();
@@ -55,6 +50,7 @@ export default function MinimalEditor() {
   // Initialize on first render
   useState(() => {
     initializeEditor();
+    return undefined;
   });
 
   const handleSaveDocument = useCallback(() => {
@@ -165,18 +161,10 @@ export default function MinimalEditor() {
             >
               <div className="editor-container">
                 <div className="editor-inner">
-                  <PlainTextPlugin
-                    contentEditable={
-                      <ContentEditable
-                        className="editor-input"
-                      />
-                    }
-                    placeholder={<div className="editor-placeholder">Start writing... Hint: type &lt;&gt; for autocomplete, ESC ESC to close</div>}
-                    ErrorBoundary={LexicalErrorBoundary}
+                  <EditorWithSync 
+                    currentDocument={currentDocument}
+                    onContentChange={handleContentChange}
                   />
-                  <OnChangePlugin onChange={handleContentChange} />
-                  <HistoryPlugin />
-                  <AutocompletePlugin />
                 </div>
               </div>
             </LexicalComposer>

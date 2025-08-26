@@ -1,5 +1,6 @@
 import { Document, DocumentSummary } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
+import { useState } from 'react';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -23,6 +24,7 @@ export default function EditorToolbar({
   sidebarVisible
 }: EditorToolbarProps) {
   const documentSummaries = documentManager.getDocumentSummaries();
+  const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   
   const handleLoadDocument = (summary: DocumentSummary) => {
     const document = documentManager.loadDocument(summary.id);
@@ -50,12 +52,25 @@ export default function EditorToolbar({
     const file = event.target.files?.[0];
     if (!file) return;
     
+    // Clear previous feedback
+    setImportFeedback(null);
+    
     const reader = new FileReader();
     reader.onload = (e) => {
-      const content = e.target?.result as string;
-      const document = documentManager.importDocument(content);
-      if (document) {
-        onLoadDocument(document);
+      try {
+        const content = e.target?.result as string;
+        const document = documentManager.importDocument(content);
+        if (document) {
+          onLoadDocument(document);
+          setImportFeedback({ type: 'success', message: `Imported "${document.title}" successfully` });
+          
+          // Clear success feedback after 3 seconds
+          setTimeout(() => setImportFeedback(null), 3000);
+        } else {
+          setImportFeedback({ type: 'error', message: 'Failed to import document - invalid format' });
+        }
+      } catch (error) {
+        setImportFeedback({ type: 'error', message: 'Failed to import document - file could not be read' });
       }
     };
     reader.readAsText(file);
@@ -142,6 +157,12 @@ export default function EditorToolbar({
       <div className="toolbar-right">
         <h1 className="editor-title">Autocompleter</h1>
       </div>
+      
+      {importFeedback && (
+        <div className={`import-feedback ${importFeedback.type}`}>
+          {importFeedback.message}
+        </div>
+      )}
     </div>
   );
 }

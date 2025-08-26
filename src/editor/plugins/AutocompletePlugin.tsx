@@ -13,10 +13,9 @@ import {
   KEY_DELETE_COMMAND,
   PASTE_COMMAND,
   TextNode,
-  $getNodeByKey,
 } from 'lexical';
-import { useCallback, useEffect, useState, useRef } from 'react';
-import { $createAutocompleteNode, $isAutocompleteNode, AutocompleteNode } from '../nodes/AutocompleteNode';
+import { useCallback, useEffect, useState } from 'react';
+import { $createAutocompleteNode, $isAutocompleteNode } from '../nodes/AutocompleteNode';
 
 interface AutocompleteState {
   isActive: boolean;
@@ -49,7 +48,7 @@ const GLOBAL_BRAIN_SUGGESTIONS = [
   "header", "footer", "navigation", "sidebar", "modal"
 ];
 
-export default function AutocompletePlugin(): JSX.Element | null {
+export default function AutocompletePlugin(): React.JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const [autocompleteState, setAutocompleteState] = useState<AutocompleteState | null>(null);
 
@@ -296,9 +295,13 @@ export default function AutocompletePlugin(): JSX.Element | null {
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
         () => {
-          return editor.update(() => {
+          let handled = false;
+          editor.update(() => {
             const selection = $getSelection();
-            if (!$isRangeSelection(selection)) return false;
+            if (!$isRangeSelection(selection)) {
+              handled = false;
+              return;
+            }
 
             const anchorNode = selection.anchor.getNode();
             const focusNode = selection.focus.getNode();
@@ -307,18 +310,21 @@ export default function AutocompletePlugin(): JSX.Element | null {
               const previousSibling = anchorNode.getPreviousSibling();
               if ($isAutocompleteNode(previousSibling)) {
                 previousSibling.remove();
-                return true;
+                handled = true;
+                return;
               }
             }
 
             if ($isAutocompleteNode(anchorNode)) {
               anchorNode.remove();
-              return true;
+              handled = true;
+              return;
             }
             
             if ($isAutocompleteNode(focusNode)) {
               focusNode.remove();
-              return true;
+              handled = true;
+              return;
             }
 
             if (!selection.isCollapsed()) {
@@ -333,12 +339,14 @@ export default function AutocompletePlugin(): JSX.Element | null {
               }
               
               if (hasAutocompleteNode) {
-                return true;
+                handled = true;
+                return;
               }
             }
 
-            return false;
+            handled = false;
           });
+          return handled;
         },
         COMMAND_PRIORITY_HIGH
       ),
