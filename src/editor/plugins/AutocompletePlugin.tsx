@@ -4,15 +4,19 @@ import {
   $isRangeSelection,
   $createTextNode,
   COMMAND_PRIORITY_LOW,
+  COMMAND_PRIORITY_HIGH,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   KEY_BACKSPACE_COMMAND,
+  KEY_DELETE_COMMAND,
+  PASTE_COMMAND,
   TextNode,
+  $getNodeByKey,
 } from 'lexical';
 import { useCallback, useEffect, useState } from 'react';
-import { $createAutocompleteNode, $isAutocompleteNode } from '../nodes/AutocompleteNode';
+import { $createAutocompleteNode, $isAutocompleteNode, AutocompleteNode } from '../nodes/AutocompleteNode';
 
 interface AutocompleteState {
   isActive: boolean;
@@ -69,15 +73,31 @@ export default function AutocompletePlugin(): JSX.Element | null {
           const beforeTrigger = textContent.substring(0, triggerIndex);
           const afterCursor = textContent.substring(cursorOffset);
           
-          // Update the text node to remove the trigger and match string
-          anchorNode.setTextContent(beforeTrigger + afterCursor);
-          
           // Create and insert the autocomplete node at the trigger position
           const autocompleteNode = $createAutocompleteNode(suggestion);
           
-          if (beforeTrigger.length === 0) {
-            // If trigger is at the beginning, insert before the text node
-            anchorNode.insertBefore(autocompleteNode);
+          if (beforeTrigger.length === 0 && afterCursor.length === 0) {
+            // Replace entire text node with autocomplete node
+            anchorNode.replace(autocompleteNode);
+            // Insert a new text node after and position cursor there
+            const newTextNode = $createTextNode(' ');
+            autocompleteNode.insertAfter(newTextNode);
+            newTextNode.select(1, 1);
+          } else if (beforeTrigger.length === 0) {
+            // Autocomplete at beginning
+            const afterTextNode = $createTextNode(afterCursor);
+            anchorNode.replace(autocompleteNode);
+            autocompleteNode.insertAfter(afterTextNode);
+            afterTextNode.select(0, 0);
+          } else if (afterCursor.length === 0) {
+            // Autocomplete at end
+            const beforeTextNode = $createTextNode(beforeTrigger);
+            anchorNode.replace(beforeTextNode);
+            beforeTextNode.insertAfter(autocompleteNode);
+            // Insert a new text node after and position cursor there
+            const newTextNode = $createTextNode(' ');
+            autocompleteNode.insertAfter(newTextNode);
+            newTextNode.select(1, 1);
           } else {
             // Split the text node and insert the autocomplete node
             const beforeTextNode = $createTextNode(beforeTrigger);
@@ -87,7 +107,7 @@ export default function AutocompletePlugin(): JSX.Element | null {
             beforeTextNode.insertAfter(autocompleteNode);
             autocompleteNode.insertAfter(afterTextNode);
             
-            // Set cursor after the autocomplete node
+            // Set cursor at the beginning of the after text node
             afterTextNode.select(0, 0);
           }
         }
@@ -220,22 +240,92 @@ export default function AutocompletePlugin(): JSX.Element | null {
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
         () => {
-          editor.update(() => {
+          return editor.update(() => {
             const selection = $getSelection();
-            if (!$isRangeSelection(selection)) return;
+            if (!$isRangeSelection(selection)) return false;
 
             const anchorNode = selection.anchor.getNode();
-            const previousSibling = anchorNode.getPreviousSibling();
+            const focusNode = selection.focus.getNode();
             
-            // Check if we're about to delete an autocomplete node
-            if ($isAutocompleteNode(previousSibling) && selection.anchor.offset === 0) {
-              previousSibling.remove();
+            // If cursor is at start of a text node, check previous sibling
+            if (selection.anchor.offset === 0) {
+              const previousSibling = anchorNode.getPreviousSibling();
+              if ($isAutocompleteNode(previousSibling)) {
+                previousSibling.remove();
+                return true;
+              }
+            }
+
+            // If selection spans or touches an autocomplete node, handle it
+            if ($isAutocompleteNode(anchorNode)) {
+              anchorNode.remove();
               return true;
             }
+            
+            if ($isAutocompleteNode(focusNode)) {
+              focusNode.remove();
+              return true;
+            }
+
+            // Check if selection contains autocomplete nodes
+            if (!selection.isCollapsed()) {
+              const nodes = selection.getNodes();
+              let hasAutocompleteNode = false;
+              
+              for (const node of nodes) {
+                if ($isAutocompleteNode(node)) {
+                  node.remove();
+                  hasAutocompleteNode = true;
+                }
+              }
+              
+              if (hasAutocompleteNode) {
+                return true;
+              }
+            }
+
+            return false;
           });
+        },
+        COMMAND_PRIORITY_HIGH
+      ),
+
+
+      // Prevent delete key from editing autocomplete nodes
+      editor.registerCommand(
+        KEY_DELETE_COMMAND,
+        () => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return false;
+
+          const anchorNode = selection.anchor.getNode();
+          
+          if ($isAutocompleteNode(anchorNode)) {
+            return true; // Block the deletion
+          }
+          
           return false;
         },
-        COMMAND_PRIORITY_LOW
+        COMMAND_PRIORITY_HIGH
+      ),
+
+      // Prevent paste into autocomplete nodes
+      editor.registerCommand(
+        PASTE_COMMAND,
+        () => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return false;
+
+          const anchorNode = selection.anchor.getNode();
+          const focusNode = selection.focus.getNode();
+          
+          if ($isAutocompleteNode(anchorNode) || $isAutocompleteNode(focusNode)) {
+            return true; // Block the paste
+          }
+          
+          return false;
+        },
+        COMMAND_PRIORITY_HIGH
       )
     ];
 

@@ -1,8 +1,8 @@
 import {
-  DecoratorNode,
+  TextNode,
   NodeKey,
   LexicalNode,
-  SerializedLexicalNode,
+  SerializedTextNode,
   Spread,
 } from 'lexical';
 
@@ -10,12 +10,10 @@ export type SerializedAutocompleteNode = Spread<
   {
     text: string;
   },
-  SerializedLexicalNode
+  SerializedTextNode
 >;
 
-export class AutocompleteNode extends DecoratorNode<JSX.Element> {
-  __text: string;
-
+export class AutocompleteNode extends TextNode {
   static getType(): string {
     return 'autocomplete';
   }
@@ -25,18 +23,22 @@ export class AutocompleteNode extends DecoratorNode<JSX.Element> {
   }
 
   constructor(text: string, key?: NodeKey) {
-    super(key);
-    this.__text = text;
+    super(text, key);
   }
 
   createDOM(): HTMLElement {
     const span = document.createElement('span');
     span.className = 'autocomplete-entry';
     span.setAttribute('data-lexical-autocomplete', 'true');
+    span.textContent = this.__text;
     return span;
   }
 
-  updateDOM(): false {
+  updateDOM(prevNode: AutocompleteNode, dom: HTMLElement): boolean {
+    if (prevNode.__text !== this.__text) {
+      dom.textContent = this.__text;
+      return true;
+    }
     return false;
   }
 
@@ -47,38 +49,12 @@ export class AutocompleteNode extends DecoratorNode<JSX.Element> {
 
   exportJSON(): SerializedAutocompleteNode {
     return {
-      text: this.__text,
+      ...super.exportJSON(),
       type: 'autocomplete',
-      version: 1,
     };
   }
 
-  getText(): string {
-    return this.__text;
-  }
-
-  setText(text: string): void {
-    const writableNode = this.getWritable();
-    writableNode.__text = text;
-  }
-
-  decorate(): JSX.Element {
-    return (
-      <span className="autocomplete-entry" data-lexical-autocomplete="true">
-        {this.__text}
-      </span>
-    );
-  }
-
-  isInline(): boolean {
-    return true;
-  }
-
-  isKeyboardSelectable(): boolean {
-    return true;
-  }
-
-  canBeEmpty(): boolean {
+  isEditable(): boolean {
     return false;
   }
 
@@ -90,7 +66,15 @@ export class AutocompleteNode extends DecoratorNode<JSX.Element> {
     return true;
   }
 
-  isIsolated(): boolean {
+  canBeEmpty(): boolean {
+    return false;
+  }
+
+  isSegmented(): boolean {
+    return true;
+  }
+
+  isToken(): boolean {
     return true;
   }
 }

@@ -80,7 +80,6 @@ body {
     padding: 2px 4px;
     border-radius: 3px;
     font-weight: 500;
-    user-select: none;
     display: inline-block;
 }
 
