@@ -1,6 +1,6 @@
 import { Document, DocumentSummary } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -25,6 +25,9 @@ export default function EditorToolbar({
 }: EditorToolbarProps) {
   const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [fileMenuOpen, setFileMenuOpen] = useState(false);
+  const [recentMenuOpen, setRecentMenuOpen] = useState(false);
+  const toolbarRef = useRef<HTMLDivElement>(null);
   
   // Load document summaries
   useEffect(() => {
@@ -94,8 +97,36 @@ export default function EditorToolbar({
     event.target.value = '';
   };
 
+  // Handle click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (toolbarRef.current && !toolbarRef.current.contains(event.target as Node)) {
+        setFileMenuOpen(false);
+        setRecentMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleFileMenu = () => {
+    setFileMenuOpen(!fileMenuOpen);
+    setRecentMenuOpen(false);
+  };
+
+  const toggleRecentMenu = () => {
+    setRecentMenuOpen(!recentMenuOpen);
+    setFileMenuOpen(false);
+  };
+
+  const closeMenus = () => {
+    setFileMenuOpen(false);
+    setRecentMenuOpen(false);
+  };
+
   return (
-    <div className="editor-toolbar">
+    <div className="editor-toolbar" ref={toolbarRef}>
       <div className="toolbar-left">
         <button 
           className="toolbar-btn sidebar-toggle-btn"
@@ -106,23 +137,23 @@ export default function EditorToolbar({
         </button>
         
         <div className="toolbar-dropdown">
-          <button className="toolbar-btn dropdown-toggle">
+          <button className="toolbar-btn dropdown-toggle" onClick={toggleFileMenu}>
             File ▾
           </button>
-          <div className="dropdown-content file-menu">
-            <button onClick={onNewDocument}>New</button>
-            <button onClick={onSaveDocument} disabled={!currentDocument || !isModified}>
+          <div className={`dropdown-content file-menu ${fileMenuOpen ? 'show' : ''}`}>
+            <button onClick={() => { onNewDocument(); closeMenus(); }}>New</button>
+            <button onClick={() => { onSaveDocument(); closeMenus(); }} disabled={!currentDocument || !isModified}>
               Save
             </button>
-            <button onClick={handleExport} disabled={!currentDocument}>
+            <button onClick={() => { handleExport(); closeMenus(); }} disabled={!currentDocument}>
               Export
             </button>
-            <label className="file-input-label">
+            <label className="file-input-label" onClick={closeMenus}>
               Import
               <input 
                 type="file" 
                 accept=".json"
-                onChange={handleImport}
+                onChange={(e) => { handleImport(e); closeMenus(); }}
                 className="file-input"
               />
             </label>
@@ -131,29 +162,22 @@ export default function EditorToolbar({
 
 
         <div className="toolbar-dropdown">
-          <button className="toolbar-btn dropdown-toggle">
+          <button className="toolbar-btn dropdown-toggle" onClick={toggleRecentMenu}>
             Recent ▾
           </button>
-          <div className="dropdown-content">
+          <div className={`dropdown-content ${recentMenuOpen ? 'show' : ''}`}>
             {documentSummaries.length > 0 ? (
               documentSummaries.slice(0, 10).map(summary => (
                 <div key={summary.id} className="document-item">
                   <button 
                     className="document-load-btn"
-                    onClick={() => handleLoadDocument(summary)}
+                    onClick={() => { handleLoadDocument(summary); closeMenus(); }}
                     title={summary.preview}
                   >
                     <div className="document-title">{summary.title}</div>
                     <div className="document-meta">
                       {summary.wordCount} words • {summary.updatedAt.toLocaleDateString()}
                     </div>
-                  </button>
-                  <button 
-                    className="document-delete-btn"
-                    onClick={() => onDeleteDocument(summary.id)}
-                    title="Delete"
-                  >
-                    ×
                   </button>
                 </div>
               ))
