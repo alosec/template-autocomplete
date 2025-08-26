@@ -10,6 +10,7 @@ import { EditorState } from 'lexical';
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
 import AutocompletePlugin from '../editor/plugins/AutocompletePlugin';
 import EditorToolbar from './EditorToolbar';
+import GlobalBrainSidebar from './GlobalBrainSidebar';
 import { Document } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
 
@@ -27,6 +28,7 @@ const editorConfig = {
 export default function MinimalEditor() {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
   const [isModified, setIsModified] = useState(false);
+  const [sidebarVisible, setSidebarVisible] = useState(false);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout>();
 
   const handleNewDocument = useCallback(() => {
@@ -120,8 +122,13 @@ export default function MinimalEditor() {
     setIsModified(true);
   }, [currentDocument]);
 
+  const toggleSidebar = useCallback(() => {
+    setSidebarVisible(prev => !prev);
+  }, []);
+
+
   return (
-    <div className="minimal-editor">
+    <div className={`minimal-editor ${sidebarVisible ? 'sidebar-open' : ''}`}>
       <EditorToolbar
         currentDocument={currentDocument}
         isModified={isModified}
@@ -129,6 +136,8 @@ export default function MinimalEditor() {
         onSaveDocument={handleSaveDocument}
         onLoadDocument={handleLoadDocument}
         onDeleteDocument={handleDeleteDocument}
+        onToggleSidebar={toggleSidebar}
+        sidebarVisible={sidebarVisible}
       />
       
       <div className="editor-main">
@@ -150,7 +159,7 @@ export default function MinimalEditor() {
               key={currentDocument.id}
               initialConfig={{
                 ...editorConfig,
-                editorState: currentDocument.content || null
+                editorState: null
               }}
             >
               <div className="editor-container">
@@ -173,6 +182,11 @@ export default function MinimalEditor() {
           )}
         </div>
       </div>
+      
+      <GlobalBrainSidebar 
+        isVisible={sidebarVisible}
+        onToggle={toggleSidebar}
+      />
       
       <div className="editor-status">
         <div className="status-left">

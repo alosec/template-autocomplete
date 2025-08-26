@@ -29,23 +29,25 @@ interface AutocompleteState {
   triggerOffset: number;
 }
 
-// Hardcoded suggestions as per requirements
-const SUGGESTIONS = [
-  'component',
-  'container',
-  'button',
-  'input',
-  'form',
-  'header',
-  'footer',
-  'navigation',
-  'sidebar',
-  'modal',
-  'dropdown',
-  'tooltip',
-  'card',
-  'list',
-  'item',
+// Hardcoded Global Brain suggestions
+const GLOBAL_BRAIN_SUGGESTIONS = [
+  "Claude's Investigations",
+  "impt unsolved problems", 
+  "Gut-Brain Axis Drug Repurposing",
+  "Urban vertical farming networks",
+  "Ocean plastic cleanup initiatives", 
+  "Creating universal cancer vaccines",
+  "Global basic income pilot programs",
+  "AI consciousness detection methods",
+  "gut-brain", "drug-repurposing", "research",
+  "vertical farming", "urban", "agriculture", "sustainability",
+  "ocean", "plastic", "cleanup", "environment", 
+  "cancer", "vaccines", "oncology", "prevention",
+  "basic income", "pilot", "economic policy",
+  "consciousness", "detection", "research",
+  // Basic UI suggestions
+  "component", "container", "button", "input", "form",
+  "header", "footer", "navigation", "sidebar", "modal"
 ];
 
 export default function AutocompletePlugin(): JSX.Element | null {
@@ -169,7 +171,7 @@ export default function AutocompletePlugin(): JSX.Element | null {
   }, []);
 
   const updateSuggestions = useCallback((matchString: string, updatePosition = false) => {
-    const filtered = SUGGESTIONS.filter(suggestion => 
+    const filtered = GLOBAL_BRAIN_SUGGESTIONS.filter(suggestion => 
       suggestion.toLowerCase().startsWith(matchString.toLowerCase())
     );
     
@@ -219,7 +221,7 @@ export default function AutocompletePlugin(): JSX.Element | null {
             // Calculate actual cursor position for dropdown
             const triggerPosition = calculateCursorPosition();
             
-            const filtered = SUGGESTIONS.filter(suggestion => 
+            const filtered = GLOBAL_BRAIN_SUGGESTIONS.filter(suggestion => 
               suggestion.toLowerCase().startsWith(matchString.toLowerCase())
             );
             
@@ -436,7 +438,7 @@ export default function AutocompletePlugin(): JSX.Element | null {
     return () => {
       unregisterKeyHandlers.forEach(unregister => unregister());
     };
-  }, [editor, autocompleteState, selectSuggestion]);
+  }, [editor, autocompleteState, selectSuggestion, hideAutocomplete]);
 
   if (!autocompleteState?.isActive || autocompleteState.suggestions.length === 0) {
     return null;

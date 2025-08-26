@@ -8,6 +8,8 @@ interface EditorToolbarProps {
   onSaveDocument: () => void;
   onLoadDocument: (document: Document) => void;
   onDeleteDocument: (id: string) => void;
+  onToggleSidebar: () => void;
+  sidebarVisible: boolean;
 }
 
 export default function EditorToolbar({
@@ -16,7 +18,9 @@ export default function EditorToolbar({
   onNewDocument,
   onSaveDocument,
   onLoadDocument,
-  onDeleteDocument
+  onDeleteDocument,
+  onToggleSidebar,
+  sidebarVisible
 }: EditorToolbarProps) {
   const documentSummaries = documentManager.getDocumentSummaries();
   
@@ -74,6 +78,14 @@ export default function EditorToolbar({
       </div>
       
       <div className="toolbar-actions">
+        <button 
+          className={`toolbar-btn ${sidebarVisible ? 'active' : ''}`}
+          onClick={onToggleSidebar}
+          title="Toggle Global Brain Sidebar"
+        >
+          🧠 {sidebarVisible ? 'Hide' : 'Show'} Brain
+        </button>
+        
         <button 
           className="toolbar-btn primary"
           onClick={onNewDocument}
