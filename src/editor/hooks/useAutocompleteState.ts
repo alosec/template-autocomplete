@@ -9,8 +9,10 @@ export interface AutocompleteState {
   selectedIndex: number;
   suggestions: string[];
   triggerPosition: DropdownPosition;
+  triggerBoxPosition: DropdownPosition;
   triggerNode: TextNode | null;
   triggerOffset: number;
+  triggerIndex: number;
 }
 
 export interface AutocompleteActions {
@@ -18,8 +20,10 @@ export interface AutocompleteActions {
     matchString: string;
     suggestions: string[];
     triggerPosition: DropdownPosition;
+    triggerBoxPosition: DropdownPosition;
     triggerNode: TextNode;
     triggerOffset: number;
+    triggerIndex: number;
   }) => void;
   hideAutocomplete: () => void;
   selectNext: () => void;
@@ -34,8 +38,10 @@ const INITIAL_STATE: AutocompleteState = {
   selectedIndex: 0,
   suggestions: [],
   triggerPosition: { top: 0, left: 0 },
+  triggerBoxPosition: { top: 0, left: 0 },
   triggerNode: null,
-  triggerOffset: 0
+  triggerOffset: 0,
+  triggerIndex: 0
 };
 
 export function useAutocompleteState(): [AutocompleteState, AutocompleteActions] {
@@ -45,8 +51,10 @@ export function useAutocompleteState(): [AutocompleteState, AutocompleteActions]
     matchString: string;
     suggestions: string[];
     triggerPosition: DropdownPosition;
+    triggerBoxPosition: DropdownPosition;
     triggerNode: TextNode;
     triggerOffset: number;
+    triggerIndex: number;
   }) => {
     setState({
       isActive: true,
@@ -54,8 +62,10 @@ export function useAutocompleteState(): [AutocompleteState, AutocompleteActions]
       selectedIndex: 0,
       suggestions: params.suggestions,
       triggerPosition: params.triggerPosition,
+      triggerBoxPosition: params.triggerBoxPosition,
       triggerNode: params.triggerNode,
-      triggerOffset: params.triggerOffset
+      triggerOffset: params.triggerOffset,
+      triggerIndex: params.triggerIndex
     });
   }, []);
 

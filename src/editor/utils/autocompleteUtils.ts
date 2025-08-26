@@ -13,6 +13,43 @@ export interface TriggerInfo {
 }
 
 /**
+ * Calculate optimal position for autocomplete trigger box
+ * Positions at the actual trigger location in the text
+ */
+export function calculateTriggerBoxPosition(triggerIndex: number): DropdownPosition {
+  try {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) {
+      return { top: 100, left: 100 };
+    }
+    
+    const range = selection.getRangeAt(0);
+    const anchorNode = range.startContainer;
+    
+    // Create a range at the trigger position
+    const triggerRange = document.createRange();
+    triggerRange.setStart(anchorNode, triggerIndex);
+    triggerRange.setEnd(anchorNode, triggerIndex + 2); // Position after <>
+    
+    const rect = triggerRange.getBoundingClientRect();
+    
+    const editorContainer = document.querySelector('.editor-container');
+    const containerRect = editorContainer?.getBoundingClientRect();
+    
+    if (!containerRect) {
+      return { top: 100, left: 100 };
+    }
+    
+    const top = rect.top - containerRect.top - 5; // Position slightly above trigger
+    const left = Math.max(0, rect.left - containerRect.left);
+    
+    return { top, left };
+  } catch (error) {
+    return { top: 100, left: 100 };
+  }
+}
+
+/**
  * Calculate optimal position for autocomplete dropdown
  */
 export function calculateDropdownPosition(): DropdownPosition {
@@ -87,6 +124,7 @@ export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
     triggerIndex: -1
   };
 }
+
 
 /**
  * Filter suggestions based on match string

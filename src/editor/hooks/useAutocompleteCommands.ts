@@ -6,8 +6,8 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_HIGH,
-  KEY_ARROW_DOWN_COMMAND,
-  KEY_ARROW_UP_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  KEY_DOWN_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   KEY_BACKSPACE_COMMAND,
@@ -33,8 +33,6 @@ export function useAutocompleteCommands(
 ): AutocompleteCommandHandlers {
   const selectSuggestion = useCallback((suggestion: string) => {
     editor.update(() => {
-      if (!state.triggerNode) return;
-
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
@@ -44,23 +42,27 @@ export function useAutocompleteCommands(
       const textContent = anchorNode.getTextContent();
       const cursorOffset = selection.anchor.offset;
       
+      // Find the trigger pattern
       const beforeCursor = textContent.substring(0, cursorOffset);
       const triggerIndex = beforeCursor.lastIndexOf('<>');
       
       if (triggerIndex !== -1) {
+        // Replace the entire <> + matchString with AutocompleteNode
         insertAutocompleteNode(anchorNode, suggestion, triggerIndex, cursorOffset);
       }
     });
     
     actions.hideAutocomplete();
   }, [editor, state.triggerNode, actions]);
-  // Arrow navigation commands
+  // Critical priority keyboard handler to prevent cursor movement
   useEffect(() => {
-    const unregisterDown = editor.registerCommand(
-      KEY_ARROW_DOWN_COMMAND,
-      () => {
-        if (!state.isActive) return false;
-        
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!state.isActive) return false;
+      
+      // Handle UP/DOWN before any other handlers
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         actions.selectNext();
         
         // Scroll selected item into view
@@ -71,19 +73,11 @@ export function useAutocompleteCommands(
         }, 0);
         
         return true;
-      },
-      COMMAND_PRIORITY_LOW
-    );
-
-    return unregisterDown;
-  }, [editor, state.isActive, actions]);
-
-  useEffect(() => {
-    const unregisterUp = editor.registerCommand(
-      KEY_ARROW_UP_COMMAND,
-      () => {
-        if (!state.isActive) return false;
-        
+      }
+      
+      if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         actions.selectPrevious();
         
         // Scroll selected item into view
@@ -94,11 +88,19 @@ export function useAutocompleteCommands(
         }, 0);
         
         return true;
-      },
-      COMMAND_PRIORITY_LOW
+      }
+      
+      
+      return false;
+    };
+
+    const unregister = editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      handleKeyDown,
+      COMMAND_PRIORITY_CRITICAL
     );
 
-    return unregisterUp;
+    return unregister;
   }, [editor, state.isActive, actions]);
 
   // Selection commands (Enter and Tab)
@@ -246,6 +248,7 @@ export function useAutocompleteCommands(
 
     return unregisterPaste;
   }, [editor]);
+
 
   return { selectSuggestion };
 }

@@ -22,7 +22,8 @@ export default function AutocompletePlugin(): React.JSX.Element | null {
   // Handle escape key
   useEscapeKeyHandler(state.isActive, actions.hideAutocomplete);
 
-  // Render dropdown if active
+
+  // Render autocomplete dropdown if active and has suggestions
   if (!state.isActive || state.suggestions.length === 0) {
     return null;
   }

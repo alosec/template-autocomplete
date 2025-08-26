@@ -423,6 +423,49 @@ body {
     font-weight: 500;
 }
 
+
+/* CSS-based visual highlighting for active autocomplete trigger */
+.editor-container.autocomplete-active {
+    /* This class is applied when autocomplete is active */
+}
+
+/* Highlight effect for text that looks like <> patterns when autocomplete is active */
+.editor-container.autocomplete-active .editor-input {
+    /* Use CSS to create a subtle highlight effect around trigger patterns */
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(59, 130, 246, 0.1) 100%,
+        transparent 100%
+    );
+    border-radius: 4px;
+    transition: all 0.15s ease-out;
+}
+
+/* Alternative approach: Add a subtle glow effect */
+.editor-container.autocomplete-active .editor-input::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 6px;
+    pointer-events: none;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .minimal-editor {

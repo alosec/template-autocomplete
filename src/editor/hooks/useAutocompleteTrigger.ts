@@ -3,7 +3,7 @@ import { LexicalEditor, TextNode, $getSelection, $isRangeSelection } from 'lexic
 import { 
   detectTrigger, 
   filterSuggestions, 
-  calculateDropdownPosition 
+  calculateDropdownPosition
 } from '../utils/autocompleteUtils';
 import { GLOBAL_BRAIN_SUGGESTIONS } from '../config/autocompleteConfig';
 import { AutocompleteActions } from './useAutocompleteState';
@@ -53,8 +53,10 @@ export function useAutocompleteTrigger(
             matchString: triggerInfo.matchString,
             suggestions: filtered,
             triggerPosition,
+            triggerBoxPosition: triggerPosition, // Use same position for now
             triggerNode: anchorNode,
-            triggerOffset: cursorOffset
+            triggerOffset: cursorOffset,
+            triggerIndex: triggerInfo.triggerIndex
           });
         } else if (isActive) {
           // Hide autocomplete if trigger not found

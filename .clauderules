@@ -1,0 +1,137 @@
+# Claude Rules for Minimal Text Editor Project
+
+## Development Patterns
+
+### Component Architecture
+- Use functional components with hooks exclusively
+- Implement manager pattern for business logic (DocumentManager, StorageManager)
+- Keep components focused on UI concerns, delegate logic to managers
+- Use TypeScript strictly - no `any` types, proper interface definitions
+
+### Lexical Integration
+- Custom plugin approach required (no third-party Lexical plugins)
+- AutocompleteNode extends TextNode for non-editable entries
+- Plugin composition pattern in EditorWithSync component
+- Preserve editor state through document switches
+
+### Storage & Persistence
+- IndexedDB via abstraction layers (IndexedDBHelper → StorageManager → DocumentManager)
+- Debounced auto-save (2-second delay) for optimal UX
+- Proper error handling for storage quota and connection issues
+- Maintain document schema compatibility across updates
+
+### Testing Standards
+- 100% test pass rate requirement
+- React Testing Library for component testing
+- Custom Lexical testing utilities for editor behavior
+- Mock IndexedDB for storage operation testing
+- Test both happy path and edge cases
+
+### UI/UX Patterns
+- Minimal, flat design aesthetic throughout
+- Responsive design with mobile considerations
+- Loading states for all async operations
+- Consistent hover/focus states and transitions
+- Proper keyboard navigation support
+
+## Code Quality Standards
+
+### File Organization
+```
+src/
+├── components/          # UI components
+├── editor/             
+│   ├── nodes/          # Custom Lexical nodes
+│   └── plugins/        # Custom Lexical plugins
+├── hooks/              # Reusable React hooks
+├── types/              # TypeScript definitions
+├── utils/              # Business logic managers
+└── __tests__/          # Test files
+```
+
+### Naming Conventions
+- PascalCase for components and classes
+- camelCase for functions, variables, and methods
+- UPPER_SNAKE_CASE for constants
+- Descriptive names that indicate purpose
+- Manager suffix for business logic classes
+
+### State Management
+- Local state with useState for UI concerns
+- useCallback for event handlers to prevent re-renders
+- useRef for DOM references and mutable values
+- No global state library needed - prop drilling acceptable for current scope
+
+### Error Handling
+- Try-catch blocks for all async operations
+- Graceful degradation for storage failures
+- User-friendly error messages in UI
+- Console logging for debugging in development
+
+## Project-Specific Rules
+
+### Global Brain Integration
+- Flat list design for sidebar content (no card-based styling)
+- Click-to-load workflow creates full documents
+- Maintain existing document data structure when loading Global Brain items
+- Loading states with spinner feedback during async operations
+
+### Autocomplete Behavior
+- Trigger on `<>` characters only
+- Dynamic filtering based on user input after trigger
+- Keyboard navigation: arrows for selection, enter/tab to accept
+- Single backspace to delete completed entries
+- Visual distinction with blue background for completed entries
+
+### Document Management
+- Auto-save with visual indicators
+- Recent documents sorted by modification date
+- Word count tracking and display
+- Export/import in JSON format with metadata preservation
+
+### Performance Requirements
+- Autocomplete response time <100ms
+- Document save operations <500ms
+- Smooth sidebar resizing at 60fps
+- Test suite execution <10 seconds
+
+## Development Workflow
+
+### Git Practices
+- Conventional commits with clear descriptions
+- Feature branch development
+- Commit frequently with logical changesets
+- Detailed commit messages explaining the why, not just what
+
+### Build & Development
+- Vite for fast development server with HMR
+- TypeScript strict mode enabled
+- Jest for testing with jsdom environment
+- ESLint for code quality (when configured)
+
+### Testing Approach
+- Test-driven development preferred
+- Unit tests for individual components
+- Integration tests for workflows
+- Mock external dependencies (IndexedDB, File API)
+- Test user interactions with Testing Library utilities
+
+## Maintenance Notes
+
+### Dependencies
+- Keep React/Lexical versions aligned
+- Update dependencies cautiously to avoid breaking changes  
+- Prefer stable, well-maintained packages
+- Document any critical dependency decisions
+
+### Documentation
+- Memory bank files updated after significant changes
+- Component interfaces properly documented with TypeScript
+- README kept current with setup instructions
+- Code comments for complex business logic only
+
+### Future Considerations
+- Global Brain dataset expansion planned
+- Autocomplete metadata integration roadmap defined  
+- UI polish phase identified
+- Performance monitoring capabilities if needed

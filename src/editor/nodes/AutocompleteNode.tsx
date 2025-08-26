@@ -83,6 +83,7 @@ export class AutocompleteNode extends TextNode {
   isToken(): boolean {
     return true;
   }
+
 }
 
 export function $createAutocompleteNode(text: string): AutocompleteNode {
