@@ -234,30 +234,6 @@ export default function AutocompletePlugin(): JSX.Element | null {
     return unregisterTextListener;
   }, [editor, autocompleteState, hideAutocomplete, calculateCursorPosition]);
 
-  // Update dropdown position when autocomplete is active and cursor moves
-  useEffect(() => {
-    if (!autocompleteState?.isActive) return;
-
-    const updatePosition = () => {
-      const newPosition = calculateCursorPosition();
-      setAutocompleteState(prev => prev ? {
-        ...prev,
-        triggerPosition: newPosition
-      } : null);
-    };
-
-    // Update position on selection changes (cursor movement)
-    const handleSelectionChange = () => {
-      // Small delay to ensure DOM is updated
-      setTimeout(updatePosition, 10);
-    };
-
-    document.addEventListener('selectionchange', handleSelectionChange);
-    
-    return () => {
-      document.removeEventListener('selectionchange', handleSelectionChange);
-    };
-  }, [autocompleteState?.isActive, calculateCursorPosition]);
 
   useEffect(() => {
     const unregisterKeyHandlers = [
