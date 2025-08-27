@@ -9,8 +9,8 @@ interface EditorToolbarProps {
   onSaveDocument: () => void;
   onLoadDocument: (document: Document) => void;
   onDeleteDocument: (id: string) => void;
-  onToggleSidebar: () => void;
-  sidebarVisible: boolean;
+  onToggleBrainPanel: () => void;
+  brainPanelVisible: boolean;
 }
 
 export default function EditorToolbar({
@@ -20,8 +20,8 @@ export default function EditorToolbar({
   onSaveDocument,
   onLoadDocument,
   onDeleteDocument,
-  onToggleSidebar,
-  sidebarVisible
+  onToggleBrainPanel,
+  brainPanelVisible
 }: EditorToolbarProps) {
   const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -128,13 +128,6 @@ export default function EditorToolbar({
   return (
     <div className="editor-toolbar" ref={toolbarRef}>
       <div className="toolbar-left">
-        <button 
-          className="toolbar-btn sidebar-toggle-btn"
-          onClick={onToggleSidebar}
-          title={sidebarVisible ? 'Hide sidebar' : 'Show sidebar'}
-        >
-          {sidebarVisible ? '←' : '→'}
-        </button>
         
         <div className="toolbar-dropdown">
           <button className="toolbar-btn dropdown-toggle" onClick={toggleFileMenu}>
@@ -189,6 +182,13 @@ export default function EditorToolbar({
       </div>
 
       <div className="toolbar-right">
+        <button 
+          className="toolbar-btn brain-toggle-btn"
+          onClick={onToggleBrainPanel}
+          title={brainPanelVisible ? 'Hide brain panel' : 'Show brain panel'}
+        >
+          🧠
+        </button>
       </div>
       
       {importFeedback && (

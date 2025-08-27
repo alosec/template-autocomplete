@@ -5,7 +5,7 @@ import { EditorState, $getRoot } from 'lexical';
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
 import EditorToolbar from './EditorToolbar';
 import EditorWithSync from './EditorWithSync';
-import ResizableSidebar from './ResizableSidebar';
+import TopBrainPanel from './TopBrainPanel';
 import { Document } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
 
@@ -23,8 +23,8 @@ const editorConfig = {
 export default function MinimalEditor() {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
   const [isModified, setIsModified] = useState(false);
-  const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(300);
+  const [brainPanelVisible, setBrainPanelVisible] = useState(false);
+  const [brainPanelHeight, setBrainPanelHeight] = useState(400);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleNewDocument = useCallback(() => {
@@ -124,12 +124,13 @@ export default function MinimalEditor() {
     setIsModified(true);
   }, [currentDocument]);
 
-  const toggleSidebar = useCallback(() => {
-    setSidebarVisible(prev => !prev);
+
+  const toggleBrainPanel = useCallback(() => {
+    setBrainPanelVisible(prev => !prev);
   }, []);
 
-  const handleSidebarWidthChange = useCallback((width: number) => {
-    setSidebarWidth(width);
+  const handleBrainPanelHeightChange = useCallback((height: number) => {
+    setBrainPanelHeight(height);
   }, []);
 
   const handleLoadGlobalBrainItem = useCallback(async (item: any) => {
@@ -146,20 +147,7 @@ export default function MinimalEditor() {
 
 
   return (
-    <div 
-      className="minimal-editor"
-      style={{
-        marginLeft: sidebarVisible ? `${sidebarWidth}px` : '0'
-      }}
-    >
-      <ResizableSidebar 
-        isVisible={sidebarVisible}
-        onToggle={toggleSidebar}
-        width={sidebarWidth}
-        onWidthChange={handleSidebarWidthChange}
-        onLoadItem={handleLoadGlobalBrainItem}
-      />
-      
+    <div className="minimal-editor">
       <EditorToolbar
         currentDocument={currentDocument}
         isModified={isModified}
@@ -167,8 +155,16 @@ export default function MinimalEditor() {
         onSaveDocument={handleSaveDocument}
         onLoadDocument={handleLoadDocument}
         onDeleteDocument={handleDeleteDocument}
-        onToggleSidebar={toggleSidebar}
-        sidebarVisible={sidebarVisible}
+        onToggleBrainPanel={toggleBrainPanel}
+        brainPanelVisible={brainPanelVisible}
+      />
+      
+      <TopBrainPanel 
+        isVisible={brainPanelVisible}
+        onToggle={toggleBrainPanel}
+        height={brainPanelHeight}
+        onHeightChange={handleBrainPanelHeightChange}
+        onLoadItem={handleLoadGlobalBrainItem}
       />
       
       <div className="editor-main">
