@@ -42,21 +42,15 @@ export function useAutocompleteCommands(
       const anchorNode = selection.anchor.getNode();
       if (!(anchorNode instanceof TextNode)) return;
 
-      const textContent = anchorNode.getTextContent();
-      const cursorOffset = selection.anchor.offset;
-      
-      // Find the trigger pattern
-      const beforeCursor = textContent.substring(0, cursorOffset);
-      const triggerIndex = beforeCursor.lastIndexOf('<>');
-      
-      if (triggerIndex !== -1) {
-        // Replace the entire <> + matchString with AutocompleteNode
-        insertAutocompleteNode(anchorNode, suggestion.text, triggerIndex, cursorOffset, state.matchString);
+      // Use the stored trigger info from state instead of re-detecting
+      if (state.triggerIndex !== -1) {
+        const cursorOffset = selection.anchor.offset;
+        insertAutocompleteNode(anchorNode, suggestion.text, state.triggerIndex, cursorOffset, state.matchString);
       }
     });
     
     actions.hideAutocomplete();
-  }, [editor, state.triggerNode, actions]);
+  }, [editor, state.triggerIndex, state.matchString, actions]);
   // Critical priority keyboard handler for UP/DOWN arrows when autocomplete is active
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {

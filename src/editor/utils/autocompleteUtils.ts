@@ -102,7 +102,9 @@ export function calculateDropdownPosition(): DropdownPosition {
 
 /**
  * Detect trigger pattern in text with cursor position awareness
+ * Uses simple rule: last <> before cursor is the active trigger
  * Handles both <>text| and <>|text scenarios by looking at text before and after cursor
+ * Only closes autocomplete on whitespace/newlines, not on angle brackets in content
  */
 export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
   const beforeCursor = text.substring(0, cursorOffset);
@@ -111,29 +113,23 @@ export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
   if (triggerIndex !== -1) {
     const matchStringBefore = beforeCursor.substring(triggerIndex + 2);
     
-    // Don't continue if there's partial trigger pattern before cursor
-    if (matchStringBefore.includes('<')) {
-      return { found: false, matchString: '', triggerIndex: -1 };
-    }
-    
     // Look for text after cursor until whitespace or end (word characters only)
     const afterCursor = text.substring(cursorOffset);
     const wordMatch = afterCursor.match(/^([a-zA-Z0-9-_]*)/);
     const matchStringAfter = wordMatch ? wordMatch[1] : '';
     
-    // Only include word characters, stop at spaces or punctuation
-    
     const fullMatchString = matchStringBefore + matchStringAfter;
     
-    // Don't trigger if match string contains newline
-    if (!fullMatchString.includes('\n')) {
-      return {
-        found: true,
-        matchString: fullMatchString,
-        triggerIndex,
-        cursorInMiddle: matchStringBefore.length < fullMatchString.length
-      };
-    }
+    // Close autocomplete if match string contains whitespace or newlines
+    // But still return the trigger info for consistent behavior
+    const shouldClose = fullMatchString.includes(' ') || fullMatchString.includes('\n');
+    
+    return {
+      found: !shouldClose,
+      matchString: shouldClose ? '' : fullMatchString,
+      triggerIndex,
+      cursorInMiddle: matchStringBefore.length < fullMatchString.length
+    };
   }
   
   return {

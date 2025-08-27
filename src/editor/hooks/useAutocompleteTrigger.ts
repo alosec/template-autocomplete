@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { LexicalEditor, TextNode, $getSelection, $isRangeSelection } from 'lexical';
+import { LexicalEditor, TextNode, $getSelection, $isRangeSelection, $getRoot } from 'lexical';
 import { 
   detectTrigger, 
   filterSuggestions, 
@@ -34,30 +34,22 @@ export function useAutocompleteTrigger(
       const triggerInfo = detectTrigger(nodeTextContent, cursorOffset);
       
       if (triggerInfo.found) {
-        // Check if this is the same trigger that's already active
-        const isSameTrigger = state.isActive && 
-          state.triggerNode === anchorNode &&
-          state.triggerIndex === triggerInfo.triggerIndex;
-
-        // Only update if different trigger or not active
-        if (!isSameTrigger) {
-          // Calculate dropdown position
-          const triggerPosition = calculateDropdownPosition();
-          
-          // Filter suggestions based on match string
-          const filtered = filterSuggestions(suggestions, triggerInfo.matchString);
-          
-          // Show autocomplete for this trigger
-          actions.showAutocomplete({
-            matchString: triggerInfo.matchString,
-            suggestions: filtered,
-            triggerPosition,
-            triggerBoxPosition: triggerPosition,
-            triggerNode: anchorNode,
-            triggerOffset: cursorOffset,
-            triggerIndex: triggerInfo.triggerIndex
-          });
-        }
+        // Calculate dropdown position
+        const triggerPosition = calculateDropdownPosition();
+        
+        // Filter suggestions based on match string
+        const filtered = filterSuggestions(suggestions, triggerInfo.matchString);
+        
+        // Show autocomplete for this trigger
+        actions.showAutocomplete({
+          matchString: triggerInfo.matchString,
+          suggestions: filtered,
+          triggerPosition,
+          triggerBoxPosition: triggerPosition,
+          triggerNode: anchorNode,
+          triggerOffset: cursorOffset,
+          triggerIndex: triggerInfo.triggerIndex
+        });
       } else if (state.isActive) {
         // Hide autocomplete if no trigger found at cursor
         actions.hideAutocomplete();
@@ -65,34 +57,29 @@ export function useAutocompleteTrigger(
     });
   };
 
-  // Listen to text content changes
-  useEffect(() => {
-    const unregisterTextListener = editor.registerTextContentListener((textContent) => {
-      // Hide autocomplete if editor is empty
-      if (textContent === '') {
-        if (state.isActive) {
-          actions.hideAutocomplete();
-        }
-        return;
-      }
-
-      // Check autocomplete state at current cursor position
-      checkAutocompleteAtCursor();
-    });
-
-    return () => {
-      unregisterTextListener();
-    };
-  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex, suggestions]);
-
-  // Listen to selection changes (cursor movement)
+  // Single consolidated listener for all editor changes (text content and cursor position)
   useEffect(() => {
     let lastCursorPosition = -1;
     let lastNodeKey = '';
+    let lastTextContent = '';
     
-    const unregisterSelectionListener = editor.registerUpdateListener(({ editorState }) => {
+    const unregisterUpdateListener = editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection();
+        
+        // Get current text content for empty check
+        const currentTextContent = editor.getEditorState().read(() => {
+          return $getRoot().getTextContent();
+        });
+        
+        // Hide autocomplete if editor is empty
+        if (currentTextContent === '') {
+          if (state.isActive) {
+            actions.hideAutocomplete();
+          }
+          return;
+        }
+        
         if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
           // Close dropdown for non-range selections or multi-selections
           if (state.isActive) {
@@ -114,21 +101,27 @@ export function useAutocompleteTrigger(
         const currentCursorPosition = selection.anchor.offset;
         const currentNodeKey = anchorNode.getKey();
         
-        // Only check if cursor actually moved
-        if (currentCursorPosition !== lastCursorPosition || currentNodeKey !== lastNodeKey) {
+        // Check if anything significant changed (cursor position, node, or text content)
+        const hasChanged = 
+          currentCursorPosition !== lastCursorPosition || 
+          currentNodeKey !== lastNodeKey ||
+          currentTextContent !== lastTextContent;
+          
+        if (hasChanged) {
           lastCursorPosition = currentCursorPosition;
           lastNodeKey = currentNodeKey;
+          lastTextContent = currentTextContent;
           
-          // Use immediate check for cursor movement (no setTimeout)
+          // Check autocomplete state at current cursor position
           checkAutocompleteAtCursor();
         }
       });
     });
 
     return () => {
-      unregisterSelectionListener();
+      unregisterUpdateListener();
     };
-  }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex, suggestions]);
+  }, [editor, actions, state.isActive, suggestions]);
 
   // Listen for editor focus to re-check autocomplete when returning to editor
   useEffect(() => {

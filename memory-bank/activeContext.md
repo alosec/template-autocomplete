@@ -2,15 +2,34 @@
 
 ## Current Work Focus
 
-### Recently Completed (Current Session)
-**Global Brain Idea Flow Matrix** - Major paradigm shift from complex sidebar to serendipitous discovery:
+### Critical Issue: Adversarial Autocomplete Input Handling
+**Primary Challenge**: Autocomplete trigger detection failing for complex input patterns
 
-- ✅ **Paradigm Evolution**: Moved from left sidebar → marquee ticker → centered card discovery
-- ✅ **Tinder-Style Interface**: One idea at a time with Next 🎲 and Load This actions
-- ✅ **Crapboard-Inspired Simplicity**: Focus on organic, serendipitous content discovery
-- ✅ **Minimalist Card Design**: Sharp gray borders, centered layout, clean typography
-- ✅ **Brain Toggle**: 🧠 emoji button in toolbar (replaced arrow sidebar toggle)
-- ✅ **Random Selection Logic**: Algorithmic idea shuffling for discovery experience
+**Specific Problem Case**: 
+- Input string: `<><><>>>>>><<<<>>><<<>>>`
+- Position: `<><><>>>>>><<<<>>><<<>|>>` (after `<>` at position 20)
+- **Left-to-right navigation**: ✅ Dropdown appears correctly  
+- **Right-to-left navigation**: ❌ Dropdown fails to appear
+- **Additional Issue**: Dropdown doesn't close properly when it should
+
+**Current Understanding Gap**: 
+After extensive debugging of `detectTrigger` function, root cause remains unclear. The issue may not be in trigger detection logic at all, but rather in:
+1. **Navigation Handling** - How cursor movement events are processed differently by direction
+2. **State Management** - How autocomplete state is updated during navigation
+3. **Event Timing** - Race conditions or timing issues between navigation and trigger checking
+
+**Key Insight**: "It's not a matter of getting it right, it's a matter of understanding the nature of the code and the nature of the problem." Current approach has been spinning wheels on trigger detection without sufficient understanding of the full system behavior.
+
+**New North Star**: Focus on adversarial input scenarios and systematic understanding of the autocomplete system's three main components:
+- Trigger Detection (`detectTrigger` in `autocompleteUtils.ts`)
+- Navigation Handling (`useAutocompleteTrigger.ts` cursor movement logic)  
+- State Management (`useAutocompleteState.ts` dropdown visibility)
+
+### Recently Completed (Previous Session)
+**Global Brain Idea Flow Matrix** - Major paradigm shift completed:
+- ✅ Tinder-style discovery interface with 🧠 brain toggle
+- ✅ Centered card layout replacing complex sidebar
+- ✅ Random selection logic for serendipitous discovery
 
 ### Technical Implementation Details
 - Created `TopBrainPanel` component with resizable height (200-600px)
@@ -73,7 +92,28 @@ interface EnhancedGlobalBrainItem {
 
 ## Immediate Next Steps
 
-### **North Star Goal**: Rich Dataset from Global Brain Platform
+### **Current Priority**: Systematic Autocomplete Debugging
+**Approach**: Move beyond trigger detection to understand full system behavior
+
+#### Phase 1: Navigation Handling Analysis (Next)
+1. **Add logging to cursor movement detection** in `useAutocompleteTrigger.ts`
+2. **Trace event flow**: Left-to-right vs right-to-left navigation differences  
+3. **Identify timing issues**: Are events firing in different orders?
+4. **Check selection state**: Is cursor position calculated differently by direction?
+
+#### Phase 2: State Management Investigation  
+1. **Add state debugging** to `useAutocompleteState.ts`
+2. **Track state transitions**: When does dropdown show/hide get called?
+3. **Identify race conditions**: Are state updates conflicting?
+4. **Test isolation**: Call trigger detection directly vs through navigation
+
+#### Phase 3: Holistic System Understanding
+1. **Create minimal reproduction case** 
+2. **Document exact event sequence** for both working and failing scenarios
+3. **Map interaction between all three components**
+4. **Implement targeted fix** based on root cause understanding
+
+### **Future Goal**: Rich Dataset from Global Brain Platform  
 Target: 300+ high-quality items extracted from https://edge.globalbrain.ai/
 
 #### Phase 1: Platform Content Scraping (Next Session)
