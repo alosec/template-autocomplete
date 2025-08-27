@@ -17,6 +17,7 @@ import {
 import { $isAutocompleteNode } from '../nodes/AutocompleteNode';
 import { insertAutocompleteNode } from '../utils/autocompleteUtils';
 import { AutocompleteState, AutocompleteActions } from './useAutocompleteState';
+import { HIDE_AUTOCOMPLETE_COMMAND } from '../commands/autocompleteCommands';
 
 import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
@@ -253,6 +254,21 @@ export function useAutocompleteCommands(
     return unregisterPaste;
   }, [editor]);
 
+  // Hide autocomplete command - for external UI elements to close dropdown
+  useEffect(() => {
+    const unregisterHideCommand = editor.registerCommand(
+      HIDE_AUTOCOMPLETE_COMMAND,
+      () => {
+        if (state.isActive) {
+          actions.hideAutocomplete();
+        }
+        return true; // Command handled
+      },
+      COMMAND_PRIORITY_HIGH
+    );
+
+    return unregisterHideCommand;
+  }, [editor, state.isActive, actions]);
 
   return { selectSuggestion };
 }

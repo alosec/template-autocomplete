@@ -129,4 +129,23 @@ export function useAutocompleteTrigger(
       unregisterSelectionListener();
     };
   }, [editor, actions, state.isActive, state.triggerNode, state.triggerIndex, suggestions]);
+
+  // Listen for editor focus to re-check autocomplete when returning to editor
+  useEffect(() => {
+    const rootElement = editor.getRootElement();
+    if (!rootElement) return;
+
+    const handleFocus = () => {
+      // Small delay to ensure selection is properly set after focus
+      setTimeout(() => {
+        checkAutocompleteAtCursor();
+      }, 10);
+    };
+
+    rootElement.addEventListener('focus', handleFocus);
+    
+    return () => {
+      rootElement.removeEventListener('focus', handleFocus);
+    };
+  }, [editor, checkAutocompleteAtCursor]);
 }

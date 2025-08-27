@@ -1,8 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { EditorState, $getRoot } from 'lexical';
+import { EditorState, $getRoot, LexicalEditor } from 'lexical';
 
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
+import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 import EditorToolbar from './EditorToolbar';
 import EditorWithSync from './EditorWithSync';
 import TopBrainPanel from './TopBrainPanel';
@@ -26,6 +27,7 @@ export default function MinimalEditor() {
   const [brainPanelVisible, setBrainPanelVisible] = useState(false);
   const [brainPanelHeight, setBrainPanelHeight] = useState(400);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const editorRef = useRef<LexicalEditor | null>(null);
 
   const handleNewDocument = useCallback(() => {
     const newDoc = documentManager.createNewDocument();
@@ -124,6 +126,13 @@ export default function MinimalEditor() {
     setIsModified(true);
   }, [currentDocument]);
 
+  const handleTitleFocus = useCallback(() => {
+    // Close autocomplete when focusing on title
+    if (editorRef.current) {
+      editorRef.current.dispatchCommand(HIDE_AUTOCOMPLETE_COMMAND, undefined);
+    }
+  }, []);
+
 
   const toggleBrainPanel = useCallback(() => {
     setBrainPanelVisible(prev => !prev);
@@ -157,6 +166,7 @@ export default function MinimalEditor() {
         onDeleteDocument={handleDeleteDocument}
         onToggleBrainPanel={toggleBrainPanel}
         brainPanelVisible={brainPanelVisible}
+        editorRef={editorRef}
       />
       
       <TopBrainPanel 
@@ -165,6 +175,7 @@ export default function MinimalEditor() {
         height={brainPanelHeight}
         onHeightChange={handleBrainPanelHeightChange}
         onLoadItem={handleLoadGlobalBrainItem}
+        editorRef={editorRef}
       />
       
       <div className="editor-main">
@@ -174,6 +185,7 @@ export default function MinimalEditor() {
               type="text"
               value={currentDocument.title}
               onChange={handleTitleChange}
+              onFocus={handleTitleFocus}
               className="document-title-input"
               placeholder="Document title..."
             />
@@ -194,6 +206,7 @@ export default function MinimalEditor() {
                   <EditorWithSync 
                     currentDocument={currentDocument}
                     onContentChange={handleContentChange}
+                    editorRef={editorRef}
                   />
                 </div>
               </div>

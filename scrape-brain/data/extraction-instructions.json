@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-08-27T03:43:15.091Z",
+  "url": "https://edge.globalbrain.ai/",
+  "extractionSteps": [
+    {
+      "step": 1,
+      "action": "Navigate to Global Brain",
+      "tool": "mcp__puppeteer__puppeteer_navigate",
+      "params": {
+        "url": "https://edge.globalbrain.ai/"
+      }
+    },
+    {
+      "step": 2,
+      "action": "Extract initial structure",
+      "tool": "mcp__puppeteer__puppeteer_evaluate",
+      "script": "\n    var structure = {\n      title: document.title,\n      url: window.location.href,\n      extractedAt: new Date().toISOString()\n    };\n\n    var categories = [];\n    var allElements = document.querySelectorAll('*');\n\n    for (var i = 0; i < allElements.length; i++) {\n      var element = allElements[i];\n      var text = element.textContent ? element.textContent.trim() : '';\n      \n      // Look for category headers with counts\n      if (text && text.length > 5 && text.length < 100 && element.children.length === 0) {\n        var nextSibling = element.nextElementSibling;\n        var count = null;\n        \n        if (nextSibling && /^\\d+$/.test(nextSibling.textContent?.trim() || '')) {\n          count = parseInt(nextSibling.textContent.trim());\n        }\n        \n        categories.push({\n          text: text,\n          count: count,\n          tagName: element.tagName,\n          className: element.className\n        });\n      }\n    }\n\n    ({\n      ...structure,\n      categories: categories.slice(0, 50),\n      totalFound: categories.length\n    });\n  ",
+      "saveAs": "initial-structure.json"
+    },
+    {
+      "step": 3,
+      "action": "Extract detailed content",
+      "tool": "mcp__puppeteer__puppeteer_evaluate",
+      "script": "\n    var detailedContent = [];\n    var allTextElements = document.querySelectorAll('*');\n\n    for (var i = 0; i < allTextElements.length; i++) {\n      var element = allTextElements[i];\n      var text = element.textContent ? element.textContent.trim() : '';\n      \n      // Look for substantial content items\n      if (text && text.length > 15 && text.length < 500 && element.children.length === 0) {\n        detailedContent.push({\n          text: text,\n          tag: element.tagName,\n          className: element.className,\n          id: element.id\n        });\n      }\n    }\n\n    // Filter out UI elements and duplicates\n    var filteredContent = [];\n    var seenTexts = {};\n    \n    for (var i = 0; i < detailedContent.length; i++) {\n      var item = detailedContent[i];\n      var text = item.text;\n      \n      // Skip UI elements and short content\n      if (!seenTexts[text] && \n          !text.match(/^(Recently|My |Local |BETA|Global|Sign|Ctrl|Filters|Sort|Display|User|Pinned)/) &&\n          !text.match(/^\\d+$/) &&\n          text.indexOf('gmail.com') === -1) {\n        filteredContent.push(item);\n        seenTexts[text] = true;\n      }\n    }\n\n    // Sort by length to get substantial content first\n    filteredContent.sort(function(a, b) { return b.text.length - a.text.length; });\n\n    ({\n      extractedAt: new Date().toISOString(),\n      totalItems: filteredContent.length,\n      content: filteredContent.slice(0, 100), // Top 100 items\n      fullText: document.body.innerText\n    });\n  ",
+      "saveAs": "detailed-content.json"
+    }
+  ],
+  "priorityCategories": [
+    {
+      "name": "Claude's Investigations",
+      "filename": "claude-investigations.json",
+      "priority": "high"
+    },
+    {
+      "name": "impt unsolved problems",
+      "filename": "unsolved-problems.json",
+      "priority": "high"
+    },
+    {
+      "name": "Scientific Progress",
+      "filename": "scientific-progress.json",
+      "priority": "high"
+    }
+  ],
+  "scripts": {
+    "initial": "\n    var structure = {\n      title: document.title,\n      url: window.location.href,\n      extractedAt: new Date().toISOString()\n    };\n\n    var categories = [];\n    var allElements = document.querySelectorAll('*');\n\n    for (var i = 0; i < allElements.length; i++) {\n      var element = allElements[i];\n      var text = element.textContent ? element.textContent.trim() : '';\n      \n      // Look for category headers with counts\n      if (text && text.length > 5 && text.length < 100 && element.children.length === 0) {\n        var nextSibling = element.nextElementSibling;\n        var count = null;\n        \n        if (nextSibling && /^\\d+$/.test(nextSibling.textContent?.trim() || '')) {\n          count = parseInt(nextSibling.textContent.trim());\n        }\n        \n        categories.push({\n          text: text,\n          count: count,\n          tagName: element.tagName,\n          className: element.className\n        });\n      }\n    }\n\n    ({\n      ...structure,\n      categories: categories.slice(0, 50),\n      totalFound: categories.length\n    });\n  ",
+    "detailed": "\n    var detailedContent = [];\n    var allTextElements = document.querySelectorAll('*');\n\n    for (var i = 0; i < allTextElements.length; i++) {\n      var element = allTextElements[i];\n      var text = element.textContent ? element.textContent.trim() : '';\n      \n      // Look for substantial content items\n      if (text && text.length > 15 && text.length < 500 && element.children.length === 0) {\n        detailedContent.push({\n          text: text,\n          tag: element.tagName,\n          className: element.className,\n          id: element.id\n        });\n      }\n    }\n\n    // Filter out UI elements and duplicates\n    var filteredContent = [];\n    var seenTexts = {};\n    \n    for (var i = 0; i < detailedContent.length; i++) {\n      var item = detailedContent[i];\n      var text = item.text;\n      \n      // Skip UI elements and short content\n      if (!seenTexts[text] && \n          !text.match(/^(Recently|My |Local |BETA|Global|Sign|Ctrl|Filters|Sort|Display|User|Pinned)/) &&\n          !text.match(/^\\d+$/) &&\n          text.indexOf('gmail.com') === -1) {\n        filteredContent.push(item);\n        seenTexts[text] = true;\n      }\n    }\n\n    // Sort by length to get substantial content first\n    filteredContent.sort(function(a, b) { return b.text.length - a.text.length; });\n\n    ({\n      extractedAt: new Date().toISOString(),\n      totalItems: filteredContent.length,\n      content: filteredContent.slice(0, 100), // Top 100 items\n      fullText: document.body.innerText\n    });\n  "
+  }
+}

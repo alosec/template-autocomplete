@@ -1,6 +1,8 @@
 import { Document, DocumentSummary } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
 import { useState, useEffect, useRef } from 'react';
+import { LexicalEditor } from 'lexical';
+import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -11,6 +13,7 @@ interface EditorToolbarProps {
   onDeleteDocument: (id: string) => void;
   onToggleBrainPanel: () => void;
   brainPanelVisible: boolean;
+  editorRef?: React.MutableRefObject<LexicalEditor | null>;
 }
 
 export default function EditorToolbar({
@@ -21,7 +24,8 @@ export default function EditorToolbar({
   onLoadDocument,
   onDeleteDocument,
   onToggleBrainPanel,
-  brainPanelVisible
+  brainPanelVisible,
+  editorRef
 }: EditorToolbarProps) {
   const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -125,8 +129,15 @@ export default function EditorToolbar({
     setRecentMenuOpen(false);
   };
 
+  const handleToolbarMouseDown = () => {
+    // Close autocomplete when clicking anywhere in toolbar
+    if (editorRef?.current) {
+      editorRef.current.dispatchCommand(HIDE_AUTOCOMPLETE_COMMAND, undefined);
+    }
+  };
+
   return (
-    <div className="editor-toolbar" ref={toolbarRef}>
+    <div className="editor-toolbar" ref={toolbarRef} onMouseDown={handleToolbarMouseDown}>
       <div className="toolbar-left">
         
         <div className="toolbar-dropdown">

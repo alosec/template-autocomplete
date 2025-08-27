@@ -2,95 +2,139 @@
 
 ## Current Work Focus
 
-### Recently Completed (Last Session)
-**Global Brain Sidebar Restructuring** - Major UI/UX overhaul completed:
+### Recently Completed (Current Session)
+**Global Brain Idea Flow Matrix** - Major paradigm shift from complex sidebar to serendipitous discovery:
 
-- ✅ **Sidebar Architecture**: Converted from fixed right overlay to integrated left-side resizable panel
-- ✅ **Toggle Interface**: Added arrow button (←/→) adjacent to File menu for show/hide
-- ✅ **Resize Functionality**: Implemented drag handle with 200-600px range constraints
-- ✅ **Document Loading**: Full UX matching existing document import/export workflow
-- ✅ **IndexedDB Integration**: Global Brain items now save as proper documents
-- ✅ **Loading States**: Added spinner feedback during document creation
-- ✅ **Styling Overhaul**: Flat, minimal design consistent with toolbar aesthetic
+- ✅ **Paradigm Evolution**: Moved from left sidebar → marquee ticker → centered card discovery
+- ✅ **Tinder-Style Interface**: One idea at a time with Next 🎲 and Load This actions
+- ✅ **Crapboard-Inspired Simplicity**: Focus on organic, serendipitous content discovery
+- ✅ **Minimalist Card Design**: Sharp gray borders, centered layout, clean typography
+- ✅ **Brain Toggle**: 🧠 emoji button in toolbar (replaced arrow sidebar toggle)
+- ✅ **Random Selection Logic**: Algorithmic idea shuffling for discovery experience
 
 ### Technical Implementation Details
-- Renamed `GlobalBrainSidebar` → `ResizableSidebar` component
-- Added `documentManager.createDocumentFromGlobalBrainItem()` method
-- Integrated with existing document lifecycle (save, load, recent menu, export)
-- Removed card-based styling in favor of flat list design
-- Implemented mouse drag resizing with proper event handling
+- Created `TopBrainPanel` component with resizable height (200-600px)
+- Implemented centered card layout with idea-centric design
+- Added random item selection with `Math.floor(Math.random() * GLOBAL_BRAIN_DATA.length)`
+- Maintained document loading integration with existing workflow
+- Removed complex marquee/ticker implementations in favor of simplicity
 
 ## Current State Assessment
 
-### What's Working Well
-1. **Core Editor**: Lexical integration is solid with custom autocomplete
-2. **Document System**: Full CRUD operations with IndexedDB persistence
-3. **Global Brain UI**: Clean, functional sidebar with proper loading states
+### What's Working Excellently
+1. **Core Editor**: Lexical integration solid with custom autocomplete system
+2. **Document System**: Full CRUD operations with IndexedDB persistence  
+3. **Global Brain UX**: Clean discovery interface capturing Crapboard essence
 4. **Test Coverage**: 100% pass rate with comprehensive test suite
 5. **Architecture**: Clean separation of concerns with manager patterns
 
-### Identified Limitations
-1. **Limited Dataset**: Global Brain has only 8 hardcoded sample items
-2. **Disconnected Metadata**: Autocomplete not linked to Global Brain categories
-3. **Styling Polish**: Functional but could be more refined visually
-4. **Content Quality**: Sample data isn't representative of real-world usage
+### Critical Next Phase: Dataset Expansion
+
+#### **PRIMARY LIMITATION**: Static 8-Item Dataset
+Current Global Brain data is hardcoded with only 8 sample items:
+- 2 categories ("Claude's Investigations", "impt unsolved problems")
+- 6 research/challenge items with basic metadata
+
+#### **URGENT NEED**: Robust Data Structure Evolution
+Current schema is insufficient for rich content:
+```typescript
+// Current limited structure
+{
+  text: string;
+  type: "category" | "research" | "item" | "challenge";
+  description: string;
+  tags?: string[];
+  priority?: "high" | "medium";
+  itemCount?: number;
+}
+```
+
+**Required evolution** to support scraped Global Brain platform content:
+```typescript
+interface EnhancedGlobalBrainItem {
+  text: string;
+  type: ContentType; // Expanded taxonomy
+  description: string;
+  source: "global-brain-platform" | "curated";
+  tags: string[];
+  priority: Priority;
+  domain?: Domain; // Scientific, philosophical, technical
+  urgency?: Urgency;
+  category: string; // Parent category from platform
+  relatedItems?: string[]; // Cross-references
+  extractionMetadata: {
+    originalContext: string;
+    parentCategory: string;
+    contentDepth: number;
+    platformLocation: string;
+  };
+}
+```
 
 ## Immediate Next Steps
 
-### Phase 4: Enhancement & Completion
-1. **Expand Dataset**: Replace limited hardcoded data with meaningful Global Brain content
-2. **Metadata Integration**: Connect autocomplete system to Global Brain item categories/tags
-3. **UI Polish**: Final styling refinements and visual improvements
-4. **Feature Finalization**: Mark as production-ready
+### **North Star Goal**: Rich Dataset from Global Brain Platform
+Target: 300+ high-quality items extracted from https://edge.globalbrain.ai/
 
-### Technical Priorities
-1. **Content Enhancement**:
-   - Source richer Global Brain dataset (research topics, concepts, etc.)
-   - Ensure proper tag categorization for autocomplete integration
-   - Maintain existing data structure compatibility
+#### Phase 1: Platform Content Scraping (Next Session)
+1. **Execute Scraping Plan**: Implement the comprehensive extraction documented in `planning/scrape-brain.md`
+2. **Category Mapping**: Extract content from major categories:
+   - "Claude's Investigations" (2,595+ items)
+   - "impt unsolved problems" (16+ items)
+   - "Global Brain", "World Suggestion Boxes", "Curated Lists"
+   - Scientific Progress, philosophical insights
 
-2. **Autocomplete Integration**:
-   - Extract categories/tags from Global Brain items
-   - Update AutocompletePlugin to use dynamic suggestions
-   - Preserve existing `<>` trigger behavior
+3. **Content Classification**: Implement rich taxonomy system
+   - Research problems with context and urgency
+   - Philosophical insights with depth indicators
+   - Cross-reference networks between related items
+   - Rich descriptions from surrounding platform context
 
-3. **Styling Refinement**:
-   - Polish sidebar typography and spacing
-   - Enhance hover states and interactions
-   - Ensure consistent design language throughout
+#### Phase 2: Type System & Schema Evolution
+1. **Update TypeScript interfaces** to support expanded metadata
+2. **Enhance component rendering** to display rich content appropriately
+3. **Maintain backward compatibility** with existing 8-item sample set
+4. **Add content quality indicators** (depth, relevance, cross-references)
+
+#### Phase 3: Integration & Polish
+1. **Dynamic Autocomplete**: Connect `<>` triggers to expanded dataset tags
+2. **Smart Discovery**: Implement content recommendation based on user interaction
+3. **Quality Filtering**: Prioritize high-value research problems and insights
 
 ## Development Context
 
 ### Current Branch
-`feature/minimal-text-editor` - All recent work committed with proper Git history
+`feature/minimal-text-editor` - Latest: `fc6ed3a` Global Brain Idea Flow Matrix
 
 ### Recent Commits
-- `5ca3f82`: Resizable sidebar with document loading (latest)
-- `4dec57f`: Hybrid storage system for large documents
-- `87e19b5`: Document import functionality with testing
-- `bb585ee`: 100% test pass rate achievement
+- `fc6ed3a`: Global Brain Idea Flow Matrix implementation (latest)
+- `f89306d`: Global brain JSON data integration
+- `31644c7`: Click-to-toggle dropdown menus
+- `9bb6d9e`: Cursor-aware autocomplete scenarios
 
 ### Environment State
-- Dev server running on `localhost:5176`
-- All dependencies up to date
-- Test suite passing completely
-- No build errors or warnings
+- Dev server: `localhost:5173` (port changed)
+- All dependencies current
+- Test suite: 100% pass rate
+- Build: Clean, no errors
 
-## Considerations & Constraints
+## Strategic Direction
 
-### Time/Scope Management
-- Original 4-hour assessment evolved into full-featured editor
-- Core requirements exceeded, now focusing on polish
-- Clean stopping point approaching after current enhancements
+### Content Quality Over Quantity
+- Focus on **meaningful research problems** and **actionable insights**
+- Prioritize content that sparks creativity and intellectual curiosity
+- Maintain the **serendipitous discovery** experience that makes Crapboard compelling
 
-### Technical Constraints
-- Maintain Lexical custom plugin approach (no third-party plugins)
-- Preserve existing document data structure
-- Keep IndexedDB schema compatible
-- Maintain test coverage standards
+### Technical Excellence
+- Preserve clean architecture and test coverage standards
+- Maintain performance with larger dataset (lazy loading, efficient rendering)
+- Keep the interface **dead simple** - complexity kills discovery magic
 
-### User Experience Goals
-- Professional, polished appearance
-- Intuitive Global Brain content discovery
-- Seamless integration between knowledge browsing and document creation
-- Consistent interaction patterns throughout the application
+### User Experience North Star
+The Global Brain Idea Flow Matrix should feel like:
+- **Stumbling upon fascinating ideas** unexpectedly
+- **Academic Twitter** but curated and substantial
+- **Research rabbit holes** made discoverable
+- **Intellectual serendipity** in a clean, focused interface
+
+Ready for robust dataset expansion to transform this proof-of-concept into a genuinely compelling knowledge discovery tool.

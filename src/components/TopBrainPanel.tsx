@@ -1,4 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
+import { LexicalEditor } from 'lexical';
+import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 import './top-brain-panel.css';
 
 interface TopBrainPanelProps {
@@ -7,6 +9,7 @@ interface TopBrainPanelProps {
   height: number;
   onHeightChange: (height: number) => void;
   onLoadItem: (item: any) => void;
+  editorRef?: React.MutableRefObject<LexicalEditor | null>;
 }
 
 // Hardcoded Global Brain data from the JSON file
@@ -69,7 +72,7 @@ const GLOBAL_BRAIN_DATA = [
   }
 ];
 
-export default function TopBrainPanel({ isVisible, onToggle, height, onHeightChange, onLoadItem }: TopBrainPanelProps) {
+export default function TopBrainPanel({ isVisible, onToggle, height, onHeightChange, onLoadItem, editorRef }: TopBrainPanelProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
@@ -115,11 +118,19 @@ export default function TopBrainPanel({ isVisible, onToggle, height, onHeightCha
 
   const currentIdea = GLOBAL_BRAIN_DATA[currentItemIndex];
 
+  const handlePanelMouseDown = () => {
+    // Close autocomplete when clicking anywhere in brain panel
+    if (editorRef?.current) {
+      editorRef.current.dispatchCommand(HIDE_AUTOCOMPLETE_COMMAND, undefined);
+    }
+  };
+
   return (
     <div 
       ref={panelRef}
       className="top-brain-panel"
       style={{ height: isVisible ? `${height}px` : '0px' }}
+      onMouseDown={handlePanelMouseDown}
     >
       <div className="panel-content">
         <div className="idea-display">
