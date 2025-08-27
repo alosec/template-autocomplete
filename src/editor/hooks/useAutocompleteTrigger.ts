@@ -93,10 +93,23 @@ export function useAutocompleteTrigger(
     const unregisterSelectionListener = editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection();
-        if (!$isRangeSelection(selection) || !selection.isCollapsed()) return;
+        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+          // Close dropdown for non-range selections or multi-selections
+          if (state.isActive) {
+            actions.hideAutocomplete();
+          }
+          return;
+        }
 
         const anchorNode = selection.anchor.getNode();
-        if (!(anchorNode instanceof TextNode)) return;
+        
+        // If not a TextNode, close dropdown (clicking on empty lines, etc.)
+        if (!(anchorNode instanceof TextNode)) {
+          if (state.isActive) {
+            actions.hideAutocomplete();
+          }
+          return;
+        }
 
         const currentCursorPosition = selection.anchor.offset;
         const currentNodeKey = anchorNode.getKey();
