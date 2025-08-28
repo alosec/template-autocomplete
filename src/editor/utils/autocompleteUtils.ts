@@ -143,9 +143,7 @@ export function filterSuggestions(suggestions: AutocompleteItem[], matchString: 
   
   const matchLower = matchString.toLowerCase();
   const filtered = suggestions.filter(item => 
-    item.text.toLowerCase().includes(matchLower) ||
-    item.description.toLowerCase().includes(matchLower) ||
-    item.tags.some(tag => tag.toLowerCase().includes(matchLower))
+    item.text.toLowerCase().includes(matchLower)
   );
   
   // If no suggestions match, return the match string as a fallback suggestion

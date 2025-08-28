@@ -39,9 +39,7 @@ export const useGlobalBrain = () => {
     
     const queryLower = query.toLowerCase();
     return data.suggestions.filter(item => 
-      item.text.toLowerCase().includes(queryLower) ||
-      item.description.toLowerCase().includes(queryLower) ||
-      item.tags.some(tag => tag.toLowerCase().includes(queryLower))
+      item.text.toLowerCase().includes(queryLower)
     );
   }, [data]);
 
