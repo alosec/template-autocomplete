@@ -111,37 +111,26 @@ describe('AutocompleteNode - Non-Editable Behavior Enforcement', () => {
     // Insert autocomplete node
     await insertAutocompleteNodeIntoEditor(lexicalEditorInstance, '', 'TestNode', '');
 
-    // Mock the getDOM method for testing
-    let mockDOMElement: HTMLElement;
-    let autocompleteNode: AutocompleteNode;
+    // Mock getElementByKey to return a mock DOM element
+    const mockDOMElement = document.createElement('span');
+    mockDOMElement.className = 'autocomplete-entry';
     
-    await act(async () => {
-      lexicalEditorInstance.getEditorState().read(() => {
-        const root = $getRoot();
-        const paragraph = root.getFirstChild();
-        if (paragraph) {
-          autocompleteNode = paragraph.getChildren().find($isAutocompleteNode) as AutocompleteNode;
-          if (autocompleteNode) {
-            // Create mock DOM element
-            mockDOMElement = document.createElement('span');
-            mockDOMElement.className = 'autocomplete-entry';
-            
-            // Mock the getDOM method
-            (autocompleteNode as any).getDOM = jest.fn(() => mockDOMElement);
-          }
-        }
-      });
-    });
-
-    expect(autocompleteNode!).toBeDefined();
-    expect(mockDOMElement!).toBeDefined();
-    expect(mockDOMElement!.classList.contains('autocomplete-shake')).toBe(false);
+    // Mock the editor's getElementByKey method
+    const originalGetElementByKey = lexicalEditorInstance.getElementByKey;
+    lexicalEditorInstance.getElementByKey = jest.fn(() => mockDOMElement);
+    
+    expect(mockDOMElement.classList.contains('autocomplete-shake')).toBe(false);
 
     // Try to position cursor in autocomplete node
     await act(async () => {
       lexicalEditorInstance.update(() => {
-        if (autocompleteNode) {
-          autocompleteNode.select(3, 3);
+        const root = $getRoot();
+        const paragraph = root.getFirstChild();
+        if (paragraph) {
+          const autocompleteNode = paragraph.getChildren().find($isAutocompleteNode) as AutocompleteNode;
+          if (autocompleteNode) {
+            autocompleteNode.select(3, 3);
+          }
         }
       });
     });
@@ -152,12 +141,15 @@ describe('AutocompleteNode - Non-Editable Behavior Enforcement', () => {
     });
 
     // STRONG ASSERTION: Should have shake class added
-    expect(mockDOMElement!.classList.contains('autocomplete-shake')).toBe(true);
+    expect(mockDOMElement.classList.contains('autocomplete-shake')).toBe(true);
     
     // Content should not change (typing blocked)
     const finalContent = getEditorTextContent(lexicalEditorInstance);
     expect(finalContent).toBe('TestNode');
     expect(finalContent).not.toContain('test');
+    
+    // Restore original method
+    lexicalEditorInstance.getElementByKey = originalGetElementByKey;
   });
 
   test('handles copy/paste operations with autocomplete nodes gracefully', async () => {

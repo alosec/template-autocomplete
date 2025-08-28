@@ -259,8 +259,16 @@ export function useAutocompleteCommands(
           if (isCursorInAutocompleteNode()) {
             const autocompleteNode = getCurrentAutocompleteNode();
             if (autocompleteNode) {
-              // Trigger shake animation on the node
-              autocompleteNode.triggerShakeAnimation();
+              // Trigger shake animation using editor DOM access
+              // Solution based on: https://github.com/facebook/lexical/discussions/1939
+              const domElement = editor.getElementByKey(autocompleteNode.getKey());
+              if (domElement) {
+                domElement.classList.add('autocomplete-shake');
+                // Remove animation class after animation completes
+                setTimeout(() => {
+                  domElement.classList.remove('autocomplete-shake');
+                }, 500);
+              }
               handled = true; // Prevent text insertion
             }
           }
