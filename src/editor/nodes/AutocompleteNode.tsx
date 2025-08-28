@@ -84,6 +84,14 @@ export class AutocompleteNode extends TextNode {
     return true;
   }
 
+  isKeyboardSelectable(): boolean {
+    return false;
+  }
+
+  splitText(splitOffsets: number[]): TextNode[] {
+    return [this];
+  }
+
 }
 
 export function $createAutocompleteNode(text: string): AutocompleteNode {
