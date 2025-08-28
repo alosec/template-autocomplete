@@ -9,6 +9,33 @@ import { $getRoot, $createTextNode, $getSelection, $isRangeSelection, $createPar
 import { act } from '@testing-library/react';
 import AutocompletePlugin from '../AutocompletePlugin';
 import { AutocompleteNode } from '../../nodes/AutocompleteNode';
+// Mock the useGlobalBrain hook
+jest.mock('../../../hooks/useGlobalBrain', () => ({
+  useGlobalBrain: jest.fn(() => ({
+    data: null,
+    loading: false,
+    error: null,
+    suggestions: [
+      { text: "Claude's Investigations", type: 'item', description: "AI research projects", tags: ['ai', 'research'], source: 'global-brain-generic', priority: 'high' },
+      { text: "Urban vertical farming networks", type: 'item', description: "Sustainable agriculture", tags: ['farming', 'sustainability'], source: 'global-brain-generic', priority: 'medium' },
+      { text: "hello world", type: 'item', description: "Basic greeting", tags: ['greeting'], source: 'global-brain-generic', priority: 'medium' },
+    ],
+    getFilteredSuggestions: jest.fn((query = '') => {
+      const allSuggestions = [
+        { text: "Claude's Investigations", type: 'item', description: "AI research projects", tags: ['ai', 'research'], source: 'global-brain-generic', priority: 'high' },
+        { text: "Urban vertical farming networks", type: 'item', description: "Sustainable agriculture", tags: ['farming', 'sustainability'], source: 'global-brain-generic', priority: 'medium' },
+        { text: "hello world", type: 'item', description: "Basic greeting", tags: ['greeting'], source: 'global-brain-generic', priority: 'medium' },
+      ];
+      if (!query.trim()) return allSuggestions;
+      const queryLower = query.toLowerCase();
+      return allSuggestions.filter(item => item.text.toLowerCase().includes(queryLower));
+    }),
+    getSuggestionsByType: jest.fn(),
+    getRandomSuggestions: jest.fn(),
+    submitNewIdea: jest.fn(),
+    totalItems: 3
+  }))
+}));
 
 const editorConfig = {
   namespace: 'TestEditor',
