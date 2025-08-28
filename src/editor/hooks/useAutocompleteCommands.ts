@@ -102,9 +102,55 @@ export function useAutocompleteCommands(
     return unregister;
   }, [editor, state.isActive, actions]);
 
-  // Selection commands (Enter and Tab)
+  // Enhanced Enter command - handles both autocomplete selection and node navigation
   useEffect(() => {
-    const handleSelection = (event?: KeyboardEvent) => {
+    const handleEnter = (event?: KeyboardEvent) => {
+      // Priority 1: Handle autocomplete selection when dropdown is active
+      if (state.isActive && state.suggestions.length > 0) {
+        if (event) {
+          event.preventDefault();
+        }
+        
+        const selectedSuggestion = actions.getSelectedSuggestion();
+        if (!selectedSuggestion) return false;
+
+        selectSuggestion(selectedSuggestion);
+        return true;
+      }
+      
+      // Priority 2: Handle Enter key when cursor is inside autocomplete node
+      let handled = false;
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) {
+          handled = false;
+          return;
+        }
+
+        const anchorNode = selection.anchor.getNode();
+        
+        // Check if cursor is inside an autocomplete node
+        if ($isAutocompleteNode(anchorNode)) {
+          // Move cursor to after the autocomplete node
+          anchorNode.selectNext();
+          handled = true;
+          return;
+        }
+        
+        handled = false;
+      });
+      
+      return handled;
+    };
+
+    const unregisterEnter = editor.registerCommand(
+      KEY_ENTER_COMMAND,
+      handleEnter,
+      COMMAND_PRIORITY_CRITICAL
+    );
+
+    // Tab command for autocomplete selection only
+    const handleTab = (event?: KeyboardEvent) => {
       if (!state.isActive || state.suggestions.length === 0) return false;
       
       if (event) {
@@ -118,15 +164,9 @@ export function useAutocompleteCommands(
       return true;
     };
 
-    const unregisterEnter = editor.registerCommand(
-      KEY_ENTER_COMMAND,
-      handleSelection,
-      COMMAND_PRIORITY_HIGH
-    );
-
     const unregisterTab = editor.registerCommand(
       KEY_TAB_COMMAND,
-      handleSelection,
+      handleTab,
       COMMAND_PRIORITY_HIGH
     );
 

@@ -77,7 +77,7 @@ export class AutocompleteNode extends TextNode {
   }
 
   isSegmented(): boolean {
-    return true;
+    return false;
   }
 
   isToken(): boolean {
