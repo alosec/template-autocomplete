@@ -31,6 +31,50 @@ global.HTMLElement.prototype.getBoundingClientRect = jest.fn(() => ({
 
 global.HTMLElement.prototype.scrollIntoView = jest.fn();
 
+// Mock DOM Selection.modify() method that JSDOM doesn't implement
+global.Selection.prototype.modify = jest.fn(function(alter, direction, granularity) {
+  // Basic implementation for test scenarios
+  // alter: 'move' | 'extend'
+  // direction: 'forward' | 'backward' | 'left' | 'right'  
+  // granularity: 'character' | 'word' | 'lineboundary'
+  
+  if (!this.rangeCount) return;
+  
+  const range = this.getRangeAt(0);
+  if (!range) return;
+  
+  // For backspace tests, we mainly need to handle backward character movement
+  if (alter === 'move' && direction === 'backward' && granularity === 'character') {
+    try {
+      // Move the selection one character backward
+      if (range.startOffset > 0) {
+        range.setStart(range.startContainer, Math.max(0, range.startOffset - 1));
+        range.setEnd(range.startContainer, range.startOffset);
+      } else if (range.startContainer.previousSibling) {
+        // Try to move to previous sibling node
+        const prevNode = range.startContainer.previousSibling;
+        if (prevNode.nodeType === Node.TEXT_NODE) {
+          range.setStart(prevNode, prevNode.textContent.length);
+          range.setEnd(prevNode, prevNode.textContent.length);
+        }
+      }
+    } catch (e) {
+      // Ignore range errors in test environment
+    }
+  }
+  
+  // Handle other common cases for extend
+  if (alter === 'extend' && direction === 'backward' && granularity === 'character') {
+    try {
+      if (range.startOffset > 0) {
+        range.setStart(range.startContainer, Math.max(0, range.startOffset - 1));
+      }
+    } catch (e) {
+      // Ignore range errors in test environment
+    }
+  }
+});
+
 // Mock fetch for global-brain-autocomplete.json
 const mockGlobalBrainData = {
   metadata: {

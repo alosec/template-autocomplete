@@ -1546,6 +1546,13 @@
   resolved "https://registry.npmjs.org/@pkgr/core/-/core-0.2.9.tgz"
   integrity sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==
 
+"@playwright/test@^1.55.0":
+  version "1.55.0"
+  resolved "https://registry.npmjs.org/@playwright/test/-/test-1.55.0.tgz"
+  integrity sha512-04IXzPwHrW69XusN/SIdDdKZBzMfOT9UNT/YiJit/xpy2VuAoB8NHc8Aplb96zsWDddLnbkPL3TsmrS04ZU2xQ==
+  dependencies:
+    playwright "1.55.0"
+
 "@rollup/rollup-linux-arm64-gnu@4.34.8":
   version "4.34.8"
   resolved "https://registry.npmjs.org/@rollup/rollup-linux-arm64-gnu/-/rollup-linux-arm64-gnu-4.34.8.tgz"
@@ -3233,6 +3240,20 @@ pkg-dir@^4.2.0:
   integrity sha512-HRDzbaKjC+AOWVXxAU/x54COGeIv9eb+6CkDSQoNTt4XyWoIJvuPsXizxu/Fr23EiekbtZwmh1IcIG/l/a10GQ==
   dependencies:
     find-up "^4.0.0"
+
+playwright-core@1.55.0:
+  version "1.55.0"
+  resolved "https://registry.npmjs.org/playwright-core/-/playwright-core-1.55.0.tgz"
+  integrity sha512-GvZs4vU3U5ro2nZpeiwyb0zuFaqb9sUiAJuyrWpcGouD8y9/HLgGbNRjIph7zU9D3hnPaisMl9zG9CgFi/biIg==
+
+playwright@1.55.0:
+  version "1.55.0"
+  resolved "https://registry.npmjs.org/playwright/-/playwright-1.55.0.tgz"
+  integrity sha512-sdCWStblvV1YU909Xqx0DhOjPZE4/5lJsIS84IfN9dAZfcl/CIZ5O8l3o0j7hPMjDvqoTF8ZUcc+i/GL5erstA==
+  dependencies:
+    playwright-core "1.55.0"
+  optionalDependencies:
+    fsevents "2.3.2"
 
 postcss@^8.5.1:
   version "8.5.2"
