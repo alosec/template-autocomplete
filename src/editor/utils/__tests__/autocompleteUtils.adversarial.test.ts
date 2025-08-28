@@ -56,26 +56,26 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
     test('handles incomplete triggers mixed in', () => {
       const text = '<><text<><more<';
       
-      // Cursor after second <> (position 8)
-      const result = detectTrigger(text, 8);
+      // Cursor after second <> (position 9)
+      const result = detectTrigger(text, 9);
       expect(result.found).toBe(true);
-      expect(result.triggerIndex).toBe(0); // lastIndexOf finds the first <>, not the second
-      expect(result.matchString).toBe('<text<><more<');
+      expect(result.triggerIndex).toBe(7); // lastIndexOf finds the second complete <>
+      expect(result.matchString).toBe(''); // No text between second <> and cursor position 9
     });
 
     test('handles single chars between triggers', () => {
       const text = '<>a<>b<>c<>';
       
-      // Test each position after each trigger
-      const result1 = detectTrigger(text, 2); // After first <>
+      // Test each position after each character
+      const result1 = detectTrigger(text, 3); // After 'a'
       expect(result1.triggerIndex).toBe(0);
       expect(result1.matchString).toBe('a');
       
-      const result2 = detectTrigger(text, 5); // After second <>
+      const result2 = detectTrigger(text, 6); // After 'b'
       expect(result2.triggerIndex).toBe(3);
       expect(result2.matchString).toBe('b');
       
-      const result3 = detectTrigger(text, 8); // After third <>
+      const result3 = detectTrigger(text, 9); // After 'c'
       expect(result3.triggerIndex).toBe(6);
       expect(result3.matchString).toBe('c');
     });
@@ -83,10 +83,10 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
 
   describe('Boundary Conditions', () => {
     test('handles trigger at very start', () => {
-      const result = detectTrigger('<>text', 2);
+      const result = detectTrigger('<>text', 6);
       expect(result.found).toBe(true);
       expect(result.triggerIndex).toBe(0);
-      expect(result.matchString).toBe('text');
+      expect(result.matchString).toBe('text'); // cursor at end, so 'text' between <> and cursor
     });
 
     test('handles trigger at very end', () => {
@@ -112,7 +112,7 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
       const result = detectTrigger('<>text', 2); // Right after <>
       expect(result.found).toBe(true);
       expect(result.triggerIndex).toBe(0);
-      expect(result.matchString).toBe('text');
+      expect(result.matchString).toBe(''); // No text between <> and cursor at position 2
     });
   });
 
@@ -127,7 +127,8 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
     test('handles HTML-like content', () => {
       const text = '<>span class="test"';
       const result = detectTrigger(text, text.length);
-      expect(result.found).toBe(false); // Contains space, should close
+      expect(result.found).toBe(true); // Spaces are now allowed in match strings
+      expect(result.matchString).toBe('span class="test"');
     });
 
     test('handles special characters', () => {
@@ -154,42 +155,53 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
   });
 
   describe('Whitespace Edge Cases', () => {
-    test('closes on space immediately after trigger', () => {
+    test('allows space immediately after trigger', () => {
       const result = detectTrigger('<> text', 3);
-      expect(result.found).toBe(false); // Should close on space
+      expect(result.found).toBe(true); // Spaces are now allowed
+      expect(result.matchString).toBe(' ');
     });
 
-    test('closes on multiple spaces', () => {
+    test('allows multiple spaces', () => {
       const result = detectTrigger('<>   multispace', 5);
-      expect(result.found).toBe(false); // Should close on spaces
+      expect(result.found).toBe(true); // Spaces are now allowed
+      expect(result.matchString).toBe('   ');
     });
 
     test('handles just trigger + space', () => {
       const result = detectTrigger('<> ', 3);
-      expect(result.found).toBe(false); // Should close
+      expect(result.found).toBe(true); // Spaces are now allowed
+      expect(result.matchString).toBe(' ');
     });
 
     test('does not close on tab character (current behavior)', () => {
-      const result = detectTrigger('<>\ttab', 3);
+      const result = detectTrigger('<>\ttab', 6);
       expect(result.found).toBe(true); // Current implementation doesn't close on tab
-      expect(result.matchString).toBe('\ttab');
+      expect(result.matchString).toBe('\ttab'); // Full text between <> and cursor
     });
 
     test('closes on newlines', () => {
       const result = detectTrigger('<>\nnewline', 3);
       expect(result.found).toBe(false); // Should close on newline
+      expect(result.matchString).toBe(''); // Empty string when closing
+    });
+
+    test('allows spaces in match string per requirements', () => {
+      const result = detectTrigger('<>test more text', 11);
+      expect(result.found).toBe(true); // Spaces should be allowed
+      expect(result.matchString).toBe('test more'); // Only between <> and cursor at position 11
     });
   });
 
   describe('Code-Like Content', () => {
     test('handles programming logic with spaces', () => {
       const result = detectTrigger('<>if (x > 0)', 4);
-      expect(result.found).toBe(true); // At cursor position 4, matchString is 'if' (no space yet)
-      expect(result.matchString).toBe('if (x > 0)');
+      expect(result.found).toBe(true); // At cursor position 4, matchString is 'if'
+      expect(result.matchString).toBe('if');
       
-      // Test at position where space would be in match string
+      // Test at position where space is in match string
       const resultWithSpace = detectTrigger('<>if (x > 0)', 12);
-      expect(resultWithSpace.found).toBe(false); // This should close due to space
+      expect(resultWithSpace.found).toBe(true); // Spaces are now allowed
+      expect(resultWithSpace.matchString).toBe('if (x > 0)');
     });
 
     test('handles mathematical expressions without spaces', () => {
@@ -199,8 +211,9 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
     });
 
     test('handles SQL-like content with spaces', () => {
-      const result = detectTrigger('<>SELECT * FROM', 8);
-      expect(result.found).toBe(false); // Should close due to space in match string
+      const result = detectTrigger('<>SELECT * FROM', 10);
+      expect(result.found).toBe(true); // Spaces are now allowed in match strings
+      expect(result.matchString).toBe('SELECT *'); // Text between <> and cursor at position 10
     });
   });
 
@@ -265,8 +278,9 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
     });
 
     test('handles many short words with spaces', () => {
-      const result = detectTrigger('<>a b c d e f', 4);
-      expect(result.found).toBe(false); // Should close on space
+      const result = detectTrigger('<>a b c d e f', 5);
+      expect(result.found).toBe(true); // Spaces are now allowed
+      expect(result.matchString).toBe('a b'); // Text between <> and cursor at position 5
     });
   });
 
@@ -300,12 +314,28 @@ describe('Autocomplete Utils - Adversarial Testing', () => {
     test('handles very long match string with no matches', () => {
       const longMatch = 'xyz'.repeat(1000);
       const filtered = filterSuggestions(mockSuggestions, longMatch);
-      expect(filtered).toEqual([]);
+      // Should return fallback suggestion when no matches found
+      expect(filtered).toEqual([{
+        text: longMatch,
+        type: 'item',
+        description: `Custom entry: ${longMatch}`,
+        source: 'global-brain-generic',
+        tags: ['custom'],
+        priority: 'low'
+      }]);
     });
 
     test('handles special characters in match string', () => {
       const filtered = filterSuggestions(mockSuggestions, '!@#$');
-      expect(filtered).toEqual([]);
+      // Should return fallback suggestion when no matches found
+      expect(filtered).toEqual([{
+        text: '!@#$',
+        type: 'item',
+        description: 'Custom entry: !@#$',
+        source: 'global-brain-generic',
+        tags: ['custom'],
+        priority: 'low'
+      }]);
     });
   });
 

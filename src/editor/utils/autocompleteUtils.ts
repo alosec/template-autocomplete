@@ -103,32 +103,24 @@ export function calculateDropdownPosition(): DropdownPosition {
 /**
  * Detect trigger pattern in text with cursor position awareness
  * Uses simple rule: last <> before cursor is the active trigger
- * Handles both <>text| and <>|text scenarios by looking at text before and after cursor
- * Only closes autocomplete on whitespace/newlines, not on angle brackets in content
+ * Match string is strictly the text between <> and cursor position
+ * Only closes autocomplete on newlines, spaces are allowed in match strings
  */
 export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
   const beforeCursor = text.substring(0, cursorOffset);
   const triggerIndex = beforeCursor.lastIndexOf('<>');
   
   if (triggerIndex !== -1) {
-    const matchStringBefore = beforeCursor.substring(triggerIndex + 2);
+    const matchString = beforeCursor.substring(triggerIndex + 2);
     
-    // Look for text after cursor until whitespace or end (word characters only)
-    const afterCursor = text.substring(cursorOffset);
-    const wordMatch = afterCursor.match(/^([a-zA-Z0-9-_]*)/);
-    const matchStringAfter = wordMatch ? wordMatch[1] : '';
-    
-    const fullMatchString = matchStringBefore + matchStringAfter;
-    
-    // Close autocomplete if match string contains whitespace or newlines
-    // But still return the trigger info for consistent behavior
-    const shouldClose = fullMatchString.includes(' ') || fullMatchString.includes('\n');
+    // Close autocomplete only if match string contains newlines
+    // Spaces are allowed in match strings per requirements
+    const shouldClose = matchString.includes('\n');
     
     return {
       found: !shouldClose,
-      matchString: shouldClose ? '' : fullMatchString,
-      triggerIndex,
-      cursorInMiddle: matchStringBefore.length < fullMatchString.length
+      matchString: shouldClose ? '' : matchString,
+      triggerIndex
     };
   }
   
@@ -172,7 +164,7 @@ export function filterSuggestions(suggestions: AutocompleteItem[], matchString: 
 }
 
 /**
- * Insert autocomplete node into editor, handling all text splitting cases including cursor in middle
+ * Insert autocomplete node into editor, replacing text from trigger to cursor position
  */
 export function insertAutocompleteNode(
   anchorNode: TextNode,
@@ -183,21 +175,11 @@ export function insertAutocompleteNode(
 ): void {
   const textContent = anchorNode.getTextContent();
   const beforeTrigger = textContent.substring(0, triggerIndex);
-  
-  // If we have a matchString, find where it ends to replace the full word
-  let afterWord: string;
-  if (matchString && matchString.length > 0) {
-    // Find the end of the matched word after the trigger
-    const afterTrigger = textContent.substring(triggerIndex + 2);
-    const wordEndIndex = triggerIndex + 2 + matchString.length;
-    afterWord = textContent.substring(wordEndIndex);
-  } else {
-    afterWord = textContent.substring(cursorOffset);
-  }
+  const afterCursor = textContent.substring(cursorOffset);
   
   const autocompleteNode = $createAutocompleteNode(suggestion);
   
-  if (beforeTrigger.length === 0 && afterWord.length === 0) {
+  if (beforeTrigger.length === 0 && afterCursor.length === 0) {
     // Replace entire node
     anchorNode.replace(autocompleteNode);
     const newTextNode = $createTextNode(' ');
@@ -205,11 +187,11 @@ export function insertAutocompleteNode(
     newTextNode.select(1, 1);
   } else if (beforeTrigger.length === 0) {
     // Replace from start
-    const afterTextNode = $createTextNode(afterWord);
+    const afterTextNode = $createTextNode(afterCursor);
     anchorNode.replace(autocompleteNode);
     autocompleteNode.insertAfter(afterTextNode);
     afterTextNode.select(0, 0);
-  } else if (afterWord.length === 0) {
+  } else if (afterCursor.length === 0) {
     // Replace to end
     const beforeTextNode = $createTextNode(beforeTrigger);
     anchorNode.replace(beforeTextNode);
@@ -218,9 +200,9 @@ export function insertAutocompleteNode(
     autocompleteNode.insertAfter(newTextNode);
     newTextNode.select(1, 1);
   } else {
-    // Split node - replace the trigger and matched word, keep before and after
+    // Split node - replace from trigger through cursor, keep before and after
     const beforeTextNode = $createTextNode(beforeTrigger);
-    const afterTextNode = $createTextNode(afterWord);
+    const afterTextNode = $createTextNode(afterCursor);
     
     anchorNode.replace(beforeTextNode);
     beforeTextNode.insertAfter(autocompleteNode);
