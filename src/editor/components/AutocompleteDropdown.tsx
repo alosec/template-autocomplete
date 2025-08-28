@@ -42,15 +42,7 @@ export function AutocompleteDropdown({
           onClick={() => onSelect(suggestion)}
           onMouseEnter={() => onHover(index)}
         >
-          <div className="suggestion-text">{suggestion.text}</div>
-          <div className="suggestion-description">{suggestion.description}</div>
-          {suggestion.tags.length > 0 && (
-            <div className="suggestion-tags">
-              {suggestion.tags.slice(0, 3).map(tag => (
-                <span key={tag} className="suggestion-tag">{tag}</span>
-              ))}
-            </div>
-          )}
+          {suggestion.text}
         </div>
       ))}
     </div>

@@ -142,6 +142,7 @@ export function detectTrigger(text: string, cursorOffset: number): TriggerInfo {
 
 /**
  * Filter suggestions based on match string
+ * If no suggestions match and matchString exists, return the matchString as a fallback suggestion
  */
 export function filterSuggestions(suggestions: AutocompleteItem[], matchString: string): AutocompleteItem[] {
   if (!matchString.trim()) {
@@ -149,11 +150,25 @@ export function filterSuggestions(suggestions: AutocompleteItem[], matchString: 
   }
   
   const matchLower = matchString.toLowerCase();
-  return suggestions.filter(item => 
+  const filtered = suggestions.filter(item => 
     item.text.toLowerCase().includes(matchLower) ||
     item.description.toLowerCase().includes(matchLower) ||
     item.tags.some(tag => tag.toLowerCase().includes(matchLower))
   );
+  
+  // If no suggestions match, return the match string as a fallback suggestion
+  if (filtered.length === 0) {
+    return [{
+      text: matchString,
+      type: 'item',
+      description: `Custom entry: ${matchString}`,
+      source: 'global-brain-generic',
+      tags: ['custom'],
+      priority: 'low'
+    }];
+  }
+  
+  return filtered;
 }
 
 /**
