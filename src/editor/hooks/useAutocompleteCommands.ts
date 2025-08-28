@@ -12,10 +12,11 @@ import {
   KEY_TAB_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
-  PASTE_COMMAND
+  PASTE_COMMAND,
+  CONTROLLED_TEXT_INSERTION_COMMAND
 } from 'lexical';
 import { $isAutocompleteNode } from '../nodes/AutocompleteNode';
-import { insertAutocompleteNode } from '../utils/autocompleteUtils';
+import { insertAutocompleteNode, isCursorInAutocompleteNode, getCurrentAutocompleteNode } from '../utils/autocompleteUtils';
 import { AutocompleteState, AutocompleteActions } from './useAutocompleteState';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../commands/autocompleteCommands';
 
@@ -246,6 +247,30 @@ export function useAutocompleteCommands(
     );
 
     return unregisterPaste;
+  }, [editor]);
+
+  // Text insertion command for autocomplete nodes - prevent editing and show shake animation
+  useEffect(() => {
+    const unregisterTextInsertion = editor.registerCommand(
+      CONTROLLED_TEXT_INSERTION_COMMAND,
+      () => {
+        let handled = false;
+        editor.getEditorState().read(() => {
+          if (isCursorInAutocompleteNode()) {
+            const autocompleteNode = getCurrentAutocompleteNode();
+            if (autocompleteNode) {
+              // Trigger shake animation on the node
+              autocompleteNode.triggerShakeAnimation();
+              handled = true; // Prevent text insertion
+            }
+          }
+        });
+        return handled;
+      },
+      COMMAND_PRIORITY_HIGH
+    );
+
+    return unregisterTextInsertion;
   }, [editor]);
 
   // Hide autocomplete command - for external UI elements to close dropdown

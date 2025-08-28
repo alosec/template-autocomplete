@@ -1,5 +1,5 @@
 import { TextNode, $getSelection, $isRangeSelection, $createTextNode } from 'lexical';
-import { $createAutocompleteNode } from '../nodes/AutocompleteNode';
+import { $createAutocompleteNode, $isAutocompleteNode, AutocompleteNode } from '../nodes/AutocompleteNode';
 import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
 export interface DropdownPosition {
@@ -207,4 +207,38 @@ export function insertAutocompleteNode(
     autocompleteNode.insertAfter(afterTextNode);
     afterTextNode.select(0, 0);
   }
+}
+
+/**
+ * Check if cursor is currently positioned within an autocomplete node
+ */
+export function isCursorInAutocompleteNode(): boolean {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) return false;
+
+  const anchorNode = selection.anchor.getNode();
+  const focusNode = selection.focus.getNode();
+  
+  // Check if either anchor or focus is within an autocomplete node
+  return $isAutocompleteNode(anchorNode) || $isAutocompleteNode(focusNode);
+}
+
+/**
+ * Get the autocomplete node that the cursor is currently in (if any)
+ */
+export function getCurrentAutocompleteNode(): AutocompleteNode | null {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) return null;
+
+  const anchorNode = selection.anchor.getNode();
+  if ($isAutocompleteNode(anchorNode)) {
+    return anchorNode;
+  }
+
+  const focusNode = selection.focus.getNode();
+  if ($isAutocompleteNode(focusNode)) {
+    return focusNode;
+  }
+
+  return null;
 }

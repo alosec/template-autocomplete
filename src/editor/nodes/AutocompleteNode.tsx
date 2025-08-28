@@ -92,6 +92,20 @@ export class AutocompleteNode extends TextNode {
     return [this];
   }
 
+  /**
+   * Trigger shake animation when user tries to edit the node
+   */
+  triggerShakeAnimation(): void {
+    const dom = this.getDOM();
+    if (dom) {
+      dom.classList.add('autocomplete-shake');
+      // Remove animation class after animation completes
+      setTimeout(() => {
+        dom.classList.remove('autocomplete-shake');
+      }, 500);
+    }
+  }
+
 }
 
 export function $createAutocompleteNode(text: string): AutocompleteNode {

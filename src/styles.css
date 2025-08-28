@@ -395,6 +395,21 @@ body {
     display: inline-block;
     font-size: 14px;
     border: 1px solid #bfdbfe;
+    transition: all 0.1s ease;
+}
+
+/* Shake animation for denied input attempts */
+.autocomplete-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+    border-color: #fca5a5 !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
 .autocomplete-dropdown {
