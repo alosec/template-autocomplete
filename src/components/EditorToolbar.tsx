@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { LexicalEditor } from 'lexical';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 import SubmitIdeaButton from './SubmitIdeaButton';
+import { useGlobalBrain } from '../hooks/useGlobalBrain';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -31,6 +32,7 @@ export default function EditorToolbar({
   const [fileMenuOpen, setFileMenuOpen] = useState(false);
   const [recentMenuOpen, setRecentMenuOpen] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const { getRandomSuggestions } = useGlobalBrain();
   
   // Load document summaries
   useEffect(() => {
@@ -135,6 +137,24 @@ export default function EditorToolbar({
     }
   };
 
+  const handleRandomIdea = () => {
+    const randomIdeas = getRandomSuggestions(1);
+    if (randomIdeas.length > 0) {
+      const randomIdea = randomIdeas[0];
+      // Insert the random idea into the editor if we have editor ref
+      if (editorRef?.current) {
+        editorRef.current.update(() => {
+          const selection = window.getSelection();
+          if (selection) {
+            const range = selection.getRangeAt(0);
+            range.deleteContents();
+            range.insertNode(document.createTextNode(randomIdea.text));
+          }
+        });
+      }
+    }
+  };
+
   return (
     <div className="editor-toolbar" ref={toolbarRef} onMouseDown={handleToolbarMouseDown}>
       <div className="toolbar-left">
@@ -192,6 +212,14 @@ export default function EditorToolbar({
       </div>
 
       <div className="toolbar-right">
+        <button 
+          className="random-idea-btn compact"
+          onClick={handleRandomIdea}
+          title="Insert a random idea from the global brain"
+        >
+          <span className="btn-icon">💡</span>
+          <span className="btn-text">Random</span>
+        </button>
         <SubmitIdeaButton 
           className="compact"
           onSubmissionSuccess={() => {

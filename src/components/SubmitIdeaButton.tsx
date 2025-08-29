@@ -61,8 +61,8 @@ export default function SubmitIdeaButton({
         title="Share your idea with the global brain community"
         type="button"
       >
-        <span className="btn-icon">🧠</span>
-        <span className="btn-text">Share Idea</span>
+        <span className="btn-icon">📝</span>
+        <span className="btn-text">Share</span>
       </button>
 
       <IdeaSubmissionModal
