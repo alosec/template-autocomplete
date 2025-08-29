@@ -15,7 +15,6 @@ export default {
   },
   moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
   testMatch: [
-    '<rootDir>/tests/jest/**/*.(js|jsx|ts|tsx)',
     '<rootDir>/tests/jest/**/*.test.(js|jsx|ts|tsx)',
   ],
   collectCoverageFrom: [
