@@ -26,16 +26,17 @@ body {
 .editor-toolbar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     padding: 0;
     background: #ffffff;
     border-bottom: 1px solid #e0e0e0;
     flex-shrink: 0;
+    min-height: 44px;
 }
 
 .toolbar-left {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
 }
 
@@ -43,7 +44,7 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding-right: 16px;
+    padding: 8px 16px;
 }
 
 .brain-toggle-btn {
@@ -108,6 +109,9 @@ body {
     cursor: pointer;
     transition: all 0.1s ease;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 .toolbar-btn:hover {
