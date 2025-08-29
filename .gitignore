@@ -31,3 +31,7 @@ dist-ssr
 # Playwright
 test-results/
 playwright-report/
+
+# Environment variables and Wrangler
+.env
+.wrangler/
