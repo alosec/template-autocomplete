@@ -47,19 +47,113 @@ body {
     padding: 8px 16px;
 }
 
+/* Brain Toggle Button - Ultra Chrome Style with Pink Outline */
 .brain-toggle-btn {
-    font-size: 36px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 20%, #f8f9fa 40%, #ffffff 60%, #fcfcfc 80%, #ffffff 100%);
+  border: 2px solid #ec4899;
+  border-radius: 6px;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 2px 8px rgba(236, 72, 153, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .brain-toggle-btn:hover {
-    background: #f0f0f0;
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 10%, #fefefe 25%, #ffffff 50%, #fafafa 75%, #ffffff 100%);
+  border-color: #f472b6;
+  transform: translateY(-2px);
+  box-shadow: 
+    0 8px 20px rgba(236, 72, 153, 0.25),
+    0 4px 12px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.brain-toggle-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 4px 12px rgba(236, 72, 153, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.brain-toggle-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8), transparent);
+  transition: left 0.6s ease;
+}
+
+.brain-toggle-btn:hover::before {
+  left: 100%;
+}
+
+.brain-toggle-btn .btn-icon {
+  font-size: 16px;
+  display: inline-block;
+  animation: brainPulse 2s ease-in-out infinite;
+}
+
+.brain-toggle-btn .btn-text {
+  font-weight: 500;
+}
+
+/* Brain pulse animation */
+@keyframes brainPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
     transform: scale(1.1);
+  }
+}
+
+/* Compact variant for toolbar */
+.brain-toggle-btn.compact {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.brain-toggle-btn.compact .btn-icon {
+  font-size: 14px;
+}
+
+/* Focus states for accessibility */
+.brain-toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(222, 226, 230, 0.3);
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .brain-toggle-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .brain-toggle-btn .btn-text {
+    display: none;
+  }
+  
+  .brain-toggle-btn .btn-icon {
+    font-size: 16px;
+  }
 }
 
 /* Random Idea Button - Golden Chrome Style */

@@ -218,11 +218,12 @@ export default function EditorToolbar({
           }}
         />
         <button 
-          className="toolbar-btn brain-toggle-btn"
+          className="brain-toggle-btn compact"
           onClick={onToggleBrainPanel}
           title={brainPanelVisible ? 'Hide brain panel' : 'Show brain panel'}
         >
-          🧠
+          <span className="btn-icon">🧠</span>
+          <span className="btn-text">Brain</span>
         </button>
       </div>
       
