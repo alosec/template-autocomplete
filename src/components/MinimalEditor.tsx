@@ -204,35 +204,30 @@ export default function MinimalEditor() {
     setIsModified(true);
   }, [currentDocument]);
 
-  // Combined handler for random button - uses next logic then loads item
+  // Random button updates BOTH brain panel state AND loads into editor
   const handleRandomIdea = useCallback(async () => {
     const nextIndex = handleNextIdea();
     if (nextIndex !== undefined && suggestions[nextIndex]) {
       await handleLoadGlobalBrainItem(suggestions[nextIndex]);
     }
-  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem]);
-
-  // Brain panel navigation handlers that also load items
-  const handleBrainPanelNext = useCallback(async () => {
-    const nextIndex = handleNextIdea();
-    if (nextIndex !== undefined && suggestions[nextIndex]) {
-      await handleLoadGlobalBrainItem(suggestions[nextIndex]);
+    // Show brain panel if it's not already visible
+    if (!brainPanelVisible) {
+      setBrainPanelVisible(true);
     }
-  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem]);
+  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem, brainPanelVisible]);
 
-  const handleBrainPanelBack = useCallback(async () => {
-    const backIndex = handleBackIdea();
-    if (backIndex !== null && suggestions[backIndex]) {
-      await handleLoadGlobalBrainItem(suggestions[backIndex]);
-    }
-  }, [handleBackIdea, suggestions, handleLoadGlobalBrainItem]);
+  // Brain panel navigation handlers - only navigate, don't load items
+  const handleBrainPanelNext = useCallback(() => {
+    handleNextIdea();
+  }, [handleNextIdea]);
 
-  const handleBrainPanelForward = useCallback(async () => {
-    const forwardIndex = handleForwardIdea();
-    if (forwardIndex !== null && suggestions[forwardIndex]) {
-      await handleLoadGlobalBrainItem(suggestions[forwardIndex]);
-    }
-  }, [handleForwardIdea, suggestions, handleLoadGlobalBrainItem]);
+  const handleBrainPanelBack = useCallback(() => {
+    handleBackIdea();
+  }, [handleBackIdea]);
+
+  const handleBrainPanelForward = useCallback(() => {
+    handleForwardIdea();
+  }, [handleForwardIdea]);
 
   const handleReplyToPost = useCallback((post: ThreadPost) => {
     setThreadContext({
