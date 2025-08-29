@@ -226,6 +226,19 @@ export default function MinimalEditor() {
     handleForwardIdea();
   }, [handleForwardIdea]);
 
+  const handleSelectIdea = useCallback((idea: any) => {
+    // Find the index of the selected idea in suggestions
+    const ideaIndex = suggestions.findIndex(suggestion => 
+      suggestion.text === idea.text && suggestion.description === idea.description
+    );
+    
+    if (ideaIndex !== -1) {
+      setCurrentItemIndex(ideaIndex);
+      navigationHistory.current.addToHistory(ideaIndex);
+      setSeenIndices(prev => new Set([...prev, ideaIndex]));
+    }
+  }, [suggestions]);
+
   const handleReplyToPost = useCallback((post: ThreadPost) => {
     setThreadContext({
       parentId: post.id,
@@ -262,6 +275,7 @@ export default function MinimalEditor() {
         onBackIdea={handleBrainPanelBack}
         onForwardIdea={handleBrainPanelForward}
         onLoadCurrentIdea={() => suggestions[currentItemIndex] && handleLoadGlobalBrainItem(suggestions[currentItemIndex])}
+        onSelectIdea={handleSelectIdea}
       />
       
       <div className="editor-main">

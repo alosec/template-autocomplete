@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { LexicalEditor } from 'lexical';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 import { useGlobalBrain } from '../hooks/useGlobalBrain';
+import { AutocompleteItem } from '../types/GlobalBrainTypes';
 import './top-brain-panel.css';
 
 interface TopBrainPanelProps {
@@ -17,6 +18,7 @@ interface TopBrainPanelProps {
   onBackIdea: () => void;
   onForwardIdea: () => void;
   onLoadCurrentIdea: () => void;
+  onSelectIdea?: (idea: AutocompleteItem) => void;
 }
 
 
@@ -32,11 +34,16 @@ export default function TopBrainPanel({
   onNextIdea, 
   onBackIdea, 
   onForwardIdea, 
-  onLoadCurrentIdea 
+  onLoadCurrentIdea,
+  onSelectIdea 
 }: TopBrainPanelProps) {
-  const { loading: dataLoading } = useGlobalBrain();
+  const { loading: dataLoading, getFilteredSuggestions } = useGlobalBrain();
   const [isResizing, setIsResizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredResults, setFilteredResults] = useState<AutocompleteItem[]>([]);
+  const [showResults, setShowResults] = useState(false);
+  const [selectedResultIndex, setSelectedResultIndex] = useState(0);
   const panelRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -76,6 +83,71 @@ export default function TopBrainPanel({
     }
   }, [currentIdea, onLoadCurrentIdea, onPanelClose]);
 
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    setSelectedResultIndex(0);
+    
+    if (query.trim()) {
+      const results = getFilteredSuggestions(query);
+      setFilteredResults(results);
+      setShowResults(true);
+    } else {
+      setShowResults(false);
+      setFilteredResults([]);
+    }
+  }, [getFilteredSuggestions]);
+
+  const handleSearchFocus = useCallback(() => {
+    if (searchQuery.trim()) {
+      setShowResults(true);
+    }
+  }, [searchQuery]);
+
+  const handleSearchBlur = useCallback(() => {
+    setTimeout(() => setShowResults(false), 150);
+  }, []);
+
+  const handleResultClick = useCallback((result: AutocompleteItem) => {
+    setSearchQuery(result.text);
+    setShowResults(false);
+    setSelectedResultIndex(0);
+    if (onSelectIdea) {
+      onSelectIdea(result);
+    }
+  }, [onSelectIdea]);
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (!showResults || filteredResults.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedResultIndex(prev => 
+          prev < filteredResults.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedResultIndex(prev => 
+          prev > 0 ? prev - 1 : filteredResults.length - 1
+        );
+        break;
+      case 'Enter':
+      case 'Tab':
+        e.preventDefault();
+        const selectedResult = filteredResults[selectedResultIndex];
+        if (selectedResult) {
+          handleResultClick(selectedResult);
+        }
+        break;
+      case 'Escape':
+        setShowResults(false);
+        setSelectedResultIndex(0);
+        break;
+    }
+  }, [showResults, filteredResults, selectedResultIndex, handleResultClick]);
+
 
   // Show loading state while data is loading
   if (dataLoading || !currentIdea) {
@@ -113,6 +185,38 @@ export default function TopBrainPanel({
       onMouseDown={handlePanelMouseDown}
     >
       <div className="panel-content">
+        <div className="search-container">
+          <input
+            type="text"
+            className="brain-search-bar"
+            placeholder="Search ideas..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onFocus={handleSearchFocus}
+            onBlur={handleSearchBlur}
+            onKeyDown={handleKeyDown}
+          />
+          {showResults && filteredResults.length > 0 && (
+            <div className="search-results-dropdown">
+              {filteredResults.slice(0, 8).map((result, index) => (
+                <div
+                  key={index}
+                  className={`search-result-item ${index === selectedResultIndex ? 'selected' : ''}`}
+                  onMouseDown={() => handleResultClick(result)}
+                  onMouseEnter={() => setSelectedResultIndex(index)}
+                >
+                  <div className="result-title">{result.text}</div>
+                  <div className="result-meta">
+                    <span className="result-type">{result.type}</span>
+                    {result.tags.slice(0, 2).map((tag, tagIndex) => (
+                      <span key={tagIndex} className="result-tag">{tag}</span>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="idea-display">
           <div className="idea-title">{currentIdea.text}</div>
           <div className="idea-meta">
@@ -149,11 +253,6 @@ export default function TopBrainPanel({
           {isLoading ? 'Loading...' : 'Load This'}
         </button>
       </div>
-      
-      <div 
-        className="resize-handle-bottom"
-        onMouseDown={handleMouseDown}
-      />
     </div>
   );
 }
