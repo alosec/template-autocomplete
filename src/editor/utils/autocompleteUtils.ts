@@ -1,4 +1,4 @@
-import { TextNode, $getSelection, $isRangeSelection, $createTextNode } from 'lexical';
+import { TextNode, $getSelection, $isRangeSelection, $createTextNode, LexicalNode } from 'lexical';
 import { $createAutocompleteNode, $isAutocompleteNode, AutocompleteNode } from '../nodes/AutocompleteNode';
 import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
@@ -241,4 +241,73 @@ export function getCurrentAutocompleteNode(): AutocompleteNode | null {
   }
 
   return null;
+}
+
+/**
+ * Parse HTML clipboard data and extract autocomplete nodes
+ */
+export interface ClipboardAutocompleteData {
+  hasAutocompleteNodes: boolean;
+  nodes: Array<{
+    text: string;
+    isAutocomplete: boolean;
+  }>;
+}
+
+export function parseClipboardHTML(html: string): ClipboardAutocompleteData {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  
+  const result: ClipboardAutocompleteData = {
+    hasAutocompleteNodes: false,
+    nodes: []
+  };
+  
+  // Find all span elements
+  const spans = doc.querySelectorAll('span');
+  
+  for (const span of spans) {
+    const isAutocomplete = span.getAttribute('data-lexical-autocomplete') === 'true';
+    const text = span.textContent || '';
+    
+    if (isAutocomplete) {
+      result.hasAutocompleteNodes = true;
+      result.nodes.push({
+        text,
+        isAutocomplete: true
+      });
+    } else if (text.trim()) {
+      result.nodes.push({
+        text,
+        isAutocomplete: false
+      });
+    }
+  }
+  
+  // If no spans found, treat as plain text
+  if (result.nodes.length === 0 && doc.body.textContent) {
+    result.nodes.push({
+      text: doc.body.textContent,
+      isAutocomplete: false
+    });
+  }
+  
+  return result;
+}
+
+/**
+ * Convert parsed clipboard data to Lexical nodes
+ */
+export function createNodesFromClipboard(clipboardData: ClipboardAutocompleteData): LexicalNode[] {
+  const nodes: LexicalNode[] = [];
+  
+  for (const nodeData of clipboardData.nodes) {
+    if (nodeData.isAutocomplete) {
+      nodes.push($createAutocompleteNode(nodeData.text));
+    } else {
+      nodes.push($createTextNode(nodeData.text));
+    }
+  }
+  
+  return nodes;
 }

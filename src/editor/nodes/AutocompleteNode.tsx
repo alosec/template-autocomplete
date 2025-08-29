@@ -4,6 +4,8 @@ import {
   LexicalNode,
   SerializedTextNode,
   Spread,
+  DOMConversion,
+  DOMConversionMap,
 } from 'lexical';
 
 export type SerializedAutocompleteNode = Spread<
@@ -20,6 +22,25 @@ export class AutocompleteNode extends TextNode {
 
   static clone(node: AutocompleteNode): AutocompleteNode {
     return new AutocompleteNode(node.__text, node.__key);
+  }
+
+  static importDOM(): DOMConversionMap | null {
+    return {
+      span: (domNode: HTMLElement): DOMConversion | null => {
+        if (domNode.getAttribute('data-lexical-autocomplete') === 'true') {
+          return {
+            conversion: (domNode: HTMLElement): { node: AutocompleteNode } => {
+              const textContent = domNode.textContent || '';
+              return {
+                node: new AutocompleteNode(textContent),
+              };
+            },
+            priority: 1,
+          };
+        }
+        return null;
+      },
+    };
   }
 
   constructor(text: string, key?: NodeKey) {
@@ -40,6 +61,14 @@ export class AutocompleteNode extends TextNode {
       return true;
     }
     return false;
+  }
+
+  exportDOM(): { element: HTMLElement } {
+    const element = document.createElement('span');
+    element.className = 'autocomplete-entry';
+    element.setAttribute('data-lexical-autocomplete', 'true');
+    element.textContent = this.__text;
+    return { element };
   }
 
   static importJSON(serializedNode: SerializedAutocompleteNode): AutocompleteNode {
@@ -88,7 +117,7 @@ export class AutocompleteNode extends TextNode {
     return false;
   }
 
-  splitText(splitOffsets: number[]): TextNode[] {
+  splitText(..._splitOffsets: number[]): TextNode[] {
     return [this];
   }
 

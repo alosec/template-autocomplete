@@ -4,6 +4,7 @@ import {
   TextNode,
   $getSelection,
   $isRangeSelection,
+  $createTextNode,
   COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_CRITICAL,
@@ -16,7 +17,7 @@ import {
   CONTROLLED_TEXT_INSERTION_COMMAND
 } from 'lexical';
 import { $isAutocompleteNode } from '../nodes/AutocompleteNode';
-import { insertAutocompleteNode, isCursorInAutocompleteNode, getCurrentAutocompleteNode } from '../utils/autocompleteUtils';
+import { insertAutocompleteNode, isCursorInAutocompleteNode, getCurrentAutocompleteNode, parseClipboardHTML, createNodesFromClipboard } from '../utils/autocompleteUtils';
 import { AutocompleteState, AutocompleteActions } from './useAutocompleteState';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../commands/autocompleteCommands';
 
@@ -230,20 +231,116 @@ export function useAutocompleteCommands(
   useEffect(() => {
     const unregisterPaste = editor.registerCommand(
       PASTE_COMMAND,
-      () => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return false;
-
-        const anchorNode = selection.anchor.getNode();
-        const focusNode = selection.focus.getNode();
-        
-        if ($isAutocompleteNode(anchorNode) || $isAutocompleteNode(focusNode)) {
-          return true; // Prevent pasting over autocomplete nodes
+      (event: ClipboardEvent) => {
+        // Check clipboard data first, before editor update
+        const clipboardData = event.clipboardData;
+        if (!clipboardData) {
+          return false;
         }
         
-        return false;
+        const htmlData = clipboardData.getData('text/html');
+        if (!htmlData) {
+          return false;
+        }
+        
+        // Parse HTML to detect autocomplete nodes
+        const parsedData = parseClipboardHTML(htmlData);
+        if (!parsedData.hasAutocompleteNodes) {
+          return false;
+        }
+        
+        // We have autocomplete nodes to handle - prevent default behavior immediately
+        event.preventDefault();
+        event.stopPropagation();
+        
+        let handled = false;
+        
+        editor.update(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) {
+            handled = false;
+            return;
+          }
+
+          const anchorNode = selection.anchor.getNode();
+          const focusNode = selection.focus.getNode();
+          
+          // Prevent pasting over autocomplete nodes
+          if ($isAutocompleteNode(anchorNode) || $isAutocompleteNode(focusNode)) {
+            handled = true;
+            return;
+          }
+          
+          // Create nodes from clipboard data
+          const nodes = createNodesFromClipboard(parsedData);
+          if (nodes.length === 0) {
+            handled = false;
+            return;
+          }
+          
+          // Insert the nodes at cursor position
+          const anchorTextNode = anchorNode instanceof TextNode ? anchorNode : null;
+          if (!anchorTextNode) {
+            handled = false;
+            return;
+          }
+          
+          // Remove any selected content first
+          if (!selection.isCollapsed()) {
+            selection.removeText();
+          }
+          
+          // Insert all the parsed nodes
+          let insertAfterNode = anchorTextNode;
+          for (let i = 0; i < nodes.length; i++) {
+            const node = nodes[i];
+            if (i === 0) {
+              // For the first node, split the current text node at cursor
+              const offset = selection.anchor.offset;
+              const textContent = insertAfterNode.getTextContent();
+              const beforeText = textContent.substring(0, offset);
+              const afterText = textContent.substring(offset);
+              
+              if (beforeText) {
+                const beforeNode = $createTextNode(beforeText);
+                insertAfterNode.replace(beforeNode);
+                beforeNode.insertAfter(node);
+                insertAfterNode = node;
+              } else {
+                insertAfterNode.replace(node);
+                insertAfterNode = node;
+              }
+              
+              if (afterText) {
+                const afterNode = $createTextNode(afterText);
+                insertAfterNode.insertAfter(afterNode);
+              }
+            } else {
+              // Insert subsequent nodes after the previous one
+              insertAfterNode.insertAfter(node);
+              insertAfterNode = node;
+            }
+          }
+          
+          // Position cursor after the last inserted node
+          if (insertAfterNode) {
+            const nextSibling = insertAfterNode.getNextSibling();
+            if (nextSibling && nextSibling instanceof TextNode) {
+              nextSibling.select(0, 0);
+            } else {
+              // Create a new text node if needed
+              const newTextNode = $createTextNode(' ');
+              insertAfterNode.insertAfter(newTextNode);
+              newTextNode.select(1, 1);
+            }
+          }
+          
+          handled = true;
+        });
+        
+        return handled;
       },
-      COMMAND_PRIORITY_HIGH
+      COMMAND_PRIORITY_CRITICAL
     );
 
     return unregisterPaste;
