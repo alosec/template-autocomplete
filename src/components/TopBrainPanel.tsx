@@ -243,31 +243,31 @@ export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoa
           </div>
           <div className="idea-description">{currentIdea.description}</div>
         </div>
-        
-        <div className="controls">
-          <button 
-            className="back-btn" 
-            onClick={handleBackIdea}
-            disabled={!canGoBack}
-            title="Go back to previous idea"
-          >
-            ← Back
-          </button>
-          <button className="next-btn" onClick={handleNextIdea} title="Discover next idea">
-            Next 🎲
-          </button>
-          <button 
-            className="forward-btn" 
-            onClick={handleForwardIdea}
-            disabled={!canGoForward}
-            title="Go forward in history"
-          >
-            Forward →
-          </button>
-          <button className="load-btn" onClick={handleLoadCurrentIdea} disabled={isLoading}>
-            {isLoading ? 'Loading...' : 'Load This'}
-          </button>
-        </div>
+      </div>
+      
+      <div className="controls">
+        <button 
+          className="back-btn" 
+          onClick={handleBackIdea}
+          disabled={!canGoBack}
+          title="Go back to previous idea"
+        >
+          ← Back
+        </button>
+        <button className="next-btn" onClick={handleNextIdea} title="Discover next idea">
+          Next 🎲
+        </button>
+        <button 
+          className="forward-btn" 
+          onClick={handleForwardIdea}
+          disabled={!canGoForward}
+          title="Go forward in history"
+        >
+          Forward →
+        </button>
+        <button className="load-btn" onClick={handleLoadCurrentIdea} disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Load This'}
+        </button>
       </div>
       
       <div 

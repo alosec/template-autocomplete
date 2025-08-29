@@ -4,16 +4,17 @@
   border-bottom: 1px solid #e0e0e0;
   overflow: hidden;
   transition: height 0.2s ease-out;
+  display: flex;
+  flex-direction: column;
 }
 
 .panel-content {
-  padding: 40px;
-  height: calc(100% - 6px);
+  padding: 40px 40px 20px 40px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 32px;
 }
 
 .idea-display {
@@ -73,6 +74,9 @@
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
+  padding: 20px 40px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: auto;
 }
 
 .back-btn, .next-btn, .forward-btn, .load-btn {
@@ -128,10 +132,6 @@
 }
 
 .resize-handle-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
   height: 6px;
   background: transparent;
   cursor: ns-resize;
