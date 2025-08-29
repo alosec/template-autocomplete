@@ -10,6 +10,7 @@ interface TopBrainPanelProps {
   height: number;
   onHeightChange: (height: number) => void;
   onLoadItem: (item: any) => void;
+  onPanelClose: () => void;
   editorRef?: React.MutableRefObject<LexicalEditor | null>;
 }
 
@@ -116,7 +117,7 @@ const getNextIntelligentIndex = (items: AutocompleteItem[], seen: Set<number>, c
   return weightedPool[Math.floor(Math.random() * weightedPool.length)];
 };
 
-export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoadItem, editorRef }: TopBrainPanelProps) {
+export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoadItem, onPanelClose, editorRef }: TopBrainPanelProps) {
   const { suggestions, loading: dataLoading } = useGlobalBrain();
   const [isResizing, setIsResizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -188,10 +189,11 @@ export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoa
     setIsLoading(true);
     try {
       await onLoadItem(suggestions[currentItemIndex]);
+      onPanelClose();
     } finally {
       setIsLoading(false);
     }
-  }, [onLoadItem, currentItemIndex, suggestions]);
+  }, [onLoadItem, onPanelClose, currentItemIndex, suggestions]);
 
   const currentIdea = suggestions[currentItemIndex];
   const canGoBack = navigationHistory.current.canGoBack();

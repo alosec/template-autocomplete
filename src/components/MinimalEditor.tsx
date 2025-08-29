@@ -173,6 +173,7 @@ export default function MinimalEditor() {
         height={brainPanelHeight}
         onHeightChange={handleBrainPanelHeightChange}
         onLoadItem={handleLoadGlobalBrainItem}
+        onPanelClose={() => setBrainPanelVisible(false)}
         editorRef={editorRef}
       />
       
