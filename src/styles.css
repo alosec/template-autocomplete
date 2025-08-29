@@ -47,46 +47,35 @@ body {
     padding: 8px 16px;
 }
 
-/* Brain Toggle Button - Ultra Chrome Style with Pink Outline */
+/* Brain Toggle Button - Light Pink Style */
 .brain-toggle-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: linear-gradient(135deg, #ffffff 0%, #fefefe 20%, #f8f9fa 40%, #ffffff 60%, #fcfcfc 80%, #ffffff 100%);
-  border: 2px solid #ec4899;
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%);
+  border: 1px solid #f9a8d4;
   border-radius: 6px;
-  color: #1a1a1a;
+  color: #6b21a8;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    0 2px 8px rgba(236, 72, 153, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .brain-toggle-btn:hover {
-  background: linear-gradient(135deg, #ffffff 0%, #ffffff 10%, #fefefe 25%, #ffffff 50%, #fafafa 75%, #ffffff 100%);
-  border-color: #f472b6;
-  transform: translateY(-2px);
-  box-shadow: 
-    0 8px 20px rgba(236, 72, 153, 0.25),
-    0 4px 12px rgba(255, 255, 255, 0.8),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 30%, #f9a8d4 70%, #ec4899 100%);
+  border-color: #f9a8d4;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(252, 231, 243, 0.8), 0 2px 6px rgba(249, 168, 212, 0.4);
 }
 
 .brain-toggle-btn:active {
-  transform: translateY(-1px);
-  box-shadow: 
-    0 4px 12px rgba(236, 72, 153, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(249, 168, 212, 0.2);
 }
 
 .brain-toggle-btn::before {
@@ -96,8 +85,8 @@ body {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8), transparent);
-  transition: left 0.6s ease;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
 }
 
 .brain-toggle-btn:hover::before {
