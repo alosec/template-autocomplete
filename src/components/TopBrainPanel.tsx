@@ -202,7 +202,7 @@ export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoa
     return (
       <div 
         className="top-brain-panel"
-        style={{ height: isVisible ? `${height}px` : '0px' }}
+        style={{ height: isVisible ? 'auto' : '0px' }}
       >
         <div className="panel-content">
           <div className="idea-display">
@@ -229,7 +229,7 @@ export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoa
     <div 
       ref={panelRef}
       className="top-brain-panel"
-      style={{ height: isVisible ? `${height}px` : '0px' }}
+      style={{ height: isVisible ? 'auto' : '0px' }}
       onMouseDown={handlePanelMouseDown}
     >
       <div className="panel-content">
