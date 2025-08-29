@@ -4,8 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import { LexicalEditor } from 'lexical';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 import SubmitIdeaButton from './SubmitIdeaButton';
-import { useGlobalBrain } from '../hooks/useGlobalBrain';
-import { getNextIntelligentIndex } from '../utils/brainNavigation';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -16,7 +14,7 @@ interface EditorToolbarProps {
   onToggleBrainPanel: () => void;
   brainPanelVisible: boolean;
   editorRef?: React.MutableRefObject<LexicalEditor | null>;
-  onLoadGlobalBrainItem?: (item: any) => void;
+  onRandomIdea: () => void;
 }
 
 export default function EditorToolbar({
@@ -28,16 +26,13 @@ export default function EditorToolbar({
   onToggleBrainPanel,
   brainPanelVisible,
   editorRef,
-  onLoadGlobalBrainItem
+  onRandomIdea
 }: EditorToolbarProps) {
   const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [fileMenuOpen, setFileMenuOpen] = useState(false);
   const [recentMenuOpen, setRecentMenuOpen] = useState(false);
-  const [currentItemIndex, setCurrentItemIndex] = useState(0);
-  const [seenIndices, setSeenIndices] = useState<Set<number>>(new Set());
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const { suggestions } = useGlobalBrain();
   
   // Load document summaries
   useEffect(() => {
@@ -142,19 +137,8 @@ export default function EditorToolbar({
     }
   };
 
-  const handleRandomIdea = async () => {
-    if (suggestions.length === 0 || !onLoadGlobalBrainItem) return;
-    
-    // Get next intelligent index using the same logic as TopBrainPanel
-    const nextIndex = getNextIntelligentIndex(suggestions, seenIndices, currentItemIndex);
-    setCurrentItemIndex(nextIndex);
-    setSeenIndices(prev => new Set([...prev, nextIndex]));
-    
-    // Load the selected idea into the editor
-    const selectedIdea = suggestions[nextIndex];
-    if (selectedIdea) {
-      await onLoadGlobalBrainItem(selectedIdea);
-    }
+  const handleRandomIdea = () => {
+    onRandomIdea();
   };
 
   return (

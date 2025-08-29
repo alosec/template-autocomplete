@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { EditorState, $getRoot, LexicalEditor } from 'lexical';
 
@@ -10,6 +10,8 @@ import EditorWithSync from './EditorWithSync';
 import TopBrainPanel from './TopBrainPanel';
 import { Document } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
+import { NavigationHistory, getNextIntelligentIndex } from '../utils/brainNavigation';
+import { useGlobalBrain } from '../hooks/useGlobalBrain';
 
 const editorConfig = {
   namespace: 'MinimalEditor',
@@ -29,6 +31,12 @@ export default function MinimalEditor() {
   const [brainPanelHeight, setBrainPanelHeight] = useState(400);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const editorRef = useRef<LexicalEditor | null>(null);
+
+  // Shared brain navigation state
+  const { suggestions } = useGlobalBrain();
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
+  const [seenIndices, setSeenIndices] = useState<Set<number>>(new Set());
+  const navigationHistory = useRef(new NavigationHistory());
 
   const handleNewDocument = useCallback(() => {
     const newDoc = documentManager.createNewDocument();
@@ -135,6 +143,45 @@ export default function MinimalEditor() {
     setBrainPanelHeight(height);
   }, []);
 
+  // Initialize brain navigation with first item when data loads
+  useMemo(() => {
+    if (suggestions.length > 0 && navigationHistory.current.size() === 0) {
+      const initialIndex = getNextIntelligentIndex(suggestions, new Set(), -1);
+      setCurrentItemIndex(initialIndex);
+      navigationHistory.current.addToHistory(initialIndex);
+      setSeenIndices(new Set([initialIndex]));
+    }
+  }, [suggestions]);
+
+  // Shared brain navigation handlers
+  const handleNextIdea = useCallback(() => {
+    if (suggestions.length === 0) return;
+    
+    const nextIndex = getNextIntelligentIndex(suggestions, seenIndices, currentItemIndex);
+    setCurrentItemIndex(nextIndex);
+    navigationHistory.current.addToHistory(nextIndex);
+    setSeenIndices(prev => new Set([...prev, nextIndex]));
+    return nextIndex;
+  }, [suggestions, seenIndices, currentItemIndex]);
+
+  const handleBackIdea = useCallback(() => {
+    const backIndex = navigationHistory.current.goBack();
+    if (backIndex !== null) {
+      setCurrentItemIndex(backIndex);
+      return backIndex;
+    }
+    return null;
+  }, []);
+
+  const handleForwardIdea = useCallback(() => {
+    const forwardIndex = navigationHistory.current.goForward();
+    if (forwardIndex !== null) {
+      setCurrentItemIndex(forwardIndex);
+      return forwardIndex;
+    }
+    return null;
+  }, []);
+
   const handleLoadGlobalBrainItem = useCallback(async (item: any) => {
     if (!editorRef.current || !currentDocument) return;
     
@@ -154,6 +201,36 @@ export default function MinimalEditor() {
     setIsModified(true);
   }, [currentDocument]);
 
+  // Combined handler for random button - uses next logic then loads item
+  const handleRandomIdea = useCallback(async () => {
+    const nextIndex = handleNextIdea();
+    if (nextIndex !== undefined && suggestions[nextIndex]) {
+      await handleLoadGlobalBrainItem(suggestions[nextIndex]);
+    }
+  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem]);
+
+  // Brain panel navigation handlers that also load items
+  const handleBrainPanelNext = useCallback(async () => {
+    const nextIndex = handleNextIdea();
+    if (nextIndex !== undefined && suggestions[nextIndex]) {
+      await handleLoadGlobalBrainItem(suggestions[nextIndex]);
+    }
+  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem]);
+
+  const handleBrainPanelBack = useCallback(async () => {
+    const backIndex = handleBackIdea();
+    if (backIndex !== null && suggestions[backIndex]) {
+      await handleLoadGlobalBrainItem(suggestions[backIndex]);
+    }
+  }, [handleBackIdea, suggestions, handleLoadGlobalBrainItem]);
+
+  const handleBrainPanelForward = useCallback(async () => {
+    const forwardIndex = handleForwardIdea();
+    if (forwardIndex !== null && suggestions[forwardIndex]) {
+      await handleLoadGlobalBrainItem(suggestions[forwardIndex]);
+    }
+  }, [handleForwardIdea, suggestions, handleLoadGlobalBrainItem]);
+
 
   return (
     <div className="minimal-editor">
@@ -166,16 +243,22 @@ export default function MinimalEditor() {
         onToggleBrainPanel={toggleBrainPanel}
         brainPanelVisible={brainPanelVisible}
         editorRef={editorRef}
-        onLoadGlobalBrainItem={handleLoadGlobalBrainItem}
+        onRandomIdea={handleRandomIdea}
       />
       
       <TopBrainPanel 
         isVisible={brainPanelVisible}
         height={brainPanelHeight}
         onHeightChange={handleBrainPanelHeightChange}
-        onLoadItem={handleLoadGlobalBrainItem}
         onPanelClose={() => setBrainPanelVisible(false)}
         editorRef={editorRef}
+        currentIdea={suggestions[currentItemIndex]}
+        canGoBack={navigationHistory.current.canGoBack()}
+        canGoForward={navigationHistory.current.canGoForward()}
+        onNextIdea={handleBrainPanelNext}
+        onBackIdea={handleBrainPanelBack}
+        onForwardIdea={handleBrainPanelForward}
+        onLoadCurrentIdea={() => suggestions[currentItemIndex] && handleLoadGlobalBrainItem(suggestions[currentItemIndex])}
       />
       
       <div className="editor-main">
