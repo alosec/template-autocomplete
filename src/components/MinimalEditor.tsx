@@ -166,6 +166,7 @@ export default function MinimalEditor() {
         onToggleBrainPanel={toggleBrainPanel}
         brainPanelVisible={brainPanelVisible}
         editorRef={editorRef}
+        onLoadGlobalBrainItem={handleLoadGlobalBrainItem}
       />
       
       <TopBrainPanel 

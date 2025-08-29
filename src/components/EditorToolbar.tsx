@@ -5,6 +5,7 @@ import { LexicalEditor } from 'lexical';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
 import SubmitIdeaButton from './SubmitIdeaButton';
 import { useGlobalBrain } from '../hooks/useGlobalBrain';
+import { getNextIntelligentIndex } from '../utils/brainNavigation';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -15,6 +16,7 @@ interface EditorToolbarProps {
   onToggleBrainPanel: () => void;
   brainPanelVisible: boolean;
   editorRef?: React.MutableRefObject<LexicalEditor | null>;
+  onLoadGlobalBrainItem?: (item: any) => void;
 }
 
 export default function EditorToolbar({
@@ -25,14 +27,17 @@ export default function EditorToolbar({
   onLoadDocument,
   onToggleBrainPanel,
   brainPanelVisible,
-  editorRef
+  editorRef,
+  onLoadGlobalBrainItem
 }: EditorToolbarProps) {
   const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   const [fileMenuOpen, setFileMenuOpen] = useState(false);
   const [recentMenuOpen, setRecentMenuOpen] = useState(false);
+  const [currentItemIndex, setCurrentItemIndex] = useState(0);
+  const [seenIndices, setSeenIndices] = useState<Set<number>>(new Set());
   const toolbarRef = useRef<HTMLDivElement>(null);
-  const { getRandomSuggestions } = useGlobalBrain();
+  const { suggestions } = useGlobalBrain();
   
   // Load document summaries
   useEffect(() => {
@@ -137,21 +142,18 @@ export default function EditorToolbar({
     }
   };
 
-  const handleRandomIdea = () => {
-    const randomIdeas = getRandomSuggestions(1);
-    if (randomIdeas.length > 0) {
-      const randomIdea = randomIdeas[0];
-      // Insert the random idea into the editor if we have editor ref
-      if (editorRef?.current) {
-        editorRef.current.update(() => {
-          const selection = window.getSelection();
-          if (selection) {
-            const range = selection.getRangeAt(0);
-            range.deleteContents();
-            range.insertNode(document.createTextNode(randomIdea.text));
-          }
-        });
-      }
+  const handleRandomIdea = async () => {
+    if (suggestions.length === 0 || !onLoadGlobalBrainItem) return;
+    
+    // Get next intelligent index using the same logic as TopBrainPanel
+    const nextIndex = getNextIntelligentIndex(suggestions, seenIndices, currentItemIndex);
+    setCurrentItemIndex(nextIndex);
+    setSeenIndices(prev => new Set([...prev, nextIndex]));
+    
+    // Load the selected idea into the editor
+    const selectedIdea = suggestions[nextIndex];
+    if (selectedIdea) {
+      await onLoadGlobalBrainItem(selectedIdea);
     }
   };
 
