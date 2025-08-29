@@ -3,6 +3,7 @@ import { documentManager } from '../utils/DocumentManager';
 import { useState, useEffect, useRef } from 'react';
 import { LexicalEditor } from 'lexical';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
+import SubmitIdeaButton from './SubmitIdeaButton';
 
 interface EditorToolbarProps {
   currentDocument: Document | null;
@@ -191,6 +192,13 @@ export default function EditorToolbar({
       </div>
 
       <div className="toolbar-right">
+        <SubmitIdeaButton 
+          className="compact"
+          onSubmissionSuccess={() => {
+            // Optional: could trigger a global brain sync here
+            console.log('Idea submitted successfully!');
+          }}
+        />
         <button 
           className="toolbar-btn brain-toggle-btn"
           onClick={onToggleBrainPanel}

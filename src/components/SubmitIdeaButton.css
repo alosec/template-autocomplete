@@ -1,0 +1,134 @@
+/* Submit Idea Button Styles */
+.submit-idea-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-idea-btn:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.submit-idea-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.submit-idea-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.submit-idea-btn:hover::before {
+  left: 100%;
+}
+
+.btn-icon {
+  font-size: 16px;
+  display: inline-block;
+  animation: brainPulse 2s ease-in-out infinite;
+}
+
+.btn-text {
+  font-weight: 500;
+}
+
+/* Brain pulse animation */
+@keyframes brainPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Compact variant for toolbar */
+.submit-idea-btn.compact {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.submit-idea-btn.compact .btn-icon {
+  font-size: 14px;
+}
+
+/* Alternative subtle style variant */
+.submit-idea-btn.subtle {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.submit-idea-btn.subtle:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #1f2937;
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-idea-btn.subtle .btn-icon {
+  animation: none;
+}
+
+/* Focus states for accessibility */
+.submit-idea-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Disabled state */
+.submit-idea-btn:disabled {
+  background: #9ca3af;
+  border-color: #9ca3af;
+  color: #f9fafb;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-idea-btn:disabled .btn-icon {
+  animation: none;
+}
+
+.submit-idea-btn:disabled::before {
+  display: none;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .submit-idea-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .btn-text {
+    display: none;
+  }
+  
+  .btn-icon {
+    font-size: 16px;
+  }
+}

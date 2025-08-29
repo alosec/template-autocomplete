@@ -20,7 +20,8 @@ export type DataSource =
   | 'global-brain' 
   | 'global-brain-investigations' 
   | 'global-brain-problems' 
-  | 'global-brain-generic';
+  | 'global-brain-generic'
+  | 'community-submission';
 
 export type Domain = 'medical' | 'technical' | 'philosophical' | 'social' | 'scientific';
 
@@ -65,4 +66,53 @@ export interface NewIdeaSubmission {
   priority: Priority;
   domain?: Domain;
   category?: string;
+}
+
+// Social features types
+export type SubmissionStatus = 'pending' | 'submitting' | 'success' | 'error';
+
+export type SyncStatus = 'idle' | 'syncing' | 'error' | 'stale';
+
+export interface SubmissionState {
+  status: SubmissionStatus;
+  error?: string;
+  isModalOpen: boolean;
+}
+
+export interface SyncState {
+  status: SyncStatus;
+  lastSync?: Date;
+  error?: string;
+}
+
+export interface CommunityStats {
+  totalSubmissions: number;
+  recentSubmissions: number;
+  lastUpdated: Date;
+}
+
+export interface CommunityIdea extends AutocompleteItem {
+  id: string;
+  submittedAt: string;
+  votes?: number;
+  isNew?: boolean;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  timestamp: string;
+}
+
+export interface IdeaSubmissionResponse {
+  id: string;
+  submittedAt: string;
+  status: 'accepted' | 'pending_review';
+}
+
+export interface SyncResponse {
+  newIdeas: CommunityIdea[];
+  totalCount: number;
+  lastSyncTimestamp: string;
 }
