@@ -1,4 +1,4 @@
-import { TextNode, $getSelection, $isRangeSelection, $createTextNode, LexicalNode } from 'lexical';
+import { TextNode, $getSelection, $isRangeSelection, $createTextNode, $createParagraphNode, $getRoot, LexicalNode } from 'lexical';
 import { $createAutocompleteNode, $isAutocompleteNode, AutocompleteNode } from '../nodes/AutocompleteNode';
 import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
@@ -310,4 +310,53 @@ export function createNodesFromClipboard(clipboardData: ClipboardAutocompleteDat
   }
   
   return nodes;
+}
+
+/**
+ * Load content with title as autocomplete node using the working copy/paste pattern
+ * This follows the same successful pattern used in the PASTE_COMMAND handler
+ */
+export function loadContentWithAutocompleteNodes(title: string, description: string, tags?: string[]): void {
+  const root = $getRoot();
+  
+  // Clear existing content
+  root.clear();
+  
+  // Create first paragraph with autocomplete node for title
+  const titleParagraph = $createParagraphNode();
+  const autocompleteNode = $createAutocompleteNode(title);
+  titleParagraph.append(autocompleteNode);
+  root.append(titleParagraph);
+  
+  // Add description in separate paragraphs if provided
+  if (description) {
+    // Add empty paragraph for spacing
+    root.append($createParagraphNode());
+    
+    // Split description by lines and create paragraphs
+    const descriptionLines = description.split('\n');
+    descriptionLines.forEach(line => {
+      const paragraph = $createParagraphNode();
+      if (line.trim()) {
+        paragraph.append($createTextNode(line));
+      }
+      root.append(paragraph);
+    });
+  }
+  
+  // Add tags in a separate paragraph if provided
+  if (tags && tags.length > 0) {
+    // Add empty paragraph for spacing
+    root.append($createParagraphNode());
+    
+    const tagsParagraph = $createParagraphNode();
+    const tagsText = tags.map(tag => `#${tag}`).join(' ');
+    tagsParagraph.append($createTextNode(tagsText));
+    root.append(tagsParagraph);
+  }
+  
+  // Position cursor after the autocomplete node in the first paragraph
+  const spaceNode = $createTextNode(' ');
+  autocompleteNode.insertAfter(spaceNode);
+  spaceNode.select(1, 1);
 }

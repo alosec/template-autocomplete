@@ -4,6 +4,7 @@ import { EditorState, $getRoot, LexicalEditor } from 'lexical';
 
 import { AutocompleteNode } from '../editor/nodes/AutocompleteNode';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../editor/commands/autocompleteCommands';
+import { loadContentWithAutocompleteNodes } from '../editor/utils/autocompleteUtils';
 import EditorToolbar from './EditorToolbar';
 import EditorWithSync from './EditorWithSync';
 import TopBrainPanel from './TopBrainPanel';
@@ -135,16 +136,23 @@ export default function MinimalEditor() {
   }, []);
 
   const handleLoadGlobalBrainItem = useCallback(async (item: any) => {
-    // Create a new document from the global brain item
-    const newDoc = documentManager.createDocumentFromGlobalBrainItem(item);
+    if (!editorRef.current || !currentDocument) return;
     
-    // Save it to IndexedDB
-    await documentManager.saveDocument(newDoc);
+    // Use the working editor command pattern to load content with autocomplete nodes
+    editorRef.current.update(() => {
+      loadContentWithAutocompleteNodes(item.text, item.description, item.tags);
+    });
     
-    // Load it into the editor
-    setCurrentDocument(newDoc);
-    setIsModified(false);
-  }, []);
+    // Update document title and metadata
+    const updatedDoc = {
+      ...currentDocument,
+      title: item.text,
+      updatedAt: new Date()
+    };
+    
+    setCurrentDocument(updatedDoc);
+    setIsModified(true);
+  }, [currentDocument]);
 
 
   return (

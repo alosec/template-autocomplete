@@ -118,6 +118,7 @@ ${item.tags ? item.tags.map((tag: string) => `#${tag}`).join(' ') : ''}`;
     return this.updateWordCount(document);
   }
   
+
   // Private methods
   private generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
