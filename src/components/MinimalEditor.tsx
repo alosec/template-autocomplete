@@ -70,14 +70,6 @@ export default function MinimalEditor() {
     setIsModified(false);
   }, []);
 
-  const handleDeleteDocument = useCallback(async (id: string) => {
-    await documentManager.deleteDocument(id);
-    
-    // If deleted document was current, create new one
-    if (currentDocument?.id === id) {
-      handleNewDocument();
-    }
-  }, [currentDocument, handleNewDocument]);
 
   const handleContentChange = useCallback((editorState: EditorState) => {
     const textContent = editorState.read(() => {
@@ -163,7 +155,6 @@ export default function MinimalEditor() {
         onNewDocument={handleNewDocument}
         onSaveDocument={handleSaveDocument}
         onLoadDocument={handleLoadDocument}
-        onDeleteDocument={handleDeleteDocument}
         onToggleBrainPanel={toggleBrainPanel}
         brainPanelVisible={brainPanelVisible}
         editorRef={editorRef}
@@ -171,7 +162,6 @@ export default function MinimalEditor() {
       
       <TopBrainPanel 
         isVisible={brainPanelVisible}
-        onToggle={toggleBrainPanel}
         height={brainPanelHeight}
         onHeightChange={handleBrainPanelHeightChange}
         onLoadItem={handleLoadGlobalBrainItem}

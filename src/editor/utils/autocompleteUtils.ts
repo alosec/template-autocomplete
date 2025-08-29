@@ -169,7 +169,7 @@ export function insertAutocompleteNode(
   suggestion: string,
   triggerIndex: number,
   cursorOffset: number,
-  matchString?: string
+  _matchString?: string
 ): void {
   const textContent = anchorNode.getTextContent();
   const beforeTrigger = textContent.substring(0, triggerIndex);

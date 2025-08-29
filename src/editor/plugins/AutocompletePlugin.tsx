@@ -5,7 +5,7 @@ import { useAutocompleteCommands } from '../hooks/useAutocompleteCommands';
 import { useEscapeKeyHandler } from '../hooks/useEscapeKeyHandler';
 import { AutocompleteDropdown } from '../components/AutocompleteDropdown';
 import { useEffect } from 'react';
-import { $getSelection, $isRangeSelection, $createTextNode } from 'lexical';
+import { $getSelection, $isRangeSelection } from 'lexical';
 import { parseClipboardHTML, createNodesFromClipboard } from '../utils/autocompleteUtils';
 import { $isAutocompleteNode } from '../nodes/AutocompleteNode';
 

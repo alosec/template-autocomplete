@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getRoot, $createTextNode, $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical';
 import { Document } from '../types/EditorTypes';
 
@@ -47,7 +47,7 @@ export const useDocumentSync = ({ document, onContentChange }: UseDocumentSyncPr
         // Split content by newlines to create proper paragraphs
         const lines = document.content.split('\n');
         
-        lines.forEach((line, index) => {
+        lines.forEach((line, _index) => {
           const paragraph = $createParagraphNode();
           if (line.trim()) {
             const textNode = $createTextNode(line);

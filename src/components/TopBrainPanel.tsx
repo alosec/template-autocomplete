@@ -5,7 +5,6 @@ import './top-brain-panel.css';
 
 interface TopBrainPanelProps {
   isVisible: boolean;
-  onToggle: () => void;
   height: number;
   onHeightChange: (height: number) => void;
   onLoadItem: (item: any) => void;
@@ -72,7 +71,7 @@ const GLOBAL_BRAIN_DATA = [
   }
 ];
 
-export default function TopBrainPanel({ isVisible, onToggle, height, onHeightChange, onLoadItem, editorRef }: TopBrainPanelProps) {
+export default function TopBrainPanel({ isVisible, height, onHeightChange, onLoadItem, editorRef }: TopBrainPanelProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentItemIndex, setCurrentItemIndex] = useState(0);

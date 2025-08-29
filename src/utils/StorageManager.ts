@@ -25,9 +25,6 @@ export class StorageManager {
     return JSON.stringify(document).length;
   }
 
-  private isLargeDocument(document: Document): boolean {
-    return this.getDocumentSize(document) > LARGE_DOCUMENT_THRESHOLD;
-  }
 
   async saveDocument(document: Document): Promise<void> {
     const size = this.getDocumentSize(document);

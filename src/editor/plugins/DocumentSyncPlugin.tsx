@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getRoot, $createTextNode, $createParagraphNode } from 'lexical';
 import { Document } from '../../types/EditorTypes';
-import { $createAutocompleteNode } from '../nodes/AutocompleteNode';
 
 interface DocumentSyncPluginProps {
   document: Document | null;

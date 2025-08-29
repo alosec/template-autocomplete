@@ -3,7 +3,6 @@ import './resizable-sidebar.css';
 
 interface ResizableSidebarProps {
   isVisible: boolean;
-  onToggle: () => void;
   width: number;
   onWidthChange: (width: number) => void;
   onLoadItem: (item: any) => void;
@@ -69,7 +68,7 @@ const GLOBAL_BRAIN_DATA = [
   }
 ];
 
-export default function ResizableSidebar({ isVisible, onToggle, width, onWidthChange, onLoadItem }: ResizableSidebarProps) {
+export default function ResizableSidebar({ isVisible, width, onWidthChange, onLoadItem }: ResizableSidebarProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [loadingItemIndex, setLoadingItemIndex] = useState<number | null>(null);
   const sidebarRef = useRef<HTMLDivElement>(null);

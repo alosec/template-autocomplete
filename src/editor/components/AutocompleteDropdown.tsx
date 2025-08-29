@@ -1,4 +1,3 @@
-import React from 'react';
 import { DropdownPosition } from '../utils/autocompleteUtils';
 import { AutocompleteItem } from '../../types/GlobalBrainTypes';
 
@@ -20,7 +19,7 @@ export function AutocompleteDropdown({
   position,
   onSelect,
   onHover
-}: AutocompleteDropdownProps): JSX.Element {
+}: AutocompleteDropdownProps) {
   if (suggestions.length === 0) {
     return <></>;
   }

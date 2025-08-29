@@ -10,7 +10,6 @@ interface EditorToolbarProps {
   onNewDocument: () => void;
   onSaveDocument: () => void;
   onLoadDocument: (document: Document) => void;
-  onDeleteDocument: (id: string) => void;
   onToggleBrainPanel: () => void;
   brainPanelVisible: boolean;
   editorRef?: React.MutableRefObject<LexicalEditor | null>;
@@ -22,7 +21,6 @@ export default function EditorToolbar({
   onNewDocument,
   onSaveDocument,
   onLoadDocument,
-  onDeleteDocument,
   onToggleBrainPanel,
   brainPanelVisible,
   editorRef

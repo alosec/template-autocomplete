@@ -1,11 +1,11 @@
 import { useEffect, useCallback } from 'react';
 import {
   LexicalEditor,
+  LexicalNode,
   TextNode,
   $getSelection,
   $isRangeSelection,
   $createTextNode,
-  COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_CRITICAL,
   KEY_DOWN_COMMAND,
@@ -291,7 +291,7 @@ export function useAutocompleteCommands(
           }
           
           // Insert all the parsed nodes
-          let insertAfterNode = anchorTextNode;
+          let insertAfterNode: TextNode | LexicalNode = anchorTextNode;
           for (let i = 0; i < nodes.length; i++) {
             const node = nodes[i];
             if (i === 0) {

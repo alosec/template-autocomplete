@@ -119,27 +119,10 @@ ${item.tags ? item.tags.map((tag: string) => `#${tag}`).join(' ') : ''}`;
   }
   
   // Private methods
-  private deserializeDocument(doc: any): Document {
-    return {
-      ...doc,
-      createdAt: new Date(doc.createdAt),
-      updatedAt: new Date(doc.updatedAt)
-    };
-  }
-  
   private generateId(): string {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
   
-  private getDefaultSettings(): EditorSettings {
-    return {
-      theme: 'light',
-      fontSize: 14,
-      lineNumbers: false,
-      wordWrap: true,
-      autoSave: true
-    };
-  }
 }
 
 export const documentManager = new DocumentManager();
