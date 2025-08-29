@@ -1,6 +1,6 @@
-import { detectTrigger, filterSuggestions } from '../autocompleteUtils';
-import { AutocompleteItem } from '../../../types/GlobalBrainTypes';
-import { mockGlobalBrainData } from './testUtils';
+import { detectTrigger, filterSuggestions } from '../../../src/editor/utils/autocompleteUtils';
+import { AutocompleteItem } from '../../../src/types/GlobalBrainTypes';
+import { mockGlobalBrainData } from '../../../src/editor/utils/__tests__/testUtils';
 
 describe('Autocomplete Utils - Adversarial Testing', () => {
   const mockSuggestions: AutocompleteItem[] = [
