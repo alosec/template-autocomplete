@@ -69,10 +69,13 @@
 
 .controls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.next-btn, .load-btn {
+.back-btn, .next-btn, .forward-btn, .load-btn {
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 14px;
@@ -80,16 +83,33 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+  min-width: 80px;
 }
 
-.next-btn {
+.back-btn, .forward-btn {
   background: #f8f9fa;
   color: #495057;
   border: 1px solid #e9ecef;
 }
 
-.next-btn:hover {
+.back-btn:disabled, .forward-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+
+.back-btn:hover:not(:disabled), .forward-btn:hover:not(:disabled) {
   background: #e9ecef;
+}
+
+.next-btn {
+  background: #28a745;
+  color: white;
+  border: 1px solid #28a745;
+}
+
+.next-btn:hover {
+  background: #218838;
 }
 
 .load-btn {
