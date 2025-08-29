@@ -11,7 +11,8 @@ import {
   sanitizeIdeaSubmission, 
   generateTagSuggestions, 
   inferContentType, 
-  inferPriority 
+  inferPriority,
+  parseDocumentStructure
 } from '../utils/ideaSubmission';
 import './IdeaSubmissionModal.css';
 
@@ -78,12 +79,12 @@ export default function IdeaSubmissionModal({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      const initialText = prePopulatedContent.slice(0, 200); // Limit to 200 chars for title
+      const parsedContent = parseDocumentStructure(prePopulatedContent || '');
       setFormData({
-        text: initialText,
+        text: parsedContent.title,
         type: 'item',
-        description: prePopulatedContent.slice(200, 700), // Use rest for description, limit to 500 chars
-        tags: [],
+        description: parsedContent.description,
+        tags: parsedContent.tags,
         priority: 'medium',
         parentId: threadContext?.parentId,
         threadRootId: threadContext?.threadRootId,

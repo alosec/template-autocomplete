@@ -109,6 +109,39 @@ export const inferContentType = (text: string, description: string): ContentType
   return 'item'; // Default fallback
 };
 
+export const parseDocumentStructure = (content: string): { title: string; description: string; tags: string[] } => {
+  if (!content || content.trim().length === 0) {
+    return { title: '', description: '', tags: [] };
+  }
+
+  const lines = content.trim().split('\n').filter(line => line.trim().length > 0);
+  
+  // First line becomes title
+  const title = lines[0]?.trim() || '';
+  
+  // Rest becomes description
+  const descriptionLines = lines.slice(1);
+  const description = descriptionLines.join('\n').trim();
+  
+  // Extract hashtags from entire content
+  const hashtagRegex = /#(\w+)/g;
+  const tags: string[] = [];
+  let match;
+  
+  while ((match = hashtagRegex.exec(content)) !== null) {
+    const tag = match[1].toLowerCase();
+    if (!tags.includes(tag)) {
+      tags.push(tag);
+    }
+  }
+  
+  return {
+    title: title.slice(0, 200), // Maintain title length limit
+    description: description.slice(0, 500), // Maintain description length limit
+    tags
+  };
+};
+
 export const inferPriority = (text: string, description: string, domain?: Domain): Priority => {
   const combined = `${text} ${description}`.toLowerCase();
   
