@@ -65,6 +65,37 @@ export type EditorAction =
   | { type: 'SET_MODIFIED'; isModified: boolean }
   | { type: 'UPDATE_SETTINGS'; settings: Partial<EditorSettings> };
 
+// Threading types
+export interface ThreadPost {
+  id: string;
+  text: string;
+  description: string;
+  type: string;
+  priority: string;
+  domain?: string;
+  category?: string;
+  tags: string[];
+  source: string;
+  submittedAt: string;
+  votes: number;
+  isNew: boolean;
+  parentId?: string;
+  threadRootId?: string;
+  threadOrder: number;
+}
+
+export interface Thread {
+  rootPost: ThreadPost;
+  posts: ThreadPost[];
+  totalPosts: number;
+}
+
+export interface ThreadContext {
+  threadRootId?: string;
+  parentId?: string;
+  threadOrder?: number;
+}
+
 // Utility types
 export type ConceptCategory = Concept['category'];
 export type DocumentMetadata = NonNullable<Document['metadata']>;

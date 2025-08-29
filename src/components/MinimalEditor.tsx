@@ -8,7 +8,8 @@ import { loadContentWithAutocompleteNodes } from '../editor/utils/autocompleteUt
 import EditorToolbar from './EditorToolbar';
 import EditorWithSync from './EditorWithSync';
 import TopBrainPanel from './TopBrainPanel';
-import { Document } from '../types/EditorTypes';
+import ThreadDisplay from './ThreadDisplay';
+import { Document, Thread, ThreadPost } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
 import { NavigationHistory, getNextIntelligentIndex } from '../utils/brainNavigation';
 import { useGlobalBrain } from '../hooks/useGlobalBrain';
@@ -29,6 +30,8 @@ export default function MinimalEditor() {
   const [isModified, setIsModified] = useState(false);
   const [brainPanelVisible, setBrainPanelVisible] = useState(false);
   const [brainPanelHeight, setBrainPanelHeight] = useState(400);
+  const [currentThread] = useState<Thread | null>(null);
+  const [threadContext, setThreadContext] = useState<{ parentId?: string; threadRootId?: string } | undefined>(undefined);
   const autoSaveTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const editorRef = useRef<LexicalEditor | null>(null);
 
@@ -231,6 +234,13 @@ export default function MinimalEditor() {
     }
   }, [handleForwardIdea, suggestions, handleLoadGlobalBrainItem]);
 
+  const handleReplyToPost = useCallback((post: ThreadPost) => {
+    setThreadContext({
+      parentId: post.id,
+      threadRootId: post.threadRootId || post.id,
+    });
+  }, []);
+
 
   return (
     <div className="minimal-editor">
@@ -244,6 +254,7 @@ export default function MinimalEditor() {
         brainPanelVisible={brainPanelVisible}
         editorRef={editorRef}
         onRandomIdea={handleRandomIdea}
+        threadContext={threadContext}
       />
       
       <TopBrainPanel 
@@ -276,6 +287,14 @@ export default function MinimalEditor() {
         )}
         
         <div className="editor-content">
+          {currentThread && (
+            <ThreadDisplay 
+              thread={currentThread}
+              onReplyToPost={handleReplyToPost}
+              className="editor-thread"
+            />
+          )}
+          
           {currentDocument && (
             <LexicalComposer 
               key={currentDocument.id}

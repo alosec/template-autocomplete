@@ -66,6 +66,9 @@ export interface NewIdeaSubmission {
   priority: Priority;
   domain?: Domain;
   category?: string;
+  parentId?: string;
+  threadRootId?: string;
+  threadOrder?: number;
 }
 
 // Social features types
@@ -96,6 +99,9 @@ export interface CommunityIdea extends AutocompleteItem {
   submittedAt: string;
   votes?: number;
   isNew?: boolean;
+  parentId?: string;
+  threadRootId?: string;
+  threadOrder?: number;
 }
 
 export interface ApiResponse<T> {

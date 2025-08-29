@@ -21,6 +21,11 @@ interface IdeaSubmissionModalProps {
   onSubmit: (idea: NewIdeaSubmission) => Promise<void>;
   submissionStatus: SubmissionStatus;
   submissionError?: string;
+  prePopulatedContent?: string;
+  threadContext?: {
+    parentId?: string;
+    threadRootId?: string;
+  };
 }
 
 const CONTENT_TYPES: { value: ContentType; label: string; description: string }[] = [
@@ -54,6 +59,8 @@ export default function IdeaSubmissionModal({
   onSubmit,
   submissionStatus,
   submissionError,
+  prePopulatedContent = '',
+  threadContext,
 }: IdeaSubmissionModalProps) {
   const [formData, setFormData] = useState<NewIdeaSubmission>({
     text: '',
@@ -71,18 +78,22 @@ export default function IdeaSubmissionModal({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
+      const initialText = prePopulatedContent.slice(0, 200); // Limit to 200 chars for title
       setFormData({
-        text: '',
+        text: initialText,
         type: 'item',
-        description: '',
+        description: prePopulatedContent.slice(200, 700), // Use rest for description, limit to 500 chars
         tags: [],
         priority: 'medium',
+        parentId: threadContext?.parentId,
+        threadRootId: threadContext?.threadRootId,
+        threadOrder: threadContext?.parentId ? 1 : 0,
       });
       setTagInput('');
       setValidationErrors([]);
       setIsAutoInferring(true);
     }
-  }, [isOpen]);
+  }, [isOpen, prePopulatedContent, threadContext]);
 
   // Auto-infer content type and priority based on text and description
   useEffect(() => {
@@ -163,6 +174,11 @@ export default function IdeaSubmissionModal({
       <div className="modal-content idea-submission-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>🧠 Contribute to the Global Brain</h2>
+          {threadContext?.parentId && (
+            <div className="thread-indicator">
+              🧵 Adding to thread
+            </div>
+          )}
           <button 
             className="close-btn" 
             onClick={onClose}

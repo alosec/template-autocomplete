@@ -39,6 +39,17 @@ export default {
         return handleStats(env, corsHeaders);
       }
 
+      // Thread endpoints
+      if (path.startsWith('/api/threads/')) {
+        const threadId = path.split('/')[3];
+        return handleGetThread(threadId, env, corsHeaders);
+      }
+
+      if (path.match(/^\/api\/posts\/[^\/]+\/replies$/)) {
+        const postId = path.split('/')[3];
+        return handleGetThreadReplies(postId, env, corsHeaders);
+      }
+
       // 404 Not Found
       return new Response(
         JSON.stringify({ error: 'Endpoint not found' }),
@@ -103,7 +114,10 @@ async function handleGetIdeas(request, env, corsHeaders) {
     source: row.source,
     submittedAt: row.submitted_at,
     votes: row.votes,
-    isNew: Boolean(row.is_new)
+    isNew: Boolean(row.is_new),
+    parentId: row.parent_id,
+    threadRootId: row.thread_root_id,
+    threadOrder: row.thread_order || 0
   }));
 
   return new Response(
@@ -134,11 +148,30 @@ async function handleSubmitIdea(request, env, corsHeaders) {
   const id = generateId();
   const submittedAt = new Date().toISOString();
   
+  // Calculate thread order for replies
+  let threadOrder = 0;
+  let threadRootId = idea.threadRootId || null;
+  
+  if (idea.parentId) {
+    // If this is a reply, get the thread info and calculate order
+    const parentStmt = env.DB.prepare('SELECT thread_root_id, thread_order FROM community_ideas WHERE id = ?');
+    const parent = await parentStmt.bind(idea.parentId).first();
+    
+    if (parent) {
+      threadRootId = parent.thread_root_id || idea.parentId;
+      
+      // Get the highest order in this thread
+      const orderStmt = env.DB.prepare('SELECT MAX(thread_order) as max_order FROM community_ideas WHERE thread_root_id = ?');
+      const orderResult = await orderStmt.bind(threadRootId).first();
+      threadOrder = (orderResult.max_order || 0) + 1;
+    }
+  }
+
   // Insert idea into database
   const stmt = env.DB.prepare(`
     INSERT INTO community_ideas 
-    (id, text, description, type, priority, domain, category, tags, source, submitted_at, votes, is_new)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    (id, text, description, type, priority, domain, category, tags, source, submitted_at, votes, is_new, parent_id, thread_root_id, thread_order)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   
   await stmt.bind(
@@ -153,7 +186,10 @@ async function handleSubmitIdea(request, env, corsHeaders) {
     'community-submission',
     submittedAt,
     0,
-    true
+    true,
+    idea.parentId || null,
+    threadRootId,
+    threadOrder
   ).run();
 
   // Update stats
@@ -210,7 +246,10 @@ async function handleSync(request, env, corsHeaders) {
     source: row.source,
     submittedAt: row.submitted_at,
     votes: row.votes,
-    isNew: Boolean(row.is_new)
+    isNew: Boolean(row.is_new),
+    parentId: row.parent_id,
+    threadRootId: row.thread_root_id,
+    threadOrder: row.thread_order || 0
   }));
 
   // Get total count
@@ -262,6 +301,122 @@ async function updateStats(env) {
     SET total_ideas = ?, recent_ideas = ?, last_updated = CURRENT_TIMESTAMP 
     WHERE id = 1
   `).bind(totalResult.total, recentResult.recent).run();
+}
+
+// Get a specific thread and its replies
+async function handleGetThread(threadRootId, env, corsHeaders) {
+  try {
+    // Get root post
+    const rootStmt = env.DB.prepare(`
+      SELECT * FROM community_ideas 
+      WHERE id = ? AND (parent_id IS NULL OR id = thread_root_id)
+    `);
+    const rootPost = await rootStmt.bind(threadRootId).first();
+    
+    if (!rootPost) {
+      return new Response(
+        JSON.stringify({ error: 'Thread not found' }),
+        { 
+          status: 404, 
+          headers: { 'Content-Type': 'application/json', ...corsHeaders }
+        }
+      );
+    }
+
+    // Get all replies in the thread
+    const repliesStmt = env.DB.prepare(`
+      SELECT * FROM community_ideas 
+      WHERE thread_root_id = ? AND parent_id IS NOT NULL
+      ORDER BY thread_order ASC
+    `);
+    const replies = await repliesStmt.bind(threadRootId).all();
+
+    const formatPost = (row) => ({
+      id: row.id,
+      text: row.text,
+      description: row.description,
+      type: row.type,
+      priority: row.priority,
+      domain: row.domain,
+      category: row.category,
+      tags: row.tags ? JSON.parse(row.tags) : [],
+      source: row.source,
+      submittedAt: row.submitted_at,
+      votes: row.votes,
+      isNew: Boolean(row.is_new),
+      parentId: row.parent_id,
+      threadRootId: row.thread_root_id,
+      threadOrder: row.thread_order
+    });
+
+    const thread = {
+      rootPost: formatPost(rootPost),
+      posts: replies.results.map(formatPost),
+      totalPosts: replies.results.length + 1
+    };
+
+    return new Response(
+      JSON.stringify(thread),
+      {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      }
+    );
+  } catch (error) {
+    console.error('Error getting thread:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to get thread' }),
+      { 
+        status: 500, 
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      }
+    );
+  }
+}
+
+// Get replies for a specific post
+async function handleGetThreadReplies(postId, env, corsHeaders) {
+  try {
+    const stmt = env.DB.prepare(`
+      SELECT * FROM community_ideas 
+      WHERE parent_id = ?
+      ORDER BY thread_order ASC
+    `);
+    const replies = await stmt.bind(postId).all();
+
+    const formattedReplies = replies.results.map(row => ({
+      id: row.id,
+      text: row.text,
+      description: row.description,
+      type: row.type,
+      priority: row.priority,
+      domain: row.domain,
+      category: row.category,
+      tags: row.tags ? JSON.parse(row.tags) : [],
+      source: row.source,
+      submittedAt: row.submitted_at,
+      votes: row.votes,
+      isNew: Boolean(row.is_new),
+      parentId: row.parent_id,
+      threadRootId: row.thread_root_id,
+      threadOrder: row.thread_order
+    }));
+
+    return new Response(
+      JSON.stringify(formattedReplies),
+      {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      }
+    );
+  } catch (error) {
+    console.error('Error getting thread replies:', error);
+    return new Response(
+      JSON.stringify({ error: 'Failed to get thread replies' }),
+      { 
+        status: 500, 
+        headers: { 'Content-Type': 'application/json', ...corsHeaders }
+      }
+    );
+  }
 }
 
 // Generate unique ID

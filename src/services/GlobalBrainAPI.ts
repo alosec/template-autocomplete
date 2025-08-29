@@ -5,6 +5,7 @@ import {
   SyncResponse, 
   CommunityIdea 
 } from '../types/GlobalBrainTypes';
+import { Thread, ThreadPost } from '../types/EditorTypes';
 
 const API_BASE_URL = import.meta.env.VITE_GLOBAL_BRAIN_API_URL || 'http://localhost:8787';
 
@@ -95,6 +96,37 @@ export class GlobalBrainAPI {
    */
   static async getAllCommunityIdeas(): Promise<ApiResponse<CommunityIdea[]>> {
     return this.request<CommunityIdea[]>('/api/ideas');
+  }
+
+  /**
+   * Get a specific thread by ID
+   */
+  static async getThread(threadRootId: string): Promise<ApiResponse<Thread>> {
+    return this.request<Thread>(`/api/threads/${threadRootId}`);
+  }
+
+  /**
+   * Get all replies for a specific post
+   */
+  static async getThreadReplies(postId: string): Promise<ApiResponse<ThreadPost[]>> {
+    return this.request<ThreadPost[]>(`/api/posts/${postId}/replies`);
+  }
+
+  /**
+   * Add a reply to an existing thread
+   */
+  static async addToThread(
+    parentId: string, 
+    idea: NewIdeaSubmission
+  ): Promise<ApiResponse<IdeaSubmissionResponse>> {
+    return this.request<IdeaSubmissionResponse>('/api/ideas', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...idea,
+        parentId,
+        submittedAt: new Date().toISOString(),
+      }),
+    });
   }
 }
 
@@ -191,4 +223,7 @@ export const API = {
   
   getCommunityStats: GlobalBrainAPI.getCommunityStats.bind(GlobalBrainAPI),
   healthCheck: GlobalBrainAPI.healthCheck.bind(GlobalBrainAPI),
+  getThread: GlobalBrainAPI.getThread.bind(GlobalBrainAPI),
+  getThreadReplies: GlobalBrainAPI.getThreadReplies.bind(GlobalBrainAPI),
+  addToThread: GlobalBrainAPI.addToThread.bind(GlobalBrainAPI),
 };

@@ -7,11 +7,18 @@ import './SubmitIdeaButton.css';
 interface SubmitIdeaButtonProps {
   className?: string;
   onSubmissionSuccess?: () => void;
+  prePopulatedContent?: string;
+  threadContext?: {
+    parentId?: string;
+    threadRootId?: string;
+  };
 }
 
 export default function SubmitIdeaButton({ 
   className = '', 
-  onSubmissionSuccess 
+  onSubmissionSuccess,
+  prePopulatedContent = '',
+  threadContext
 }: SubmitIdeaButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('pending');
@@ -71,6 +78,8 @@ export default function SubmitIdeaButton({
         onSubmit={handleSubmitIdea}
         submissionStatus={submissionStatus}
         submissionError={submissionError}
+        prePopulatedContent={prePopulatedContent}
+        threadContext={threadContext}
       />
     </>
   );

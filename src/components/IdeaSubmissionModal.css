@@ -39,6 +39,20 @@
   padding: 24px 24px 16px;
   border-bottom: 1px solid #e5e7eb;
   background: #fafafa;
+  position: relative;
+}
+
+.thread-indicator {
+  position: absolute;
+  right: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffc107;
+  color: #212529;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .modal-header h2 {

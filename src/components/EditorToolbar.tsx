@@ -15,6 +15,7 @@ interface EditorToolbarProps {
   brainPanelVisible: boolean;
   editorRef?: React.MutableRefObject<LexicalEditor | null>;
   onRandomIdea: () => void;
+  threadContext?: { parentId?: string; threadRootId?: string };
 }
 
 export default function EditorToolbar({
@@ -26,7 +27,8 @@ export default function EditorToolbar({
   onToggleBrainPanel,
   brainPanelVisible,
   editorRef,
-  onRandomIdea
+  onRandomIdea,
+  threadContext
 }: EditorToolbarProps) {
   const [documentSummaries, setDocumentSummaries] = useState<DocumentSummary[]>([]);
   const [importFeedback, setImportFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -208,6 +210,8 @@ export default function EditorToolbar({
         </button>
         <SubmitIdeaButton 
           className="compact"
+          prePopulatedContent={currentDocument?.content || ''}
+          threadContext={threadContext}
           onSubmissionSuccess={() => {
             // Optional: could trigger a global brain sync here
             console.log('Idea submitted successfully!');
