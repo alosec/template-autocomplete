@@ -9,12 +9,11 @@
 }
 
 .panel-content {
-  padding: 40px 40px 20px 40px;
-  flex: 1;
+  padding: 20px 20px 10px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .idea-display {
@@ -26,6 +25,7 @@
   max-width: 500px;
   width: 100%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 20px 0;
 }
 
 .idea-title {
@@ -76,7 +76,6 @@
   flex-wrap: wrap;
   padding: 20px 40px;
   border-top: 1px solid #f0f0f0;
-  margin-top: auto;
 }
 
 .back-btn, .next-btn, .forward-btn, .load-btn {
