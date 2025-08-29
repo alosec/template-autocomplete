@@ -204,17 +204,14 @@ export default function MinimalEditor() {
     setIsModified(true);
   }, [currentDocument]);
 
-  // Random button updates BOTH brain panel state AND loads into editor
+  // Random button loads idea into editor and syncs with brain panel state
   const handleRandomIdea = useCallback(async () => {
     const nextIndex = handleNextIdea();
     if (nextIndex !== undefined && suggestions[nextIndex]) {
       await handleLoadGlobalBrainItem(suggestions[nextIndex]);
     }
-    // Show brain panel if it's not already visible
-    if (!brainPanelVisible) {
-      setBrainPanelVisible(true);
-    }
-  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem, brainPanelVisible]);
+    // Brain panel stays in its current state - no automatic opening
+  }, [handleNextIdea, suggestions, handleLoadGlobalBrainItem]);
 
   // Brain panel navigation handlers - only navigate, don't load items
   const handleBrainPanelNext = useCallback(() => {
