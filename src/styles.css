@@ -1,74 +1,786 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    background: #eee;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, '.SFNSText-Regular',
-    sans-serif;
-    font-weight: 500;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    background: #fafafa;
+    color: #333;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-.App {
-    font-family: sans-serif;
-    text-align: center;
+.minimal-editor {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    margin: 0 auto;
 }
 
-.rtl {
-    text-align: right;
+/* Toolbar Styles */
+.editor-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    padding: 0;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+    min-height: 44px;
+}
+
+.toolbar-left {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+}
+
+.toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+}
+
+/* Brain Toggle Button - Light Pink Style */
+.brain-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f9a8d4 100%);
+  border: 1px solid #f9a8d4;
+  border-radius: 6px;
+  color: #6b21a8;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.brain-toggle-btn:hover {
+  background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 30%, #f9a8d4 70%, #ec4899 100%);
+  border-color: #f9a8d4;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(252, 231, 243, 0.8), 0 2px 6px rgba(249, 168, 212, 0.4);
+}
+
+.brain-toggle-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(249, 168, 212, 0.2);
+}
+
+.brain-toggle-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.brain-toggle-btn:hover::before {
+  left: 100%;
+}
+
+.brain-toggle-btn .btn-icon {
+  font-size: 16px;
+  display: inline-block;
+  animation: brainPulse 2s ease-in-out infinite;
+}
+
+.brain-toggle-btn .btn-text {
+  font-weight: 500;
+}
+
+/* Brain pulse animation */
+@keyframes brainPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Compact variant for toolbar */
+.brain-toggle-btn.compact {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.brain-toggle-btn.compact .btn-icon {
+  font-size: 14px;
+}
+
+/* Focus states for accessibility */
+.brain-toggle-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(222, 226, 230, 0.3);
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .brain-toggle-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .brain-toggle-btn .btn-text {
+    display: none;
+  }
+  
+  .brain-toggle-btn .btn-icon {
+    font-size: 16px;
+  }
+}
+
+/* Random Idea Button - Golden Chrome Style */
+.random-idea-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 50%, #f59e0b 100%);
+  border: 1px solid #fbbf24;
+  border-radius: 6px;
+  color: #92400e;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.random-idea-btn:hover {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 30%, #fbbf24 70%, #f59e0b 100%);
+  border-color: #fbbf24;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 251, 235, 0.8), 0 2px 6px rgba(251, 191, 36, 0.4);
+}
+
+.random-idea-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(253, 224, 71, 0.2);
+}
+
+.random-idea-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.random-idea-btn:hover::before {
+  left: 100%;
+}
+
+.random-idea-btn .btn-icon {
+  font-size: 16px;
+  display: inline-block;
+  animation: lightBulbPulse 2s ease-in-out infinite;
+}
+
+.random-idea-btn .btn-text {
+  font-weight: 500;
+}
+
+/* Light bulb pulse animation */
+@keyframes lightBulbPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Compact variant for toolbar */
+.random-idea-btn.compact {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.random-idea-btn.compact .btn-icon {
+  font-size: 14px;
+}
+
+/* Focus states for accessibility */
+.random-idea-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.3);
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .random-idea-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  .random-idea-btn .btn-text {
+    display: none;
+  }
+  
+  .random-idea-btn .btn-icon {
+    font-size: 16px;
+  }
+}
+
+.editor-info {
+    display: flex;
+    align-items: center;
+}
+
+.editor-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0.5rem 0 0;
+    color: #2c3e50;
+}
+
+.document-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+    margin-right: 16px;
+}
+
+.modified-indicator {
+    color: #e74c3c;
+    font-weight: 600;
+    margin-left: -4px;
+}
+
+.word-count {
+    background: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #666;
+}
+
+
+.toolbar-btn {
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: #374151;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.toolbar-btn:hover {
+    background: #f3f4f6;
+}
+
+.toolbar-btn.primary {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.toolbar-btn.primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+.toolbar-btn:disabled {
+    background: #f3f4f6;
+    color: #9ca3af;
+    border-color: #e5e7eb;
+    cursor: not-allowed;
+}
+
+/* Dropdown Styles */
+.toolbar-dropdown {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    margin-left: 4px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 2px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    min-width: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    margin-top: 0px;
+}
+
+.dropdown-content.show {
+    display: block;
+}
+
+.dropdown-content.file-menu {
+    min-width: 160px;
+}
+
+.dropdown-content button,
+.dropdown-content label {
+    display: block;
+    width: 100%;
+    padding: 6px 12px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+    border-radius: 0;
+    line-height: 1.4;
+}
+
+.dropdown-content button:hover,
+.dropdown-content label:hover {
+    background: #f3f4f6;
+}
+
+.dropdown-content button:disabled {
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+
+.document-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.15s ease;
+}
+
+.document-item:hover {
+    background-color: #f8fafc;
+}
+
+.document-item:last-child {
+    border-bottom: none;
+}
+
+.document-load-btn {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 0;
+    transition: none;
+    display: block;
+}
+
+.document-title {
+    font-weight: 500;
+    color: #1f2937;
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.document-meta {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.2;
+}
+
+
+.empty-state {
+    padding: 2px;
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 14px;
+}
+
+.file-input-label {
+    position: relative;
+    overflow: hidden;
+}
+
+.file-input {
+    position: absolute;
+    left: -9999px;
+}
+
+/* Main Editor Area */
+.editor-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.document-header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.document-title-input {
+    width: 100%;
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 8px 0;
+}
+
+.document-title-input::placeholder {
+    color: #bdc3c7;
+}
+
+.editor-content {
+    flex: 1;
+    overflow: auto;
 }
 
 .editor-container {
-    margin: 20px auto 20px auto;
-    border-radius: 2px;
-    max-width: 600px;
-    color: #000;
-    position: relative;
-    line-height: 20px;
-    font-weight: 400;
-    text-align: left;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .editor-inner {
-    background: #fff;
+    flex: 1;
+    background: #ffffff;
     position: relative;
 }
 
 .editor-input {
-    min-height: 150px;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
     resize: none;
-    font-size: 15px;
-    caret-color: rgb(5, 5, 5);
+    font-size: 16px;
+    line-height: 1.6;
+    color: #2c3e50;
     position: relative;
-    tab-size: 1;
+    tab-size: 2;
     outline: 0;
-    padding: 15px 10px;
-    caret-color: #444;
+    padding: 24px;
+    border: none;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
 }
 
-.tree-view-output {
-    display: block;
-    background: #222;
-    color: #fff;
-    padding: 5px;
-    font-size: 12px;
-    white-space: pre-wrap;
-    margin: 1px auto 10px auto;
-    max-height: 250px;
-    position: relative;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    overflow: auto;
-    line-height: 14px;
+.editor-placeholder {
+    color: #bdc3c7;
+    font-style: italic;
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    pointer-events: none;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
+/* Status Bar */
+.editor-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px;
+    background: #f8f9fa;
+    border-top: 1px solid #e0e0e0;
+    font-size: 13px;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auto-save-indicator {
+    color: #059669;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.auto-save-indicator::before {
+    content: "●";
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Lexical Editor Overrides */
 .editor-paragraph {
     margin: 0;
-    margin-bottom: 8px;
+    margin-bottom: 1.2em;
     position: relative;
 }
 
 .editor-paragraph:last-child {
     margin-bottom: 0;
+}
+
+/* Autocomplete Styles - Enhanced for minimal design */
+.autocomplete-entry {
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+    display: inline-block;
+    font-size: 14px;
+    border: 1px solid #bfdbfe;
+    transition: all 0.1s ease;
+}
+
+/* Shake animation for denied input attempts */
+.autocomplete-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    background-color: #fef2f2 !important;
+    color: #dc2626 !important;
+    border-color: #fca5a5 !important;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.autocomplete-dropdown {
+    position: fixed;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    min-width: 180px;
+    max-width: 280px;
+    z-index: 10000;
+    font-size: 14px;
+}
+
+.autocomplete-suggestion {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.15s ease;
+    line-height: 1.4;
+}
+
+.autocomplete-suggestion:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-suggestion:hover {
+    background-color: #f9fafb;
+}
+
+.autocomplete-suggestion.selected {
+    background-color: #eff6ff;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+
+/* CSS-based visual highlighting for active autocomplete trigger */
+.editor-container.autocomplete-active {
+    /* This class is applied when autocomplete is active */
+}
+
+/* Highlight effect for text that looks like <> patterns when autocomplete is active */
+.editor-container.autocomplete-active .editor-input {
+    /* Use CSS to create a subtle highlight effect around trigger patterns */
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(59, 130, 246, 0.1) 100%,
+        transparent 100%
+    );
+    border-radius: 4px;
+    transition: all 0.15s ease-out;
+}
+
+/* Alternative approach: Add a subtle glow effect */
+.editor-container.autocomplete-active .editor-input::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 6px;
+    pointer-events: none;
+    animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .minimal-editor {
+        height: 100vh;
+        margin: 0;
+        box-shadow: none;
+    }
+    
+    .editor-toolbar {
+        padding: 8px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .toolbar-actions {
+        gap: 6px;
+    }
+    
+    .toolbar-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    .document-header {
+        padding: 16px;
+    }
+    
+    .document-title-input {
+        font-size: 20px;
+    }
+    
+    .editor-input {
+        padding: 16px;
+        font-size: 15px;
+    }
+    
+    .dropdown-content {
+        min-width: 250px;
+        right: -50px;
+    }
+}
+
+/* Focus States */
+.document-title-input:focus {
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 6px;
+}
+
+.editor-input:focus {
+    background: #fdfdfd;
+}
+
+/* Loading States */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.toolbar-btn.active {
+    background: #eff6ff;
+    color: #1e40af;
+    border-color: #3b82f6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .minimal-editor {
+        margin-left: 0 !important;
+    }
+}
+
+
+/* Import Feedback Styles */
+.import-feedback {
+    position: absolute;
+    top: 100%;
+    right: 16px;
+    z-index: 1000;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    animation: slideInDown 0.2s ease-out;
+}
+
+.import-feedback.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.import-feedback.error {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
