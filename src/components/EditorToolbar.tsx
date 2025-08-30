@@ -201,6 +201,14 @@ export default function EditorToolbar({
 
       <div className="toolbar-right">
         <button 
+          className="brain-toggle-btn compact"
+          onClick={onToggleBrainPanel}
+          title={brainPanelVisible ? 'Hide brain panel' : 'Show brain panel'}
+        >
+          <span className="btn-icon">🧠</span>
+          <span className="btn-text">Brain</span>
+        </button>
+        <button 
           className="random-idea-btn compact"
           onClick={handleRandomIdea}
           title="Insert a random idea from the global brain"
@@ -217,14 +225,6 @@ export default function EditorToolbar({
             console.log('Idea submitted successfully!');
           }}
         />
-        <button 
-          className="brain-toggle-btn compact"
-          onClick={onToggleBrainPanel}
-          title={brainPanelVisible ? 'Hide brain panel' : 'Show brain panel'}
-        >
-          <span className="btn-icon">🧠</span>
-          <span className="btn-text">Brain</span>
-        </button>
       </div>
       
       {importFeedback && (
