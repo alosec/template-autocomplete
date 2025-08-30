@@ -122,7 +122,7 @@ test.describe('Autocomplete Basic Functionality', () => {
     await helper.selectAutocompleteOption();
     
     console.log('Step 4: Verify both autocomplete nodes exist');
-    const autocompleteNodes = page.locator('[data-lexical-decorator="true"]');
+    const autocompleteNodes = page.locator('[data-lexical-autocomplete="true"]');
     const nodeCount = await autocompleteNodes.count();
     console.log(`Found ${nodeCount} autocomplete nodes in editor`);
     expect(nodeCount).toBeGreaterThanOrEqual(2);

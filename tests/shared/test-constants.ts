@@ -21,7 +21,7 @@ export const SELECTORS = {
   editor: '[contenteditable]',
   dropdown: '.autocomplete-dropdown',
   dropdownItem: '.autocomplete-item',
-  autocompleteNode: '[data-lexical-decorator="true"]',
+  autocompleteNode: '[data-lexical-autocomplete="true"]',
 } as const;
 
 export const TIMEOUTS = {
