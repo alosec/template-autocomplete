@@ -1,0 +1,223 @@
+{
+  "timestamp": "2025-08-27T03:51:30.771Z",
+  "type": "content_structure_mapping",
+  "relationshipPatterns": {
+    "pinned": [
+      "/pinned/42e66332",
+      "/pinned/ae0b580f",
+      "/pinned/4933a382",
+      "/pinned/b0eb0ae8",
+      "/pinned/c8924adb",
+      "/pinned/3ba89e2f",
+      "/pinned/384edc53",
+      "/pinned/f2c4f1ed",
+      "/pinned/75de82dd",
+      "/pinned/5654a03d",
+      "/pinned/f5580114",
+      "/pinned/bb3dab97",
+      "/pinned/afd998a6",
+      "/pinned/68a7a31a",
+      "/pinned/3bea199d",
+      "/pinned/a1b0d78f"
+    ],
+    "all": [
+      "/all/4bcafb13",
+      "/all/4bcafb13-relationCombobox",
+      "/all/a5bd22b3",
+      "/all/14c1f65b",
+      "/all/14c1f65b-relationCombobox",
+      "/all/global-root-to-hashtags-relation-id",
+      "/all/global-root-to-hashtags-relation-id-relationCombobox",
+      "/all/1c13fcec",
+      "/all/global-root-to-global-types-id",
+      "/all/40280cb0",
+      "/all/6547bb13",
+      "/all/d207f765",
+      "/all/248281aa",
+      "/all/abd87b9b",
+      "/all/ab4c60a6",
+      "/all/2bcfd3ec",
+      "/all/7644ad72",
+      "/all/c6fed7fc",
+      "/all/925d50ba",
+      "/all/2af71d36",
+      "/all/4fca02e9",
+      "/all/6b9a268d",
+      "/all/aa3d5918",
+      "/all/aa3d5918-relationCombobox",
+      "/all/768e35ed",
+      "/all/768e35ed-relationCombobox",
+      "/all/cf7b7765",
+      "/all/5a87d9a3",
+      "/all/b95fff71",
+      "/all/718add63",
+      "/all/58ff6792",
+      "/all/5bd0606e",
+      "/all/fc7c4fbd",
+      "/all/2fcd3439",
+      "/all/9d8703a6",
+      "/all/5784e8e0",
+      "/all/c47d3ae3",
+      "/all/752dbeaf",
+      "/all/14c72488",
+      "/all/6daa054f",
+      "/all/bf8aa0fd",
+      "/all/d4b946e6",
+      "/all/f69b14f7",
+      "/all/06336d2a",
+      "/all/4f9f0323",
+      "/all/eee8d11d",
+      "/all/b59b2281"
+    ],
+    "relationComboboxes": [
+      "/all/4bcafb13-relationCombobox",
+      "/all/14c1f65b-relationCombobox",
+      "/all/global-root-to-hashtags-relation-id-relationCombobox",
+      "/all/aa3d5918-relationCombobox",
+      "/all/768e35ed-relationCombobox"
+    ],
+    "totalPinned": 16,
+    "totalAll": 47,
+    "totalComboboxes": 5
+  },
+  "relationCounters": [
+    {
+      "count": 51,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 16,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 10,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 4,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 1,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 3,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 19,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 16,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 39,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 2,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 30,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 5,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 3,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 3,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 2,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 5,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 13,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 3,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 1,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    },
+    {
+      "count": 108,
+      "categoryText": "",
+      "className": "RelatedObjectView_RelationCounter__Oqzvh RelatedObjectView_showTooltip__kVZSD"
+    }
+  ],
+  "lexicalNodes": {
+    "mentions": [
+      {
+        "text": "[Unloaded Node]",
+        "nodeId": "178e4140"
+      },
+      {
+        "text": "#dog",
+        "nodeId": "accdc339"
+      },
+      {
+        "text": "@[Unloaded Node]",
+        "nodeId": "64a6e9f8"
+      }
+    ],
+    "links": [
+      {
+        "text": "EdenChanHomepageedenchan717@gmail.com",
+        "href": "mailto:EdenChanHomepageedenchan717@gmail.com"
+      },
+      {
+        "text": "EdenChanHomepageedenchan717@gmail.comedenchan717@gmail.com",
+        "href": "mailto:EdenChanHomepageedenchan717@gmail.comedenchan717@gmail.com"
+      }
+    ],
+    "placeholders": [
+      "Start writing...",
+      "Start writing...",
+      "Start writing...",
+      "Start writing...",
+      "Start writing...",
+      "Start writing...",
+      "Start writing...",
+      "Start writing..."
+    ]
+  },
+  "sidebarSections": [],
+  "totalFunctionalIds": 246
+}

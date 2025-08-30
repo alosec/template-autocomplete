@@ -1,0 +1,164 @@
+{
+  "title": "Global Root - Zephyr",
+  "url": "https://edge.globalbrain.ai/g/global-root-id",
+  "extractedAt": "2025-08-27T03:43:42.183Z",
+  "categories": [
+    {
+      "text": "Global Root - Zephyr",
+      "count": null,
+      "tagName": "TITLE",
+      "className": ""
+    },
+    {
+      "text": "Recently Created Notes",
+      "count": null,
+      "tagName": "SPAN",
+      "className": "ResizableSidebar_ButtonText__xiWuX"
+    },
+    {
+      "text": "My Favorites",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "No favorites yet",
+      "count": null,
+      "tagName": "DIV",
+      "className": "SidebarTree_EmptyMessage__98K11"
+    },
+    {
+      "text": "My Hashtags",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "No hashtags yet",
+      "count": null,
+      "tagName": "DIV",
+      "className": "SidebarTree_EmptyMessage__98K11"
+    },
+    {
+      "text": "My Shortlinks",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Local Hashtags",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Local Mentions",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Notifications",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Global Root",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Sign in",
+      "count": null,
+      "tagName": "BUTTON",
+      "className": "Button_Button__KrbXR Button_active__J30wB Button_size-sm__0QEZK"
+    },
+    {
+      "text": "(Ctrl+/)",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Filters",
+      "count": null,
+      "tagName": "SPAN",
+      "className": "ControlsBar_HideOnMobile__fzyLk"
+    },
+    {
+      "text": "Sort by",
+      "count": null,
+      "tagName": "SPAN",
+      "className": "ControlsBar_HideOnMobile__fzyLk"
+    },
+    {
+      "text": "List View",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "Display",
+      "count": null,
+      "tagName": "SPAN",
+      "className": "ControlsBar_HideOnMobile__fzyLk"
+    },
+    {
+      "text": "Global Root",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "sublist:",
+      "count": null,
+      "tagName": "BUTTON",
+      "className": "Button_Button__KrbXR Button_ghost__6EVs7 Button_size-sm__0QEZK Button_Disabled__YxLSM RelationCombobox_RelationComboboxLabel__QpfuE"
+    },
+    {
+      "text": "Global Hashtags",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "System",
+      "count": 1,
+      "tagName": "DIV",
+      "className": "DropdownPlugin_RelatedObjectIndicator__Avtr6"
+    },
+    {
+      "text": "__global_relation_types__",
+      "count": null,
+      "tagName": "SPAN",
+      "className": ""
+    },
+    {
+      "text": "System",
+      "count": 108,
+      "tagName": "DIV",
+      "className": "DropdownPlugin_RelatedObjectIndicator__Avtr6"
+    },
+    {
+      "text": "sublist:",
+      "count": null,
+      "tagName": "BUTTON",
+      "className": "Button_Button__KrbXR Button_ghost__6EVs7 Button_size-sm__0QEZK Button_Disabled__YxLSM RelationCombobox_RelationComboboxLabel__QpfuE"
+    },
+    {
+      "text": "System",
+      "count": 121,
+      "tagName": "DIV",
+      "className": "DropdownPlugin_RelatedObjectIndicator__Avtr6"
+    },
+    {
+      "text": "(self.__next_f=self.__next_f||[]).push([0]);self.__next_f.push([2,null])",
+      "count": null,
+      "tagName": "SCRIPT",
+      "className": ""
+    }
+  ],
+  "totalFound": 26
+}

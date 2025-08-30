@@ -1,12 +1,8 @@
-import Editor from "./editor/Editor.tsx";
+import MinimalEditor from "./components/MinimalEditor";
+import "./styles.css";
 
 function App() {
-  return (
-    <>
-        <h1>React.js Plain Text Lexical Example</h1>
-        <Editor/>
-    </>
-  )
+  return <MinimalEditor />;
 }
 
-export default App
+export default App;
