@@ -5,7 +5,7 @@
 **Repository:** [https://github.com/alosec/template-autocomplete](https://github.com/alosec/template-autocomplete)  
 **Branch:** `submission/core-autocomplete-feature`
 
-This is the minimal implementation focusing on core autocomplete functionality as requested in the specification.
+This is the minimal implementation focusing on core autocomplete functionality as requested in the specification. For an enhanced version with additional features and UI improvements, see the [full product exploration](https://github.com/alosec/template-autocomplete/tree/submission/full-product-exploration) ([live demo](https://max.autocompleter.pages.dev)).
 
 ---
 
