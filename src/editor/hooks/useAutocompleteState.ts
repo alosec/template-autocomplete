@@ -6,9 +6,7 @@ export interface DropdownPosition {
   left: number;
 }
 
-interface AutocompleteItem {
-  text: string;
-}
+import { AutocompleteItem } from '../utils/autocompleteUtils';
 
 export interface AutocompleteState {
   isActive: boolean;

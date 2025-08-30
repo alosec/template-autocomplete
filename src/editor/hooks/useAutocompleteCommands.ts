@@ -21,7 +21,7 @@ import { insertAutocompleteNode, isCursorInAutocompleteNode, getCurrentAutocompl
 import { AutocompleteState, AutocompleteActions } from './useAutocompleteState';
 import { HIDE_AUTOCOMPLETE_COMMAND } from '../commands/autocompleteCommands';
 
-import { AutocompleteItem } from '../../types/GlobalBrainTypes';
+import { AutocompleteItem } from '../utils/autocompleteUtils';
 
 export interface AutocompleteCommandHandlers {
   selectSuggestion: (suggestion: AutocompleteItem) => void;

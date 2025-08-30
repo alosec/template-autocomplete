@@ -1,6 +1,13 @@
 import { TextNode, $getSelection, $isRangeSelection, $createTextNode, $createParagraphNode, $getRoot, LexicalNode } from 'lexical';
 import { $createAutocompleteNode, $isAutocompleteNode, AutocompleteNode } from '../nodes/AutocompleteNode';
-import { AutocompleteItem } from '../../types/GlobalBrainTypes';
+export interface AutocompleteItem {
+  text: string;
+  type?: string;
+  description?: string;
+  source?: string;
+  tags?: string[];
+  priority?: string;
+}
 
 export interface DropdownPosition {
   top: number;

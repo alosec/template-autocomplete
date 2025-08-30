@@ -1,8 +1,6 @@
 import { DropdownPosition } from '../utils/autocompleteUtils';
 
-interface AutocompleteItem {
-  text: string;
-}
+import { AutocompleteItem } from '../utils/autocompleteUtils';
 
 interface AutocompleteDropdownProps {
   suggestions: AutocompleteItem[];
