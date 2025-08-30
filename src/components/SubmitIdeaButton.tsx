@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NewIdeaSubmission, SubmissionStatus } from '../types/GlobalBrainTypes';
 import { API } from '../services/GlobalBrainAPI';
 import { useToast } from '../hooks/useToast';
+import { useGlobalBrain } from '../hooks/useGlobalBrain';
 import IdeaSubmissionModal from './IdeaSubmissionModal';
 import './SubmitIdeaButton.css';
 
@@ -27,6 +28,7 @@ export default function SubmitIdeaButton({
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('pending');
   const [submissionError, setSubmissionError] = useState<string | undefined>();
   const { success, error } = useToast();
+  const { addIdeaToCache } = useGlobalBrain();
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -49,6 +51,9 @@ export default function SubmitIdeaButton({
       
       if (response.success) {
         setSubmissionStatus('success');
+        
+        // Add idea to cache immediately for instant autocomplete availability
+        addIdeaToCache(idea);
         
         // Show success toast
         success(

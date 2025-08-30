@@ -117,6 +117,27 @@ export const useGlobalBrain = () => {
     }
   }, []);
 
+  const addIdeaToCache = useCallback((newIdea: NewIdeaSubmission) => {
+    // Create a CommunityIdea from the submission
+    const communityIdea: CommunityIdea = {
+      id: Date.now().toString(), // Temporary ID
+      text: newIdea.text,
+      type: newIdea.type,
+      description: newIdea.description || '',
+      tags: newIdea.tags,
+      priority: newIdea.priority || 'medium',
+      source: 'community-submission' as const,
+      submittedAt: new Date().toISOString(),
+      isNew: true,
+      threadRootId: newIdea.threadRootId,
+      parentId: newIdea.parentId,
+      threadOrder: newIdea.threadOrder || 0,
+    };
+
+    // Add to local ideas state immediately
+    setIdeas(prev => [communityIdea, ...prev]);
+  }, []);
+
   const refreshIdeas = useCallback(async () => {
     try {
       setLoading(true);
@@ -157,6 +178,7 @@ export const useGlobalBrain = () => {
     getSuggestionsByType,
     getRandomSuggestions,
     submitNewIdea,
+    addIdeaToCache,
     refreshIdeas,
     totalItems: allSuggestions.length
   };

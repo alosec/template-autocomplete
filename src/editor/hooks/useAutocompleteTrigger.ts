@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { LexicalEditor, TextNode, $getSelection, $isRangeSelection, $getRoot } from 'lexical';
 import { 
   detectTrigger, 
@@ -18,8 +18,13 @@ export function useAutocompleteTrigger(
   state: AutocompleteState
 ): void {
   const { suggestions } = useGlobalBrain();
+  const suggestionsRef = useRef(suggestions);
+  
+  // Keep suggestions ref up to date
+  suggestionsRef.current = suggestions;
+  
   // Helper function to check autocomplete state at current cursor position
-  const checkAutocompleteAtCursor = () => {
+  const checkAutocompleteAtCursor = useCallback(() => {
     editor.getEditorState().read(() => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
@@ -37,8 +42,8 @@ export function useAutocompleteTrigger(
         // Calculate dropdown position
         const triggerPosition = calculateDropdownPosition();
         
-        // Filter suggestions based on match string
-        const filtered = filterSuggestions(suggestions, triggerInfo.matchString);
+        // Filter suggestions based on match string - get fresh suggestions each time
+        const filtered = filterSuggestions(suggestionsRef.current, triggerInfo.matchString);
         
         // Show autocomplete for this trigger
         actions.showAutocomplete({
@@ -55,7 +60,7 @@ export function useAutocompleteTrigger(
         actions.hideAutocomplete();
       }
     });
-  };
+  }, [editor, actions, state.isActive]);
 
   // Single consolidated listener for all editor changes (text content and cursor position)
   useEffect(() => {
@@ -121,7 +126,10 @@ export function useAutocompleteTrigger(
     return () => {
       unregisterUpdateListener();
     };
-  }, [editor, actions, state.isActive, suggestions]);
+  }, [editor, actions, state.isActive, checkAutocompleteAtCursor]);
+
+  // Note: We don't need a separate effect for suggestions changes
+  // The main update listener already uses fresh suggestions via suggestionsRef
 
   // Listen for editor focus to re-check autocomplete when returning to editor
   useEffect(() => {

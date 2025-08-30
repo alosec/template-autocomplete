@@ -41,9 +41,11 @@ export default function TopBrainPanel({
   const [isResizing, setIsResizing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredResults, setFilteredResults] = useState<AutocompleteItem[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [selectedResultIndex, setSelectedResultIndex] = useState(0);
+  
+  // Get filtered results dynamically instead of caching them
+  const filteredResults = searchQuery.trim() ? getFilteredSuggestions(searchQuery) : [];
   const panelRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
   const startHeightRef = useRef(0);
@@ -89,14 +91,11 @@ export default function TopBrainPanel({
     setSelectedResultIndex(0);
     
     if (query.trim()) {
-      const results = getFilteredSuggestions(query);
-      setFilteredResults(results);
       setShowResults(true);
     } else {
       setShowResults(false);
-      setFilteredResults([]);
     }
-  }, [getFilteredSuggestions]);
+  }, []);
 
   const handleSearchFocus = useCallback(() => {
     if (searchQuery.trim()) {
