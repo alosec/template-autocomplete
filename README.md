@@ -1,3 +1,16 @@
+# Submission
+
+**Submitted by:** Alex  
+**Live Demo:** [max.autocompleter.pages.dev](https://max.autocompleter.pages.dev)  
+**Repository:** [https://github.com/alosec/template-autocomplete](https://github.com/alosec/template-autocomplete)  
+**Branch:** `submission/full-product-exploration`
+
+This is the full product exploration implementation with enhanced features, UI improvements, and additional functionality beyond the core specification.
+
+---
+
+## Original README
+
 # Ideaflow Technical JS take home
 
 Thanks for your interest in Ideaflow!
