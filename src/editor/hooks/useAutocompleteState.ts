@@ -98,10 +98,10 @@ export function useAutocompleteState(): [AutocompleteState, AutocompleteActions]
     setState(prev => ({ ...prev, selectedIndex: index }));
   }, []);
 
-  const getSelectedSuggestion = useCallback(() => {
+  const getSelectedSuggestion = () => {
     if (!state.isActive || state.suggestions.length === 0) return null;
     return state.suggestions[state.selectedIndex] || null;
-  }, [state.isActive, state.suggestions, state.selectedIndex]);
+  };
 
   const actions: AutocompleteActions = {
     showAutocomplete,

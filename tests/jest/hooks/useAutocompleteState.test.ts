@@ -156,7 +156,8 @@ describe('useAutocompleteState', () => {
     act(() => {
       actions.selectNext();
     });
-    selected = actions.getSelectedSuggestion();
+    const [, freshActions] = result.current;
+    selected = freshActions.getSelectedSuggestion();
     expect(selected).toEqual(testSuggestions[1]);
   });
 

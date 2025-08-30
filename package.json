@@ -36,8 +36,6 @@
     "test:backspace:gui": "npm run test:e2e:backspace:headed",
     "test:copypaste": "playwright test tests/playwright/specs/copy-paste-behavior.spec.ts",
     "test:copypaste:gui": "HEADED=1 playwright test tests/playwright/specs/copy-paste-behavior.spec.ts",
-    "test:critical-bug": "playwright test tests/playwright/specs/backspace-behavior.spec.ts --grep 'THE CRITICAL BUG'",
-    "test:critical-bug:gui": "HEADED=1 playwright test tests/playwright/specs/backspace-behavior.spec.ts --grep 'THE CRITICAL BUG'",
     "test:single-backspace": "playwright test tests/playwright/specs/backspace-behavior.spec.ts --grep 'removes entire autocomplete node with single backspace'",
     "test:single-backspace:gui": "HEADED=1 playwright test tests/playwright/specs/backspace-behavior.spec.ts --grep 'removes entire autocomplete node with single backspace'",
     "test:multi-backspace": "playwright test tests/playwright/specs/backspace-behavior.spec.ts --grep 'handles multiple consecutive autocomplete nodes'",
