@@ -82,9 +82,14 @@ test.describe('AutocompleteNode - Copy/Paste Debug', () => {
     console.log('=== Debugging clipboard data persistence across multiple operations ===');
     console.log('Purpose: Analyze how clipboard data changes or persists between multiple paste operations');
     
-    // Grant clipboard permissions for deeper debugging
+    // Grant clipboard permissions for deeper debugging (Chromium only)
     console.log('Action: Granting clipboard permissions for detailed analysis');
-    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    const browserName = page.context().browser()?.browserType().name();
+    if (browserName === 'chromium') {
+      await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    } else {
+      console.log('Note: Clipboard permissions not required for this browser');
+    }
     
     await page.goto('/');
     await page.waitForSelector('[contenteditable]');

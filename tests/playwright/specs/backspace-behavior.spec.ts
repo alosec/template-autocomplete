@@ -113,35 +113,48 @@ test.describe('AutocompleteNode - Backspace Behavior - The Critical Edge Case', 
     await page.waitForSelector('[contenteditable]');
     const editor = page.locator('[contenteditable]');
     
-    // Create initial structure: "Start [AutocompleteNode] End"
+    console.log('=== Testing backspace from beginning of text node ===');
+    console.log('Purpose: Verify backspace behavior when cursor is at start of text node after autocomplete');
+    
+    // Create initial structure: "Start [AutocompleteNode]End" (no space)
+    console.log('Action: Typing "Start <>" to trigger autocomplete');
     await editor.type('Start <>');
     await expect(page.locator('.autocomplete-dropdown')).toBeVisible();
+    console.log('Action: Pressing Enter to select autocomplete suggestion');
     await page.keyboard.press('Enter');
-    await page.keyboard.type(' End');
+    console.log('Action: Typing "End" directly after autocomplete (no space)');
+    await page.keyboard.type('End');
     
     // Wait for content to settle
     await page.waitForTimeout(100);
     
     let initialContent = await editor.textContent();
+    console.log('Initial content after setup:', JSON.stringify(initialContent));
     expect(initialContent).toContain('Start ');
-    expect(initialContent).toContain(' End');
-    expect(initialContent).toMatch(/Start .+ End/);
+    expect(initialContent).toContain('End');
+    expect(initialContent).toMatch(/Start .+End/); // No space before "End"
     
-    // Position cursor at beginning of " End" text (right after autocomplete node)
+    // Position cursor at beginning of "End" text (right after autocomplete node)
+    console.log('Action: Positioning cursor at beginning of "End" text');
     await page.keyboard.press('End');
-    await page.keyboard.press('ArrowLeft'); // Move back to beginning of " End"
-    await page.keyboard.press('ArrowLeft'); // Move back to beginning of " End"
-    await page.keyboard.press('ArrowLeft'); // Move back to beginning of " End"
+    await page.keyboard.press('ArrowLeft'); // Move back to beginning of "End"
+    await page.keyboard.press('ArrowLeft'); // Move back to beginning of "End"  
+    await page.keyboard.press('ArrowLeft'); // Move back to beginning of "End"
     
-    // Execute backspace from beginning of text node
+    console.log('Action: Pressing Backspace from beginning of text node');
     await page.keyboard.press('Backspace');
     
-    // Autocomplete node should be removed
+    // First backspace should remove the autocomplete node since cursor is at start of text node
     const finalContent = await editor.textContent();
-    expect(finalContent).toBe('Start  End');
+    console.log('Final content after backspace:', JSON.stringify(finalContent));
+    console.log('Expected: "Start End", Actual:', JSON.stringify(finalContent));
+    
+    expect(finalContent).toBe('Start End');
     expect(finalContent).not.toContain('Claude');
     expect(finalContent).not.toContain('Urban');
     expect(finalContent).not.toContain('hello');
+    
+    console.log('=== Backspace from beginning of text node test completed ===');
   });
 
   test('handles multiple consecutive autocomplete nodes with backspace', async ({ page }) => {

@@ -100,9 +100,14 @@ test.describe('AutocompleteNode - Copy/Paste Behavior', () => {
     console.log('=== Analyzing clipboard data during autocomplete copy operation ===');
     console.log('Purpose: Examine what data formats are available in clipboard when copying autocomplete nodes');
     
-    // Grant clipboard permissions
+    // Grant clipboard permissions (Chromium only)
     console.log('Action: Granting clipboard read/write permissions for analysis');
-    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    const browserName = page.context().browser()?.browserType().name();
+    if (browserName === 'chromium') {
+      await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    } else {
+      console.log('Note: Clipboard permissions not required for this browser');
+    }
     
     await page.goto('/');
     
