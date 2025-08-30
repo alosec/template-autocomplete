@@ -5,7 +5,7 @@
 **Repository:** [https://github.com/alosec/template-autocomplete](https://github.com/alosec/template-autocomplete)  
 **Branch:** `submission/full-product-exploration`
 
-This is the full product exploration implementation with enhanced features, UI improvements, and additional functionality beyond the core specification.
+This is the full product exploration implementation with enhanced features, UI improvements, and additional functionality beyond the core specification. For the minimal core implementation that strictly follows the specification, see the [core autocomplete feature](https://github.com/alosec/template-autocomplete/tree/submission/core-autocomplete-feature) ([live demo](https://autocompleter.pages.dev)).
 
 ---
 
