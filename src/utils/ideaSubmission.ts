@@ -109,19 +109,18 @@ export const inferContentType = (text: string, description: string): ContentType
   return 'item'; // Default fallback
 };
 
-export const parseDocumentStructure = (content: string): { title: string; description: string; tags: string[] } => {
+export const parseDocumentStructure = (content: string, documentTitle?: string): { title: string; description: string; tags: string[] } => {
   if (!content || content.trim().length === 0) {
-    return { title: '', description: '', tags: [] };
+    return { title: documentTitle || '', description: '', tags: [] };
   }
 
-  const lines = content.trim().split('\n').filter(line => line.trim().length > 0);
+  // Use document title if provided, otherwise fallback to first line
+  const title = documentTitle || content.trim().split('\n')[0]?.trim() || '';
   
-  // First line becomes title
-  const title = lines[0]?.trim() || '';
-  
-  // Rest becomes description
-  const descriptionLines = lines.slice(1);
-  const description = descriptionLines.join('\n').trim();
+  // Use entire content as description when document title is provided
+  const description = documentTitle 
+    ? content.trim() 
+    : content.trim().split('\n').slice(1).join('\n').trim();
   
   // Extract hashtags from entire content
   const hashtagRegex = /#(\w+)/g;

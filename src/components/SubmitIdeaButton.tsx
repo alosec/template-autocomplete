@@ -9,6 +9,7 @@ interface SubmitIdeaButtonProps {
   className?: string;
   onSubmissionSuccess?: () => void;
   prePopulatedContent?: string;
+  documentTitle?: string;
   threadContext?: {
     parentId?: string;
     threadRootId?: string;
@@ -19,6 +20,7 @@ export default function SubmitIdeaButton({
   className = '', 
   onSubmissionSuccess,
   prePopulatedContent = '',
+  documentTitle,
   threadContext
 }: SubmitIdeaButtonProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,6 +105,7 @@ export default function SubmitIdeaButton({
         submissionStatus={submissionStatus}
         submissionError={submissionError}
         prePopulatedContent={prePopulatedContent}
+        documentTitle={documentTitle}
         threadContext={threadContext}
       />
     </>

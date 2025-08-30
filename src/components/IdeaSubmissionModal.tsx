@@ -23,6 +23,7 @@ interface IdeaSubmissionModalProps {
   submissionStatus: SubmissionStatus;
   submissionError?: string;
   prePopulatedContent?: string;
+  documentTitle?: string;
   threadContext?: {
     parentId?: string;
     threadRootId?: string;
@@ -61,6 +62,7 @@ export default function IdeaSubmissionModal({
   submissionStatus,
   submissionError,
   prePopulatedContent = '',
+  documentTitle,
   threadContext,
 }: IdeaSubmissionModalProps) {
   const [formData, setFormData] = useState<NewIdeaSubmission>({
@@ -79,7 +81,7 @@ export default function IdeaSubmissionModal({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
-      const parsedContent = parseDocumentStructure(prePopulatedContent || '');
+      const parsedContent = parseDocumentStructure(prePopulatedContent || '', documentTitle);
       setFormData({
         text: parsedContent.title,
         type: 'item',
@@ -94,7 +96,7 @@ export default function IdeaSubmissionModal({
       setValidationErrors([]);
       setIsAutoInferring(true);
     }
-  }, [isOpen, prePopulatedContent, threadContext]);
+  }, [isOpen, prePopulatedContent, documentTitle, threadContext]);
 
   // Auto-infer content type and priority based on text and description
   useEffect(() => {

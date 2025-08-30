@@ -221,6 +221,7 @@ export default function EditorToolbar({
         <SubmitIdeaButton 
           className="compact"
           prePopulatedContent={currentDocument?.content || ''}
+          documentTitle={currentDocument?.title}
           threadContext={threadContext}
           onSubmissionSuccess={() => {
             console.log('Idea submitted successfully!');
