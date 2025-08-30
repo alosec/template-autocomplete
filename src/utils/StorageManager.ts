@@ -1,4 +1,5 @@
 import { Document, EditorSettings } from '../types/EditorTypes';
+import { CommunityIdea, NewIdeaSubmission } from '../types/GlobalBrainTypes';
 import { indexedDBHelper } from './IndexedDBHelper';
 
 const STORAGE_KEYS = {
@@ -259,6 +260,53 @@ export class StorageManager {
       indexedDB: indexedDBSize,
       total: localStorageSize + indexedDBSize
     };
+  }
+
+  // Global Brain Ideas methods
+  async saveGlobalBrainIdea(submission: NewIdeaSubmission): Promise<CommunityIdea> {
+    const idea: CommunityIdea = {
+      ...submission,
+      id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      submittedAt: new Date().toISOString(),
+      source: 'community-submission',
+      isNew: true,
+    };
+
+    await indexedDBHelper.saveGlobalBrainIdea(idea);
+    return idea;
+  }
+
+  async getAllGlobalBrainIdeas(): Promise<CommunityIdea[]> {
+    return await indexedDBHelper.getAllGlobalBrainIdeas();
+  }
+
+  async getGlobalBrainIdea(id: string): Promise<CommunityIdea | null> {
+    return await indexedDBHelper.getGlobalBrainIdea(id);
+  }
+
+  async searchGlobalBrainIdeas(query: string): Promise<CommunityIdea[]> {
+    const allIdeas = await this.getAllGlobalBrainIdeas();
+    const queryLower = query.toLowerCase();
+    
+    return allIdeas.filter(idea => 
+      idea.text.toLowerCase().includes(queryLower) ||
+      idea.description?.toLowerCase().includes(queryLower) ||
+      idea.tags.some(tag => tag.toLowerCase().includes(queryLower))
+    );
+  }
+
+  async getGlobalBrainSuggestions(query: string = ''): Promise<CommunityIdea[]> {
+    if (query.trim()) {
+      return await this.searchGlobalBrainIdeas(query);
+    }
+    
+    const allIdeas = await this.getAllGlobalBrainIdeas();
+    // Return random selection for empty queries
+    return allIdeas.sort(() => Math.random() - 0.5).slice(0, 10);
+  }
+
+  async deleteGlobalBrainIdea(id: string): Promise<void> {
+    await indexedDBHelper.deleteGlobalBrainIdea(id);
   }
 }
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NewIdeaSubmission, SubmissionStatus } from '../types/GlobalBrainTypes';
 import { API } from '../services/GlobalBrainAPI';
+import { useToast } from '../hooks/useToast';
 import IdeaSubmissionModal from './IdeaSubmissionModal';
 import './SubmitIdeaButton.css';
 
@@ -23,6 +24,7 @@ export default function SubmitIdeaButton({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('pending');
   const [submissionError, setSubmissionError] = useState<string | undefined>();
+  const { success, error } = useToast();
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -45,18 +47,40 @@ export default function SubmitIdeaButton({
       
       if (response.success) {
         setSubmissionStatus('success');
-        // Close modal after brief success display
-        setTimeout(() => {
-          setIsModalOpen(false);
-          onSubmissionSuccess?.();
-        }, 1500);
+        
+        // Show success toast
+        success(
+          'Idea shared successfully!', 
+          'Your idea has been added to the Global Brain and is now available for search and autocomplete.',
+          4000
+        );
+        
+        // Close modal immediately
+        setIsModalOpen(false);
+        onSubmissionSuccess?.();
       } else {
         setSubmissionStatus('error');
-        setSubmissionError(response.error || 'Failed to submit idea');
+        const errorMsg = response.error || 'Failed to submit idea';
+        setSubmissionError(errorMsg);
+        
+        // Show error toast
+        error(
+          'Failed to share idea',
+          errorMsg,
+          6000
+        );
       }
-    } catch (error) {
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Unknown error occurred';
       setSubmissionStatus('error');
-      setSubmissionError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setSubmissionError(errorMsg);
+      
+      // Show error toast
+      error(
+        'Failed to share idea',
+        errorMsg,
+        6000
+      );
     }
   };
 

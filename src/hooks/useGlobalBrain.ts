@@ -1,8 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
-import { GlobalBrainData, AutocompleteItem, NewIdeaSubmission } from '../types/GlobalBrainTypes';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { CommunityIdea, AutocompleteItem, NewIdeaSubmission, GlobalBrainData } from '../types/GlobalBrainTypes';
+import { API } from '../services/GlobalBrainAPI';
 
 export const useGlobalBrain = () => {
-  const [data, setData] = useState<GlobalBrainData | null>(null);
+  const [ideas, setIdeas] = useState<CommunityIdea[]>([]);
+  const [jsonSuggestions, setJsonSuggestions] = useState<AutocompleteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -12,15 +14,33 @@ export const useGlobalBrain = () => {
         setLoading(true);
         setError(null);
         
-        // Load the Global Brain autocomplete data
-        const response = await fetch('/data/global-brain-autocomplete.json');
+        // Load both JSON data and local storage data in parallel
+        const [jsonResponse, localResult] = await Promise.all([
+          fetch('/data/global-brain-autocomplete.json'),
+          API.getAllCommunityIdeas()
+        ]);
         
-        if (!response.ok) {
-          throw new Error(`Failed to load Global Brain data: ${response.status}`);
+        // Parse JSON data
+        let jsonData: AutocompleteItem[] = [];
+        if (jsonResponse.ok) {
+          const globalBrainData: GlobalBrainData = await jsonResponse.json();
+          jsonData = globalBrainData.suggestions || [];
+        } else {
+          console.warn('Failed to load JSON Global Brain data:', jsonResponse.status);
         }
         
-        const globalBrainData: GlobalBrainData = await response.json();
-        setData(globalBrainData);
+        // Get local storage data
+        let localData: CommunityIdea[] = [];
+        if (localResult.success) {
+          localData = localResult.data || [];
+        } else {
+          console.warn('Failed to load local Global Brain data:', localResult.error);
+        }
+        
+        setJsonSuggestions(jsonData);
+        setIdeas(localData);
+        
+        console.log(`Loaded Global Brain data: ${jsonData.length} JSON suggestions, ${localData.length} local ideas`);
       } catch (err) {
         console.error('Error loading Global Brain data:', err);
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
@@ -32,66 +52,62 @@ export const useGlobalBrain = () => {
     loadData();
   }, []);
 
-  const getFilteredSuggestions = useCallback((query: string = '') => {
-    if (!data?.suggestions) return [];
+  // Combine JSON suggestions and local ideas into unified suggestions list
+  const allSuggestions = useMemo(() => {
+    // Convert local ideas to AutocompleteItem format and combine with JSON suggestions
+    const localAsAutocomplete: AutocompleteItem[] = ideas.map(idea => ({
+      text: idea.text,
+      type: idea.type,
+      tags: idea.tags,
+      description: idea.description,
+      source: idea.source,
+      priority: idea.priority || 'medium',
+    }));
     
-    if (!query.trim()) return data.suggestions;
+    // Combine JSON suggestions (from original file) with local suggestions
+    // Put local suggestions first so they appear at the top
+    return [...localAsAutocomplete, ...jsonSuggestions];
+  }, [ideas, jsonSuggestions]);
+
+  const getFilteredSuggestions = useCallback((query: string = '') => {
+    if (!allSuggestions.length) return [];
+    
+    if (!query.trim()) return allSuggestions;
     
     const queryLower = query.toLowerCase();
-    return data.suggestions.filter(item => 
-      item.text.toLowerCase().includes(queryLower)
+    return allSuggestions.filter(suggestion => 
+      suggestion.text.toLowerCase().includes(queryLower) ||
+      suggestion.description?.toLowerCase().includes(queryLower) ||
+      suggestion.tags.some(tag => tag.toLowerCase().includes(queryLower))
     );
-  }, [data]);
+  }, [allSuggestions]);
 
   const getSuggestionsByType = useCallback((type: string) => {
-    if (!data?.suggestions) return [];
-    return data.suggestions.filter(item => item.type === type);
-  }, [data]);
+    if (!allSuggestions.length) return [];
+    return allSuggestions.filter(suggestion => suggestion.type === type);
+  }, [allSuggestions]);
 
   const getRandomSuggestions = useCallback((count: number = 10) => {
-    if (!data?.suggestions) return [];
+    if (!allSuggestions.length) return [];
     
-    const shuffled = [...data.suggestions].sort(() => Math.random() - 0.5);
+    const shuffled = [...allSuggestions].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
-  }, [data]);
+  }, [allSuggestions]);
 
   const submitNewIdea = useCallback(async (newIdea: NewIdeaSubmission): Promise<boolean> => {
     try {
-      if (!data) throw new Error('Global Brain data not loaded');
-
-      // Create new autocomplete item with generated metadata
-      const newItem: AutocompleteItem = {
-        ...newIdea,
-        source: 'global-brain-generic' as const,
-      };
-
-      // Update local state immediately for optimistic UI
-      const updatedData: GlobalBrainData = {
-        ...data,
-        metadata: {
-          ...data.metadata,
-          totalItems: data.metadata.totalItems + 1,
-          extractionStats: {
-            ...data.metadata.extractionStats,
-            totalItems: data.metadata.extractionStats.totalItems + 1,
-            validItems: data.metadata.extractionStats.validItems + 1,
-          }
-        },
-        suggestions: [newItem, ...data.suggestions]
-      };
-
-      setData(updatedData);
-
-      // In a real implementation, this would POST to an API
-      // For now, we'll simulate the submission
-      console.log('New idea submitted:', newItem);
+      // Submit to local storage
+      const result = await API.submitIdea(newIdea);
       
-      // TODO: Replace with actual API call when deploying
-      // await fetch('/api/ideas', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(newItem)
-      // });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to submit idea');
+      }
+
+      // Refresh the ideas list to include the new idea
+      const updatedResult = await API.getAllCommunityIdeas();
+      if (updatedResult.success) {
+        setIdeas(updatedResult.data || []);
+      }
 
       return true;
     } catch (err) {
@@ -99,17 +115,49 @@ export const useGlobalBrain = () => {
       setError(err instanceof Error ? err.message : 'Failed to submit idea');
       return false;
     }
-  }, [data]);
+  }, []);
+
+  const refreshIdeas = useCallback(async () => {
+    try {
+      setLoading(true);
+      
+      // Reload both JSON data and local storage data
+      const [jsonResponse, localResult] = await Promise.all([
+        fetch('/data/global-brain-autocomplete.json'),
+        API.getAllCommunityIdeas()
+      ]);
+      
+      // Update JSON data
+      if (jsonResponse.ok) {
+        const globalBrainData: GlobalBrainData = await jsonResponse.json();
+        setJsonSuggestions(globalBrainData.suggestions || []);
+      }
+      
+      // Update local data
+      if (localResult.success) {
+        setIdeas(localResult.data || []);
+        setError(null);
+      } else {
+        setError(localResult.error || 'Failed to refresh ideas');
+      }
+    } catch (err) {
+      console.error('Error refreshing ideas:', err);
+      setError(err instanceof Error ? err.message : 'Failed to refresh ideas');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return {
-    data,
+    ideas,
     loading,
     error,
-    suggestions: data?.suggestions || [],
+    suggestions: allSuggestions,
     getFilteredSuggestions,
     getSuggestionsByType,
     getRandomSuggestions,
     submitNewIdea,
-    totalItems: data?.metadata.totalItems || 0
+    refreshIdeas,
+    totalItems: allSuggestions.length
   };
 };

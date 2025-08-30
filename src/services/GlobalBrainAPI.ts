@@ -6,71 +6,63 @@ import {
   CommunityIdea 
 } from '../types/GlobalBrainTypes';
 import { Thread, ThreadPost } from '../types/EditorTypes';
+import { storageManager } from '../utils/StorageManager';
 
-const API_BASE_URL = import.meta.env.VITE_GLOBAL_BRAIN_API_URL || 'http://localhost:8787';
-
+// Local storage-based implementation for Global Brain
 export class GlobalBrainAPI {
-  private static async request<T>(
-    endpoint: string, 
-    options: RequestInit = {}
-  ): Promise<ApiResponse<T>> {
+  /**
+   * Submit a new idea to the local global brain
+   */
+  static async submitIdea(idea: NewIdeaSubmission): Promise<ApiResponse<IdeaSubmissionResponse>> {
     try {
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          ...options.headers,
-        },
-        ...options,
-      });
-
-      const data = await response.json();
+      const savedIdea = await storageManager.saveGlobalBrainIdea(idea);
       
-      if (!response.ok) {
-        return {
-          success: false,
-          error: data.error || `HTTP ${response.status}: ${response.statusText}`,
-          timestamp: new Date().toISOString(),
-        };
-      }
-
       return {
         success: true,
-        data,
+        data: {
+          id: savedIdea.id,
+          submittedAt: savedIdea.submittedAt,
+          status: 'accepted',
+        },
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown network error',
+        error: error instanceof Error ? error.message : 'Failed to save idea locally',
         timestamp: new Date().toISOString(),
       };
     }
   }
 
   /**
-   * Submit a new idea to the community global brain
-   */
-  static async submitIdea(idea: NewIdeaSubmission): Promise<ApiResponse<IdeaSubmissionResponse>> {
-    return this.request<IdeaSubmissionResponse>('/api/ideas', {
-      method: 'POST',
-      body: JSON.stringify({
-        ...idea,
-        submittedAt: new Date().toISOString(),
-      }),
-    });
-  }
-
-  /**
-   * Sync with community ideas (get new/updated ideas since last sync)
+   * Sync with local ideas (returns all local ideas)
    */
   static async syncCommunityIdeas(lastSync?: Date): Promise<ApiResponse<SyncResponse>> {
-    const params = new URLSearchParams();
-    if (lastSync) {
-      params.set('since', lastSync.toISOString());
+    try {
+      const allIdeas = await storageManager.getAllGlobalBrainIdeas();
+      
+      // Filter by lastSync if provided
+      const filteredIdeas = lastSync 
+        ? allIdeas.filter(idea => new Date(idea.submittedAt) > lastSync)
+        : allIdeas;
+      
+      return {
+        success: true,
+        data: {
+          newIdeas: filteredIdeas,
+          totalCount: allIdeas.length,
+          lastSyncTimestamp: new Date().toISOString(),
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to sync local ideas',
+        timestamp: new Date().toISOString(),
+      };
     }
-    
-    const endpoint = `/api/sync${params.toString() ? `?${params}` : ''}`;
-    return this.request<SyncResponse>(endpoint);
   }
 
   /**
@@ -81,35 +73,170 @@ export class GlobalBrainAPI {
     recentIdeas: number;
     lastUpdated: string;
   }>> {
-    return this.request('/api/stats');
+    try {
+      const allIdeas = await storageManager.getAllGlobalBrainIdeas();
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      
+      const recentIdeas = allIdeas.filter(
+        idea => new Date(idea.submittedAt) > oneWeekAgo
+      );
+      
+      return {
+        success: true,
+        data: {
+          totalIdeas: allIdeas.length,
+          recentIdeas: recentIdeas.length,
+          lastUpdated: new Date().toISOString(),
+        },
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get local stats',
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 
   /**
-   * Health check for the API
+   * Health check - always returns healthy for local storage
    */
   static async healthCheck(): Promise<ApiResponse<{ status: string; timestamp: string }>> {
-    return this.request('/api/health');
+    return {
+      success: true,
+      data: {
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    };
   }
 
   /**
-   * Get all community ideas (for initial load or full refresh)
+   * Get all community ideas from local storage
    */
   static async getAllCommunityIdeas(): Promise<ApiResponse<CommunityIdea[]>> {
-    return this.request<CommunityIdea[]>('/api/ideas');
+    try {
+      const allIdeas = await storageManager.getAllGlobalBrainIdeas();
+      
+      return {
+        success: true,
+        data: allIdeas,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get local ideas',
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 
   /**
-   * Get a specific thread by ID
+   * Get a specific thread by ID - simplified for local storage
    */
   static async getThread(threadRootId: string): Promise<ApiResponse<Thread>> {
-    return this.request<Thread>(`/api/threads/${threadRootId}`);
+    try {
+      const allIdeas = await storageManager.getAllGlobalBrainIdeas();
+      const threadIdeas = allIdeas.filter(
+        idea => idea.threadRootId === threadRootId || idea.id === threadRootId
+      );
+      
+      if (threadIdeas.length === 0) {
+        return {
+          success: false,
+          error: 'Thread not found',
+          timestamp: new Date().toISOString(),
+        };
+      }
+
+      // Convert CommunityIdea to Thread structure
+      const rootIdea = threadIdeas.find(idea => idea.id === threadRootId) || threadIdeas[0];
+      const replies = threadIdeas.filter(idea => idea.parentId && idea.id !== threadRootId);
+      
+      const thread: Thread = {
+        rootPost: {
+          id: rootIdea.id,
+          text: rootIdea.text,
+          description: rootIdea.description || '',
+          tags: rootIdea.tags,
+          type: rootIdea.type,
+          submittedAt: rootIdea.submittedAt,
+          threadOrder: 0,
+          priority: rootIdea.priority || 'medium',
+          source: rootIdea.source,
+          votes: 0,
+          isNew: rootIdea.isNew || false,
+        },
+        posts: replies.map((idea, index) => ({
+          id: idea.id,
+          text: idea.text,
+          description: idea.description || '',
+          tags: idea.tags,
+          type: idea.type,
+          submittedAt: idea.submittedAt,
+          threadOrder: index + 1,
+          parentId: idea.parentId,
+          priority: idea.priority || 'medium',
+          source: idea.source,
+          votes: 0,
+          isNew: idea.isNew || false,
+        })),
+        totalPosts: threadIdeas.length,
+      };
+
+      return {
+        success: true,
+        data: thread,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get thread',
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 
   /**
    * Get all replies for a specific post
    */
   static async getThreadReplies(postId: string): Promise<ApiResponse<ThreadPost[]>> {
-    return this.request<ThreadPost[]>(`/api/posts/${postId}/replies`);
+    try {
+      const allIdeas = await storageManager.getAllGlobalBrainIdeas();
+      const replies = allIdeas
+        .filter(idea => idea.parentId === postId)
+        .map((idea, index) => ({
+          id: idea.id,
+          text: idea.text,
+          description: idea.description || '',
+          tags: idea.tags,
+          type: idea.type,
+          submittedAt: idea.submittedAt,
+          threadOrder: index,
+          parentId: idea.parentId,
+          priority: idea.priority || 'medium',
+          source: idea.source,
+          votes: 0,
+          isNew: idea.isNew || false,
+        }));
+      
+      return {
+        success: true,
+        data: replies,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get replies',
+        timestamp: new Date().toISOString(),
+      };
+    }
   }
 
   /**
@@ -119,110 +246,26 @@ export class GlobalBrainAPI {
     parentId: string, 
     idea: NewIdeaSubmission
   ): Promise<ApiResponse<IdeaSubmissionResponse>> {
-    return this.request<IdeaSubmissionResponse>('/api/ideas', {
-      method: 'POST',
-      body: JSON.stringify({
-        ...idea,
-        parentId,
-        submittedAt: new Date().toISOString(),
-      }),
-    });
-  }
-}
-
-// Utility functions for local development/fallback
-export class LocalFallbackAPI {
-  private static readonly LOCAL_STORAGE_KEY = 'global-brain-community-ideas';
-  
-  static async submitIdea(idea: NewIdeaSubmission): Promise<ApiResponse<IdeaSubmissionResponse>> {
     try {
-      const existingIdeas = this.getLocalIdeas();
-      const newIdea: CommunityIdea = {
-        ...idea,
-        id: `local-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        submittedAt: new Date().toISOString(),
-        source: 'community-submission',
-        isNew: true,
-      };
-      
-      existingIdeas.push(newIdea);
-      localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(existingIdeas));
-      
-      return {
-        success: true,
-        data: {
-          id: newIdea.id,
-          submittedAt: newIdea.submittedAt,
-          status: 'accepted',
-        },
-        timestamp: new Date().toISOString(),
-      };
+      const ideaWithParent = { ...idea, parentId };
+      return await this.submitIdea(ideaWithParent);
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Local storage error',
+        error: error instanceof Error ? error.message : 'Failed to add to thread',
         timestamp: new Date().toISOString(),
       };
     }
   }
-  
-  static async getAllCommunityIdeas(): Promise<ApiResponse<CommunityIdea[]>> {
-    return {
-      success: true,
-      data: this.getLocalIdeas(),
-      timestamp: new Date().toISOString(),
-    };
-  }
-  
-  private static getLocalIdeas(): CommunityIdea[] {
-    try {
-      const stored = localStorage.getItem(this.LOCAL_STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  }
 }
 
-// Smart API client that falls back to local storage in development
+// Export simplified API that uses local storage only
 export const API = {
-  async submitIdea(idea: NewIdeaSubmission): Promise<ApiResponse<IdeaSubmissionResponse>> {
-    // Try production API first
-    const result = await GlobalBrainAPI.submitIdea(idea);
-    
-    // If production fails and we're in development, use local fallback
-    if (!result.success && import.meta.env.DEV) {
-      console.warn('Production API failed, using local fallback:', result.error);
-      return LocalFallbackAPI.submitIdea(idea);
-    }
-    
-    return result;
-  },
-  
-  async syncCommunityIdeas(lastSync?: Date): Promise<ApiResponse<SyncResponse>> {
-    const result = await GlobalBrainAPI.syncCommunityIdeas(lastSync);
-    
-    if (!result.success && import.meta.env.DEV) {
-      // For local fallback, return local ideas as sync response
-      const localResult = await LocalFallbackAPI.getAllCommunityIdeas();
-      if (localResult.success) {
-        return {
-          success: true,
-          data: {
-            newIdeas: localResult.data || [],
-            totalCount: (localResult.data || []).length,
-            lastSyncTimestamp: new Date().toISOString(),
-          },
-          timestamp: new Date().toISOString(),
-        };
-      }
-    }
-    
-    return result;
-  },
-  
+  submitIdea: GlobalBrainAPI.submitIdea.bind(GlobalBrainAPI),
+  syncCommunityIdeas: GlobalBrainAPI.syncCommunityIdeas.bind(GlobalBrainAPI),
   getCommunityStats: GlobalBrainAPI.getCommunityStats.bind(GlobalBrainAPI),
   healthCheck: GlobalBrainAPI.healthCheck.bind(GlobalBrainAPI),
+  getAllCommunityIdeas: GlobalBrainAPI.getAllCommunityIdeas.bind(GlobalBrainAPI),
   getThread: GlobalBrainAPI.getThread.bind(GlobalBrainAPI),
   getThreadReplies: GlobalBrainAPI.getThreadReplies.bind(GlobalBrainAPI),
   addToThread: GlobalBrainAPI.addToThread.bind(GlobalBrainAPI),

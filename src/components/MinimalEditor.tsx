@@ -9,10 +9,12 @@ import EditorToolbar from './EditorToolbar';
 import EditorWithSync from './EditorWithSync';
 import TopBrainPanel from './TopBrainPanel';
 import ThreadDisplay from './ThreadDisplay';
+import { ToastContainer } from './Toast';
 import { Document, Thread, ThreadPost } from '../types/EditorTypes';
 import { documentManager } from '../utils/DocumentManager';
 import { NavigationHistory, getNextIntelligentIndex } from '../utils/brainNavigation';
 import { useGlobalBrain } from '../hooks/useGlobalBrain';
+import { ToastContext, useToastProvider } from '../hooks/useToast';
 
 const editorConfig = {
   namespace: 'MinimalEditor',
@@ -25,7 +27,7 @@ const editorConfig = {
   },
 };
 
-export default function MinimalEditor() {
+function MinimalEditorInner() {
   const [currentDocument, setCurrentDocument] = useState<Document | null>(null);
   const [isModified, setIsModified] = useState(false);
   const [brainPanelVisible, setBrainPanelVisible] = useState(false);
@@ -36,7 +38,7 @@ export default function MinimalEditor() {
   const editorRef = useRef<LexicalEditor | null>(null);
 
   // Shared brain navigation state
-  const { suggestions } = useGlobalBrain();
+  const { suggestions, refreshIdeas } = useGlobalBrain();
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [seenIndices, setSeenIndices] = useState<Set<number>>(new Set());
   const navigationHistory = useRef(new NavigationHistory());
@@ -260,6 +262,7 @@ export default function MinimalEditor() {
         editorRef={editorRef}
         onRandomIdea={handleRandomIdea}
         threadContext={threadContext}
+        onBrainRefresh={refreshIdeas}
       />
       
       <TopBrainPanel 
@@ -338,5 +341,19 @@ export default function MinimalEditor() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function MinimalEditor() {
+  const toastProvider = useToastProvider();
+  
+  return (
+    <ToastContext.Provider value={toastProvider}>
+      <MinimalEditorInner />
+      <ToastContainer 
+        toasts={toastProvider.toasts} 
+        onDismiss={toastProvider.removeToast} 
+      />
+    </ToastContext.Provider>
   );
 }
