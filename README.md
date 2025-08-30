@@ -1,3 +1,16 @@
+# Submission
+
+**Submitted by:** Alex  
+**Live Demo:** [autocompleter.pages.dev](https://autocompleter.pages.dev)  
+**Repository:** [https://github.com/alosec/template-autocomplete](https://github.com/alosec/template-autocomplete)  
+**Branch:** `submission/core-autocomplete-feature`
+
+This is the minimal implementation focusing on core autocomplete functionality as requested in the specification.
+
+---
+
+## Original README
+
 # Ideaflow Technical JS take home
 
 Thanks for your interest in Ideaflow!
