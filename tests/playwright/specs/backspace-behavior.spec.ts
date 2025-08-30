@@ -39,14 +39,15 @@ test.describe('AutocompleteNode - Backspace Behavior - The Critical Edge Case', 
     expect(finalContent).not.toContain('hello');
   });
 
-  test('THE CRITICAL BUG: typing attempt changes subsequent backspace behavior', async ({ page }) => {
+  test('backspace behavior remains consistent after blocked typing attempts in autocomplete nodes', async ({ page }) => {
     await page.goto('/');
     
     // Wait for the editor to be ready
     await page.waitForSelector('[contenteditable]');
     const editor = page.locator('[contenteditable]');
     
-    console.log('=== Starting critical bug test ===');
+    console.log('=== Testing backspace consistency after blocked typing attempts ===');
+    console.log('Purpose: Verify that attempting to type in autocomplete nodes does not break subsequent backspace functionality');
     
     // Type the trigger pattern and create autocomplete node
     console.log('Action: Typing "Before <>" to trigger autocomplete');
@@ -86,23 +87,23 @@ test.describe('AutocompleteNode - Backspace Behavior - The Critical Edge Case', 
     console.log('Action: Moving cursor to end position');
     await page.keyboard.press('End');
     
-    // Execute backspace - THIS IS WHERE THE BUG SHOULD MANIFEST
-    // If the bug exists, backspace might not work properly after typing attempt
+    // Execute backspace - testing for consistency after blocked typing
+    // Backspace should work normally despite the previous typing attempt being blocked
     console.log('Action: Pressing Backspace (this is where the bug should manifest)');
     await page.keyboard.press('Backspace');
     
-    // CRITICAL TEST: Verify that backspace still works correctly
+    // VERIFICATION: Confirm that backspace still works correctly after typing attempt
     // The autocomplete node should be completely removed in one backspace
     const finalContent = await editor.textContent();
     console.log('Final content after backspace:', JSON.stringify(finalContent));
-    console.log('Expected: "Before ", Actual:', JSON.stringify(finalContent));
+    console.log('Expected: "Before  " (with two spaces), Actual:', JSON.stringify(finalContent));
     
     expect(finalContent).toBe('Before  '); // Two spaces: original + trailing space from autocomplete
     expect(finalContent).not.toContain('Claude');
     expect(finalContent).not.toContain('Urban');
     expect(finalContent).not.toContain('hello');
     
-    console.log('=== Critical bug test completed ===');
+    console.log('=== Backspace consistency test completed ===');
   });
 
   test('backspace from beginning of text node removes previous autocomplete node', async ({ page }) => {
